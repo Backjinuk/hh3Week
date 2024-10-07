@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: hh3week
+
+  datasource:
+    url: 'jdbc:h2:file:/db/H2/hh3week;AUTO_SERVER=true'
+    username: 'sa'
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true  # SQL? ??
+    properties:
+      hibernate:
+        format_sql: false  # SQL? ?? ?? ??
