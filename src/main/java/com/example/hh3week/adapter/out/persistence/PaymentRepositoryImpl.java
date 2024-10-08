@@ -2,11 +2,9 @@ package com.example.hh3week.adapter.out.persistence;
 
 import org.springframework.stereotype.Repository;
 
-import com.example.hh3week.application.domain.payment.repository.PaymentHistoryRepository;
-import com.example.hh3week.application.domain.payment.service.PaymentHistoryService;
+import com.example.hh3week.application.port.out.PaymentRepositoryPort;
 
 @Repository
-public class PaymentRepositoryImpl implements PaymentHistoryRepository {
-
+public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 
 }

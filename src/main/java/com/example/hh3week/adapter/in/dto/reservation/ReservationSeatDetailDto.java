@@ -1,7 +1,7 @@
 package com.example.hh3week.adapter.in.dto.reservation;
 
-import com.example.hh3week.application.domain.reservation.entity.ReservationSeatDetail;
-import com.example.hh3week.application.domain.reservation.entity.ReservationStatus;
+import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
+import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

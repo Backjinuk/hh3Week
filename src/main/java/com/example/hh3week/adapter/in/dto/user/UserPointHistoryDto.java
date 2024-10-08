@@ -2,7 +2,7 @@ package com.example.hh3week.adapter.in.dto.user;
 
 import java.time.LocalDateTime;
 
-import com.example.hh3week.application.domain.user.entity.PointStatus;
+import com.example.hh3week.domain.user.entity.PointStatus;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

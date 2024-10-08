@@ -1,9 +1,9 @@
 package com.example.hh3week.adapter.in.dto.payment;
 
-import com.example.hh3week.application.domain.payment.entity.PaymentHistory;
-import com.example.hh3week.application.domain.payment.entity.PaymentStatus;
 
-import lombok.AllArgsConstructor;
+import com.example.hh3week.domain.payment.entity.PaymentHistory;
+import com.example.hh3week.domain.payment.entity.PaymentStatus;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,6 @@
-package com.example.hh3week.adapter.in.dto.concert;
+package com.example.hh3week.domain.concert.entity;
 
-import com.example.hh3week.domain.concert.entity.ConcertSchedule;
-import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;
+import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConcertScheduleDto {
+public class ConcertSchedule {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,19 +29,19 @@ public class ConcertScheduleDto {
 	private long concertPrice;
 
 	@Builder
-	public ConcertScheduleDto(long concertScheduleId, long concertId, ConcertScheduleStatus concertScheduleStatus,
-		long concertPrice) {
+	public ConcertSchedule(long concertScheduleId, long concertId,  ConcertScheduleStatus concertScheduleStatus, long concertPrice ){
 		this.concertScheduleId = concertScheduleId;
 		this.concertId = concertId;
 		this.concertScheduleStatus = concertScheduleStatus;
 		this.concertPrice = concertPrice;
 	}
 
-	public static ConcertScheduleDto toDto(ConcertSchedule concertSchedule) {
-		return ConcertScheduleDto.builder()
-			.concertScheduleId(concertSchedule.getConcertScheduleId())
-			.concertId(concertSchedule.getConcertId())
-			.concertPrice(concertSchedule.getConcertPrice())
+	public static ConcertSchedule ToEntity (ConcertScheduleDto concertScheduleDto){
+		return ConcertSchedule.builder()
+			.concertScheduleId(concertScheduleDto.getConcertScheduleId())
+			.concertId(concertScheduleDto.getConcertId())
+			.concertScheduleStatus(concertScheduleDto.getConcertScheduleStatus())
+			.concertPrice(concertScheduleDto.getConcertPrice())
 			.build();
 	}
 }

@@ -1,13 +1,8 @@
 package com.example.hh3week.adapter.in.dto.concert;
 
 import java.time.LocalDateTime;
+import com.example.hh3week.domain.concert.entity.Concert;
 
-import com.example.hh3week.application.domain.concert.entity.Concert;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

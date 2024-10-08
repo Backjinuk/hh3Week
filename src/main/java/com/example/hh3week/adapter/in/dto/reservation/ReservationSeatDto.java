@@ -1,8 +1,9 @@
 package com.example.hh3week.adapter.in.dto.reservation;
 
-import com.example.hh3week.application.domain.reservation.entity.ReservationSeat;
 
-import lombok.AllArgsConstructor;
+
+import com.example.hh3week.domain.reservation.entity.ReservationSeat;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
