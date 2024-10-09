@@ -1,5 +1,7 @@
 package com.example.hh3week.domain.concert.entity;
 
+import java.time.LocalDateTime;
+
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 
 import jakarta.persistence.Entity;
@@ -28,12 +30,19 @@ public class ConcertSchedule {
 
 	private long concertPrice;
 
+	private LocalDateTime startDt;
+
+	private LocalDateTime endDt;
+
 	@Builder
-	public ConcertSchedule(long concertScheduleId, long concertId,  ConcertScheduleStatus concertScheduleStatus, long concertPrice ){
+	public ConcertSchedule(long concertScheduleId, long concertId, ConcertScheduleStatus concertScheduleStatus,
+		long concertPrice, LocalDateTime startDt, LocalDateTime endDt) {
 		this.concertScheduleId = concertScheduleId;
 		this.concertId = concertId;
 		this.concertScheduleStatus = concertScheduleStatus;
 		this.concertPrice = concertPrice;
+		this.startDt = startDt;
+		this.endDt = endDt;
 	}
 
 	public static ConcertSchedule ToEntity (ConcertScheduleDto concertScheduleDto){

@@ -43,8 +43,6 @@ erDiagram
         int concert_id PK
         string concert_name
         string concert_content
-        timestamp start_dt
-        timestamp end_dt
     }
 
     ConcertSchedule {
@@ -52,6 +50,8 @@ erDiagram
         int concert_id FK
         string concert_schedule_status
         long concert_price
+        timestamp start_dt
+        timestamp end_dt
     }
 
     Token {

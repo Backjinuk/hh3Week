@@ -1,5 +1,7 @@
 package com.example.hh3week.adapter.in.dto.concert;
 
+import java.time.LocalDateTime;
+
 import com.example.hh3week.domain.concert.entity.ConcertSchedule;
 import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;
 
@@ -29,14 +31,23 @@ public class ConcertScheduleDto {
 
 	private long concertPrice;
 
+	private LocalDateTime startDt;
+
+	private LocalDateTime endDt;
+
 	@Builder
 	public ConcertScheduleDto(long concertScheduleId, long concertId, ConcertScheduleStatus concertScheduleStatus,
-		long concertPrice) {
+		long concertPrice, LocalDateTime startDt, LocalDateTime endDt) {
 		this.concertScheduleId = concertScheduleId;
 		this.concertId = concertId;
 		this.concertScheduleStatus = concertScheduleStatus;
 		this.concertPrice = concertPrice;
+		this.startDt = startDt;
+		this.endDt = endDt;
 	}
+
+
+
 
 	public static ConcertScheduleDto toDto(ConcertSchedule concertSchedule) {
 		return ConcertScheduleDto.builder()
