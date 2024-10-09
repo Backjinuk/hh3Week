@@ -1,107 +1,7 @@
-# 콘서트 예약 서비스
-* * *
+## API Specs
 
-- `콘서트 예약 서비스`를 구현해 봅니다.
-- 대기열 시스템을 구축하고, 예약 서비스는 작업가능한 유저만 수행할 수 있도록 해야합니다.
-- 사용자는 좌석예약 시에 미리 충전한 잔액을 이용합니다.
-- 좌석 예약 요청시에, 결제가 이루어지지 않더라도 일정 시간동안 다른 유저가 해당 좌석에 접근할 수 없도록 합니다.
+1️⃣ **`주요` 유저 대기열 토큰 기능**
 
-> ## 프로젝트 아케텍쳐 <br>
->프로젝트 아케텍쳐는 [프로젝트 아키텍쳐 바로가기](./docs/Architecture.md) 에서 확인하실 수 있습니다.
-
-> ## MileStone <br>
-> MileStone 은 <a href="https://github.com/users/Backjinuk/projects/5/views/1">Github Projects</a>에서 확인하실 수 있습니다.
-
-
-##  요구사항
-* * *
-- 아래 5가지 API 를 구현합니다.
-  1. 유저 토큰 발급 API
-  2. 예약 가능 날짜 / 좌석 API
-  3. 좌석 예약 요청 API
-  4. 잔액 충전 / 조회 API
-  5. 결제 API
-- 각 기능 및 제약사항에 대해 단위 테스트를 반드시 하나 이상 작성하도록 합니다.
-- 다수의 인스턴스로 어플리케이션이 동작하더라도 기능에 문제가 없도록 작성하도록 합니다.
-- 동시성 이슈를 고려하여 구현합니다.
-- 대기열 개념을 고려해 구현합니다.
-
-
-
-## 목차
-- - -
-[1. 예약 가능 날짜 / 좌석 API](#1-예약-가능-날짜--좌석-api)
-
-[2. 잔액 충전 / 조회 API](#2-잔액-충전--조회-api)
-
-[3. 유저 대기열 토큰 기능](#3-유저-대기열-토큰-기능)
-
-[4. 결제 API](#4-결제-api)
-
-[5. 좌석 예약 요청 API](#5-좌석-예약-요청-API)
-
-* * *
-
-## 1. 예약 가능 날짜 / 좌석 API
-- - -
-- 예약가능한 날짜와 해당 날짜의 좌석을 조회하는 API 를 각각 작성합니다.
-- 예약 가능한 날짜 목록을 조회할 수 있습니다.
-- 날짜 정보를 입력받아 예약가능한 좌석정보를 조회할 수 있습니다.
-
-```mermaid
-sequenceDiagram
-  actor client as 사용자
-  participant ConcertSchedule as ConcertSchedule
-  participant ReservationSeat as ReservationSeat
-  participant ReservationSeatDetail as ReservationSeatDetail
-
-  client->>+ConcertSchedule: 예약 가능한 날짜 요청
-  ConcertSchedule-->>-client: 예약 가능한 날짜 반환
-
-  client->>+ReservationSeat: 예약 날짜의 좌석 요청
-  ReservationSeat->>ReservationSeat: 남은 좌석 확인
-
-  ReservationSeat->>+ReservationSeatDetail: 좌석 목록 조회
-  ReservationSeatDetail-->>-ReservationSeat: 좌석 목록 반환
-
-  ReservationSeat-->>-client: 예약가능한 날짜의 좌석 목록 반환
-```
-
-* * * 
-
-## 2. 잔액 충전 / 조회 API
-- - -
-- 결제에 사용될 금액을 API 를 통해 충전하는 API 를 작성합니다.
-- 사용자 식별자 및 충전할 금액을 받아 잔액을 충전합니다.
-- 사용자 식별자를 통해 해당 사용자의 잔액을 조회합니다.
-
-```mermaid
-sequenceDiagram
-    actor client as 사용자
-    participant User as User
-    participant UserPointHistory as UserPointHistory
-
-%% 충전 요청
-    client->>+User: 충전 요청(충전 금액)
-    activate User
-
-    User->>User: 충전 금액 검증
-    alt 충전 성공
-        User->>User: 충전 처리
-        User->>+UserPointHistory: 충전 히스토리 등록
-        UserPointHistory-->>User: 히스토리 등록 완료
-    else 충전 실패
-        User-->>client: 충전 실패 메시지 반환
-    end
-
-%% 충전 상태 반환
-    User-->>client: 충전 완료 상태 반환
-    deactivate User
-
-```
-
-## 3. 유저 대기열 토큰 기능
-- - -
 - 서비스를 이용할 토큰을 발급받는 API를 작성합니다.
 - 토큰은 유저의 UUID 와 해당 유저의 대기열을 관리할 수 있는 정보 ( 대기 순서 or 잔여 시간 등 ) 를 포함합니다.
 - 이후 모든 API 는 위 토큰을 이용해 대기열 검증을 통과해야 이용 가능합니다.
@@ -130,50 +30,37 @@ sequenceDiagram
         Token-->>client: 토큰 반환
     deactivate Token
 ```
-## 4. 결제 API
-- - -
-- 결제 처리하고 결제 내역을 생성하는 API 를 작성합니다.
-- 결제가 완료되면 해당 좌석의 소유권을 유저에게 배정하고 대기열 토큰을 만료시킵니다.
+
+
+**2️⃣ `기본` 예약 가능 날짜 / 좌석 API**
+
+- 예약가능한 날짜와 해당 날짜의 좌석을 조회하는 API 를 각각 작성합니다.
+- 예약 가능한 날짜 목록을 조회할 수 있습니다.
+- 날짜 정보를 입력받아 예약가능한 좌석정보를 조회할 수 있습니다.
 
 ```mermaid
 sequenceDiagram
     actor client as 사용자
-    participant User as User
+    participant ConcertSchedule as ConcertSchedule
+    participant ReservationSeat as ReservationSeat
     participant ReservationSeatDetail as ReservationSeatDetail
-    participant WaitingQueue as WaitingQueue
-    participant PaymentHistory as PaymentHistory
 
-%% 결제 요청
-    client->>+User: 결제 요청
-    activate User
+    client->>+ConcertSchedule: 예약 가능한 날짜 요청
+    ConcertSchedule-->>-client: 예약 가능한 날짜 반환
 
-%% 결제 처리
-    User->>User: 결제 처리
+    client->>+ReservationSeat: 예약 날짜의 좌석 요청
+    ReservationSeat->>ReservationSeat: 남은 좌석 확인
 
-    alt 결제 성공
-    %% 결제 내역 생성
-        User->>+PaymentHistory: 결제 내역 생성
-        PaymentHistory-->>User: 결제 내역 생성 완료
-
-    %% 좌석 소유권 배정
-        User->>+ReservationSeatDetail: 좌석 소유권 배정
-        ReservationSeatDetail-->>User: 소유권 배정 완료
-
-    %% 대기열 토큰 만료
-        User->>+WaitingQueue: 대기열 토큰 만료 처리
-        WaitingQueue-->>User: 토큰 만료 완료
-
-        User-->>client: 결제 성공 메시지 반환
-    else 결제 실패
-        User-->>client: 결제 실패 메시지 반환
-    end
-
-    deactivate User
+        ReservationSeat->>+ReservationSeatDetail: 좌석 목록 조회
+        ReservationSeatDetail-->>-ReservationSeat: 좌석 목록 반환
+    
+    ReservationSeat-->>-client: 예약가능한 날짜의 좌석 목록 반환
 ```
 
 
-## 5. 좌석 예약 요청 API
-- - -
+
+3️⃣ **`주요` 좌석 예약 요청 API**
+
 - 날짜와 좌석 정보를 입력받아 좌석을 예약 처리하는 API 를 작성합니다.
 - 좌석 예약과 동시에 해당 좌석은 그 유저에게 약 5분간 임시 배정됩니다. ( 시간은 정책에 따라 자율적으로 정의합니다. )
 - 만약 배정 시간 내에 결제가 완료되지 않는다면 좌석에 대한 임시 배정은 해제되어야 하며 다른 사용자는 예약할 수 없어야 한다.
@@ -248,4 +135,78 @@ sequenceDiagram
     %% 좌석 예약 반환 메시지
     ConcertSchedule-->>client: 좌석 예약 반환
     deactivate ConcertSchedule
+
+```
+
+
+4️⃣ **`기본`**  **잔액 충전 / 조회 API**
+
+- 결제에 사용될 금액을 API 를 통해 충전하는 API 를 작성합니다.
+- 사용자 식별자 및 충전할 금액을 받아 잔액을 충전합니다.
+- 사용자 식별자를 통해 해당 사용자의 잔액을 조회합니다.
+
+```mermaid
+sequenceDiagram
+    actor client as 사용자
+    participant User as User
+    participant UserPointHistory as UserPointHistory
+
+%% 충전 요청
+    client->>+User: 충전 요청(충전 금액)
+    activate User
+
+    User->>User: 충전 금액 검증
+    alt 충전 성공
+        User->>User: 충전 처리
+        User->>+UserPointHistory: 충전 히스토리 등록
+        UserPointHistory-->>User: 히스토리 등록 완료
+    else 충전 실패
+        User-->>client: 충전 실패 메시지 반환
+    end
+
+%% 충전 상태 반환
+    User-->>client: 충전 완료 상태 반환
+    deactivate User
+
+```
+
+5️⃣ **`주요` 결제 API**
+
+- 결제 처리하고 결제 내역을 생성하는 API 를 작성합니다.
+- 결제가 완료되면 해당 좌석의 소유권을 유저에게 배정하고 대기열 토큰을 만료시킵니다.
+
+```mermaid
+sequenceDiagram
+    actor client as 사용자
+    participant User as User
+    participant ReservationSeatDetail as ReservationSeatDetail
+    participant WaitingQueue as WaitingQueue
+    participant PaymentHistory as PaymentHistory
+
+%% 결제 요청
+    client->>+User: 결제 요청
+    activate User
+
+%% 결제 처리
+    User->>User: 결제 처리
+
+    alt 결제 성공
+    %% 결제 내역 생성
+        User->>+PaymentHistory: 결제 내역 생성
+        PaymentHistory-->>User: 결제 내역 생성 완료
+
+    %% 좌석 소유권 배정
+        User->>+ReservationSeatDetail: 좌석 소유권 배정
+        ReservationSeatDetail-->>User: 소유권 배정 완료
+
+    %% 대기열 토큰 만료
+        User->>+WaitingQueue: 대기열 토큰 만료 처리
+        WaitingQueue-->>User: 토큰 만료 완료
+
+        User-->>client: 결제 성공 메시지 반환
+    else 결제 실패
+        User-->>client: 결제 실패 메시지 반환
+    end
+
+    deactivate User
 ```
