@@ -5,12 +5,12 @@ import com.example.hh3week.domain.payment.entity.PaymentHistory;
 import com.example.hh3week.domain.payment.entity.PaymentStatus;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class PaymentHistoryDto {
 	private long paymentId;

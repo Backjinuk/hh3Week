@@ -23,12 +23,6 @@ public class EntityValidation {
 		if (!StringUtils.hasText(concert.getConcertContent())) {
 			throw new IllegalArgumentException("콘서트 내용은 비워둘 수 없습니다.");
 		}
-		if (concert.getStartDt() == null) {
-			throw new IllegalArgumentException("시작 날짜는 null일 수 없습니다.");
-		}
-		if (concert.getEndDt() == null) {
-			throw new IllegalArgumentException("종료 날짜는 null일 수 없습니다.");
-		}
 	}
 
 	public void validateUser(User user) {

@@ -5,12 +5,12 @@ package com.example.hh3week.adapter.in.dto.reservation;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class ReservationSeatDto {
 	private long seatId;

@@ -6,14 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Data
+@NoArgsConstructor
 public class UserDto {
 
 	@Id
@@ -29,6 +30,9 @@ public class UserDto {
 		this.userId = userId;
 		this.userName = userName;
 		this.pointBalance = pointBalance;
+	}
+
+	public UserDto(Long userId, Integer updatedBalance, String 향해_테스트) {
 	}
 
 	public static UserDto toDto(User user) {

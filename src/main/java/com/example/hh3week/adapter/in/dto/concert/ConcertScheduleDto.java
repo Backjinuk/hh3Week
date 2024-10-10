@@ -11,13 +11,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Getter
-@Setter
+
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConcertScheduleDto {
 

@@ -29,26 +29,21 @@ public class Concert {
 
 	private String concertContent;
 
-	private LocalDateTime startDt;
-
-	private LocalDateTime endDt;
-
 	@Builder
-	public Concert(long concertId, String concertName, String concertContent, LocalDateTime startDt,
-		LocalDateTime endDt) {
+	public Concert(long concertId, String concertName, String concertContent) {
 		this.concertId = concertId;
 		this.concertName = concertName;
 		this.concertContent = concertContent;
-		this.startDt = startDt;
-		this.endDt = endDt;
 	}
+
+
+
+
 
 	public static Concert ToEntity(ConcertDto concertDto) {
 		return Concert.builder()
 			.concertName(concertDto.getConcertName())
 			.concertContent(concertDto.getConcertContent())
-			.startDt(concertDto.getStartDt())
-			.endDt(concertDto.getEndDt())
 			.build();
 	}
 }

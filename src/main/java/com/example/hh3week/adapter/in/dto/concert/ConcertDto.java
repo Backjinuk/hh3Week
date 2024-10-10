@@ -4,12 +4,12 @@ import java.time.LocalDateTime;
 import com.example.hh3week.domain.concert.entity.Concert;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class ConcertDto {
 
@@ -19,27 +19,21 @@ public class ConcertDto {
 
 	private String concertContent;
 
-	private LocalDateTime startDt;
-
-	private LocalDateTime endDt;
-
 	@Builder
-	public ConcertDto(long concertId, String concertName, String concertContent, LocalDateTime startDt,
-		LocalDateTime endDt) {
+	public ConcertDto(long concertId, String concertName, String concertContent) {
 		this.concertId = concertId;
 		this.concertName = concertName;
 		this.concertContent = concertContent;
-		this.startDt = startDt;
-		this.endDt = endDt;
 	}
+
+
+
 
 	public static ConcertDto toDto(Concert concert){
 		return ConcertDto.builder()
 			.concertId(concert.getConcertId())
 			.concertName(concert.getConcertName())
 			.concertContent(concert.getConcertContent())
-			.startDt(concert.getStartDt())
-			.endDt(concert.getEndDt())
 			.build();
 	}
 }

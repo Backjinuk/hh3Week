@@ -1,0 +1,587 @@
+openapi: 3.0.3
+info:
+  title: HH3Week API
+  description: >
+    이 API는 사용자가 서비스를 이용하기 위해 토큰을 발급받고, 해당 토큰의 대기 번호를 조회할 수 있으며,
+    예약 가능한 날짜와 해당 날짜의 좌석 정보를 조회할 수 있고, 잔액을 충전 및 조회하며, 결제를 처리하는 기능을 제공합니다.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: 로컬 개발 서버
+paths:
+  /api/v1/tokens:
+    post:
+      summary: 토큰 생성
+      description: >
+        사용자가 서비스를 이용하기 위해 새로운 토큰을 생성합니다. 토큰은 사용자의 UUID와 대기 순서를 포함합니다.
+      tags:
+        - Token
+      requestBody:
+        description: 토큰 생성을 위한 사용자 정보
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+            example:
+              userId: 1
+      responses:
+        '201':
+          description: "토큰이 성공적으로 생성됨"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenDto'
+              example:
+                tokenId: 10
+                userId: 1
+                token: "550e8400-e29b-41d4-a716-446655440000"
+                issuedAt: "2024-10-09T10:00:00"
+                expiresAt: "2024-10-09T10:05:00"
+        '400':
+          description: "잘못된 요청 (예: 유효하지 않은 사용자 ID)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Bad Request"
+                message: "User ID는 필수입니다."
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "토큰 생성 중 오류가 발생했습니다."
+  /api/v1/tokens/{token}/queue:
+    get:
+      summary: 대기 번호 조회
+      description: >
+        사용자가 생성한 토큰의 대기 번호를 조회합니다.
+      tags:
+        - Token
+      parameters:
+        - name: token
+          in: path
+          description: 조회할 토큰 값
+          required: true
+          schema:
+            type: string
+            example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: "대기 번호 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 1
+        '404':
+          description: "토큰을 찾을 수 없음"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "토큰을 찾을 수 없습니다."
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "대기 번호 조회 중 오류가 발생했습니다."
+  /api/v1/reservations/dates:
+    get:
+      summary: 예약 가능한 날짜 목록 조회
+      description: >
+        예약 가능한 날짜와 해당 날짜의 총 좌석 수를 조회합니다.
+      tags:
+        - Reservation
+      responses:
+        '200':
+          description: "예약 가능한 날짜 목록 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                      description: "예약 가능한 날짜"
+                      example: "2024-10-10"
+                    availableSeats:
+                      type: integer
+                      description: "해당 날짜에 예약 가능한 총 좌석 수"
+                      example: 50
+              example:
+                - date: "2024-10-10"
+                  availableSeats: 50
+                - date: "2024-10-12"
+                  availableSeats: 50
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "예약 가능한 날짜 조회 중 오류가 발생했습니다."
+  /api/v1/reservations/dates/{date}/seats:
+    get:
+      summary: 특정 날짜의 예약 가능한 좌석 조회
+      description: >
+        특정 날짜에 예약 가능한 모든 좌석의 상세 정보를 조회합니다.
+      tags:
+        - Reservation
+      parameters:
+        - name: date
+          in: path
+          description: 조회할 예약 날짜 (예: "2024-10-10")
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-10-10"
+      responses:
+        '200':
+          description: "예약 가능한 좌석 조회 성공"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationSeatDetailDto'
+              example:
+                - seatDetailId: 1
+                  userId: 0
+                  seatId: 1
+                  seatCode: "A1"
+                  reservationStatus: "AVAILABLE"
+                  seatPrice: 10000
+                - seatDetailId: 2
+                  userId: 0
+                  seatId: 2
+                  seatCode: "A2"
+                  reservationStatus: "AVAILABLE"
+                  seatPrice: 10000
+        '400':
+          description: "잘못된 요청 (예: 날짜 형식 오류)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid Date Format"
+                message: "날짜 형식이 올바르지 않습니다. 예: 2024-10-10"
+        '404':
+          description: "해당 날짜에 예약 가능한 좌석이 없음"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "해당 날짜에 예약 가능한 좌석이 없습니다."
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "예약 가능한 좌석 조회 중 오류가 발생했습니다."
+  /mock-api/v1/balance:
+    post:
+      summary: 잔액 충전
+      description: >
+        사용자 식별자와 충전할 금액을 받아 사용자의 잔액을 충전합니다.
+      tags:
+        - User
+      requestBody:
+        description: 잔액 충전을 위한 사용자 정보 및 충전 금액
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPointHistoryDto'
+            example:
+              userId: 1
+              pointAmount: 5000
+      responses:
+        '200':
+          description: "잔액 충전 성공"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+              example:
+                userId: 1
+                pointBalance: 15000
+                userName: "향해 테스트"
+        '400':
+          description: "잘못된 요청 (예: 유효하지 않은 사용자 ID 또는 충전 금액)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Bad Request"
+                message: "User ID와 충전 금액은 필수이며, 충전 금액은 음수가 될 수 없습니다."
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "잔액 충전 중 오류가 발생했습니다."
+  /mock-api/v1/balance/{userId}:
+    get:
+      summary: 잔액 조회
+      description: >
+        사용자 식별자를 통해 해당 사용자의 현재 잔액을 조회합니다.
+      tags:
+        - User
+      parameters:
+        - name: userId
+          in: path
+          description: 조회할 사용자 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: "잔액 조회 성공"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+              example:
+                userId: 1
+                pointBalance: 15000
+                userName: "향해 테스트"
+        '404':
+          description: "사용자를 찾을 수 없음"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "사용자를 찾을 수 없습니다."
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal Server Error"
+                message: "잔액 조회 중 오류가 발생했습니다."
+    /api/v1/payments/processPayment:
+      post:
+        summary: 결제 처리
+        description: >
+          결제를 처리하고 결제 내역을 생성합니다. 결제가 완료되면 해당 좌석의 소유권을 유저에게 배정하고 대기열 토큰을 만료시킵니다.
+        tags:
+          - Payment
+        requestBody:
+          description: 결제 처리를 위한 결제 정보
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentHistoryDto'
+              example:
+                userId: 1
+                reservationId: 2
+                amount: 10000.0
+        responses:
+          '200':
+            description: "결제 처리 성공"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/PaymentHistoryDto'
+                example:
+                  paymentId: 10
+                  userId: 1
+                  reservationId: 2
+                  amount: 10000.0
+                  paymentStatus: "COMPLETED"
+          '400':
+            description: "잘못된 요청 (예: 유효하지 않은 결제 정보)"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: "오류 유형"
+                      example: "Bad Request"
+                    message:
+                      type: string
+                      description: "오류 상세 메시지"
+                      example: "User ID, Reservation ID, 그리고 유효한 금액은 필수입니다."
+          '500':
+            description: "서버 내부 오류"
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      description: "오류 유형"
+                      example: "Internal Server Error"
+                    message:
+                      type: string
+                      description: "오류 상세 메시지"
+                      example: "결제 처리 중 오류가 발생했습니다."
+  /api/v1/payments/payments/{paymentId}:
+    get:
+      summary: 결제 내역 조회
+      description: >
+        결제 ID를 통해 해당 결제의 상세 내역을 조회합니다.
+      tags:
+        - Payment
+      parameters:
+        - name: paymentId
+          in: path
+          description: 조회할 결제 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 10
+      responses:
+        '200':
+          description: "결제 내역 조회 성공"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentHistoryDto'
+              example:
+                paymentId: 10
+                userId: 1
+                reservationId: 2
+                amount: 10000.0
+                paymentStatus: "COMPLETED"
+        '404':
+          description: "결제 내역을 찾을 수 없음"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: "오류 유형"
+                    example: "Not Found"
+                  message:
+                    type: string
+                    description: "오류 상세 메시지"
+                    example: "결제 내역을 찾을 수 없습니다."
+        '500':
+          description: "서버 내부 오류"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: "오류 유형"
+                    example: "Internal Server Error"
+                  message:
+                    type: string
+                    description: "오류 상세 메시지"
+                    example: "결제 내역 조회 중 오류가 발생했습니다."
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: "사용자 ID"
+          example: 1
+        pointBalance:
+          type: integer
+          description: "사용자의 현재 잔액"
+          example: 15000
+        userName:
+          type: string
+          description: "사용자 이름"
+          example: "향해 테스트"
+      required:
+        - userId
+        - pointBalance
+        - userName
+    TokenDto:
+      type: object
+      properties:
+        tokenId:
+          type: integer
+          format: int64
+          description: "토큰 ID"
+          example: 10
+        userId:
+          type: integer
+          format: int64
+          description: "사용자 ID"
+          example: 1
+        token:
+          type: string
+          description: "생성된 토큰 값 (UUID)"
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        issuedAt:
+          type: string
+          format: date-time
+          description: "토큰 발급 시각"
+          example: "2024-10-09T10:00:00"
+        expiresAt:
+          type: string
+          format: date-time
+          description: "토큰 만료 시각"
+          example: "2024-10-09T10:05:00"
+      required:
+        - tokenId
+        - userId
+        - token
+        - issuedAt
+        - expiresAt
+    ReservationSeatDetailDto:
+      type: object
+      properties:
+        seatDetailId:
+          type: integer
+          format: int64
+          description: "좌석 상세 ID"
+          example: 1
+        userId:
+          type: integer
+          format: int64
+          description: "사용자 ID (예약되지 않은 경우 0)"
+          example: 0
+        seatId:
+          type: integer
+          format: int64
+          description: "좌석 번호"
+          example: 1
+        seatCode:
+          type: string
+          description: "좌석 코드"
+          example: "A1"
+        reservationStatus:
+          type: string
+          description: "좌석 예약 상태"
+          enum: ["AVAILABLE", "RESERVED"]
+          example: "AVAILABLE"
+        seatPrice:
+          type: integer
+          description: "좌석 가격"
+          example: 10000
+      required:
+        - seatDetailId
+        - userId
+        - seatId
+        - seatCode
+        - reservationStatus
+        - seatPrice
+    UserPointHistoryDto:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: "사용자 ID"
+          example: 1
+        pointAmount:
+          type: integer
+          description: "충전할 금액"
+          example: 5000
+      required:
+        - userId
+        - pointAmount
+    PaymentHistoryDto:
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          format: int64
+          description: "결제 ID"
+          example: 10
+        userId:
+          type: integer
+          format: int64
+          description: "사용자 ID"
+          example: 1
+        reservationId:
+          type: integer
+          format: int64
+          description: "예약 ID"
+          example: 2
+        amount:
+          type: number
+          format: double
+          description: "결제 금액"
+          example: 10000.0
+        paymentStatus:
+          type: string
+          description: "결제 상태"
+          enum: ["PENDING", "COMPLETED", "FAILED"]
+          example: "COMPLETED"
+      required:
+        - paymentId
+        - userId
+        - reservationId
+        - amount
+        - paymentStatus
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: "오류 유형"
+          example: "Bad Request"
+        message:
+          type: string
+          description: "오류 상세 메시지"
+          example: "User ID와 충전 금액은 필수이며, 충전 금액은 음수가 될 수 없습니다."
+      required:
+        - error
+        - message
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: []
+tags:
+  - name: Token
+    description: "토큰 관련 API"
+  - name: Reservation
+    description: "예약 관련 API"
+  - name: User
+    description: "사용자 관련 API"
+  - name: Payment
+    description: "결제 관련 API"
