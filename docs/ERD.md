@@ -71,17 +71,17 @@ erDiagram
         int priority
     }
 
-    User ||--o{ PointHistory : "has"
-    User ||--o{ PaymentHistory : "has"
-    User ||--o{ ReservationSeatDetail : "has"
-    User ||--o{ WaitingQueue : "has"
-    User ||--o{ Token : "has"
+    User ||--o{ PointHistory : ""
+    User ||--o{ PaymentHistory : ""
+    User ||--o{ ReservationSeatDetail : ""
+    User ||--o{ WaitingQueue : ""
+    User ||--o{ Token : ""
 
-    Concert ||--o{ ConcertSchedule : "has"
-    ConcertSchedule ||--o{ ReservationSeat : "has"
-    ConcertSchedule ||--o{ WaitingQueue : "has"
+    Concert ||--o{ ConcertSchedule : ""
+    ConcertSchedule ||--o{ ReservationSeat : ""
+    ConcertSchedule ||--o{ WaitingQueue : ""
 
-    ReservationSeat ||--o{ ReservationSeatDetail : "has"
-    ReservationSeatDetail ||--o{ PaymentHistory : "has"
+    ReservationSeat ||--o{ ReservationSeatDetail : ""
+    ReservationSeatDetail ||--o{ PaymentHistory : ""
 
 ```

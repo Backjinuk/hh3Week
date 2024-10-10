@@ -40,6 +40,11 @@
 
 [5. 좌석 예약 요청 API](#5-좌석-예약-요청-API)
 
+[6. ERD](#6-ERD)
+
+[7. Class Diagram](#7-class-diagram)
+
+[8. API Spec](#8-api-명세서)
 * * *
 
 ## 1. 예약 가능 날짜 / 좌석 API
@@ -249,3 +254,203 @@ sequenceDiagram
     ConcertSchedule-->>client: 좌석 예약 반환
     deactivate ConcertSchedule
 ```
+
+## 6. ERD
+
+```mermaid
+erDiagram
+  User {
+    int user_id PK
+    string user_name
+    long point_balance
+  }
+
+  UserPointHistory {
+    int history_id PK
+    int user_id FK
+    long point_amount
+    string point_status
+    timestamp point_date
+  }
+
+  PaymentHistory {
+    int payment_id PK
+    int user_id FK
+    int reservation_id FK
+    long payment_amount
+    string payment_status
+  }
+
+  ReservationSeat {
+    int seat_id PK
+    int concert_schedule_id FK
+    int max_capacity
+    int current_reserved
+    string seat_status
+  }
+
+  ReservationSeatDetail {
+    int seat_detail_id PK
+    int user_id FK
+    int seat_id FK
+    string reservation_status
+    float seat_price
+  }
+
+  Concert {
+    int concert_id PK
+    string concert_name
+    string concert_content
+  }
+
+  ConcertSchedule {
+    int concert_schedule_id PK
+    int concert_id FK
+    string reservable_status
+    long ticket_price
+    timestamp start_dt
+    timestamp end_dt
+  }
+
+  Token {
+    string token_id PK
+    int user_id FK
+    string token
+    timestamp issued_at
+    timestamp expires_at
+  }
+
+  WaitingQueue {
+    int queue_id PK
+    int user_id FK
+    int concert_schedule_id FK
+    int position
+    string queue_token
+  }
+
+  User ||--o{ UserPointHistory : ""
+  User ||--o{ PaymentHistory : ""
+  User ||--o{ ReservationSeatDetail : ""
+  User ||--o{ WaitingQueue : ""
+  User ||--o{ Token : ""
+
+  Concert ||--o{ ConcertSchedule : ""
+  ConcertSchedule ||--o{ ReservationSeat : ""
+  ConcertSchedule ||--o{ WaitingQueue : ""
+
+  ReservationSeat ||--o{ ReservationSeatDetail : ""
+  ReservationSeatDetail ||--o{ PaymentHistory : ""
+
+```
+
+
+## 7. Class Diagram
+
+```mermaid
+
+classDiagram
+    class User {
+        +long userId
+        +String userName
+        +long pointBalance
+        +addPoints()
+        +subtractPoints()
+    }
+    
+    class UserPointHistory {
+        +long historyId
+        +long userId
+        +long pointAmount
+        +PointStatus pointStatus
+        +LocalDateTime pointDate
+        +addHistory()
+    }
+    
+    class ConcertSchedule {
+        +long concertScheduleId
+        +long concertId
+        +LocalDate scheduleDate
+        +LocalTime scheduleTime
+        +String reservableStatus
+        +float ticketPrice
+        +getAvailableSeats()
+    }
+    
+    class ReservationSeat {
+        +long seatId
+        +long concertId
+        +int maxCapacity
+        +int currentReserved
+        +reserveSeat()
+    }
+    
+    class ReservationSeatDetail {
+        +long seatDetailId
+        +long userId
+        +long seatId
+        +String seatStatus
+        +String reservationStatus
+        +float seatPrice
+        +assignSeat()
+        +releaseSeat()
+    }
+    
+    class PaymentHistory {
+        +long paymentId
+        +long userId
+        +long reservationId
+        +float paymentAmount
+        +String paymentStatus
+        +processPayment()
+    }
+    
+    class WaitingQueue {
+        +long queueId
+        +long userId
+        +int position
+        +String queueToken
+        +addToQueue()
+        +removeFromQueue()
+        +generateToken()
+    }
+    
+    User --> UserPointHistory : 
+    User --> PaymentHistory : 
+    ConcertSchedule --> ReservationSeat : 
+    ReservationSeat --> ReservationSeatDetail : 
+    User --> ReservationSeatDetail : 
+    WaitingQueue --> User : 
+
+```
+
+
+### User (사용자):
+- userId, userName, pointBalance 등의 속성을 가짐
+- 사용자의 포인트를 추가하거나 차감하는 addPoints(), subtractPoints() 메서드를 제공함.
+
+### UserPointHistory (포인트 히스토리):
+- historyId, userId, pointAmount, pointStatus, pointDate와 같은 속성을 가짐
+- 사용자의 포인트 기록을 추가하는 addHistory() 메서드를 제공함.
+
+### ConcertSchedule (콘서트 스케줄):
+- concertScheduleId, concertId, scheduleDate, scheduleTime, reservableStatus, ticketPrice 등의 속성을 가짐
+- 예약 가능한 좌석을 조회하는 getAvailableSeats() 메서드를 제공함.
+
+### ReservationSeat (예약 좌석):
+- seatId, concertId, maxCapacity, currentReserved 등의 속성을 가짐
+- 좌석을 예약하는 reserveSeat() 메서드를 제공함.
+
+### ReservationSeatDetail (좌석 상세 정보):
+- seatDetailId, userId, seatId, seatStatus, reservationStatus, seatPrice 속성을 가짐
+- 좌석을 사용자에게 할당하거나 해제하는 assignSeat(), releaseSeat() 메서드를 제공함.
+-
+### PaymentHistory (결제 히스토리):
+- paymentId, userId, reservationId, paymentAmount, paymentStatus 속성을 가짐
+- 결제를 처리하는 processPayment() 메서드를 제공함.
+
+### WaitingQueue (대기열):
+- queueId, userId, position, queueToken 등의 속성을 가짐
+- 유저를 대기열에 추가하거나 제거하고, 토큰을 생성하는 addToQueue(), removeFromQueue(), generateToken() 메서드를 제공함.
+
+## 8. API 명세서
+> API 명세서는 [여기에서](./docs/ApiSpac.md) 확인하실 수 있습니다.

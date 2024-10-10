@@ -26,7 +26,7 @@ paths:
             example:
               userId: 1
       responses:
-        '201':
+        '200':
           description: "토큰이 성공적으로 생성됨"
           content:
             application/json:
@@ -147,7 +147,7 @@ paths:
       parameters:
         - name: date
           in: path
-          description: 조회할 예약 날짜 (예: "2024-10-10")
+          description: '조회할 예약 날짜 (예: "2024-10-10")'
           required: true
           schema:
             type: string
@@ -202,7 +202,7 @@ paths:
               example:
                 error: "Internal Server Error"
                 message: "예약 가능한 좌석 조회 중 오류가 발생했습니다."
-  /mock-api/v1/balance:
+  /api/v1/balance:
     post:
       summary: 잔액 충전
       description: >
@@ -248,7 +248,7 @@ paths:
               example:
                 error: "Internal Server Error"
                 message: "잔액 충전 중 오류가 발생했습니다."
-  /mock-api/v1/balance/{userId}:
+  /api/v1/balance/{userId}:
     get:
       summary: 잔액 조회
       description: >
@@ -293,7 +293,7 @@ paths:
               example:
                 error: "Internal Server Error"
                 message: "잔액 조회 중 오류가 발생했습니다."
-    /api/v1/payments/processPayment:
+    /api/v1/payments:
       post:
         summary: 결제 처리
         description: >
@@ -354,7 +354,7 @@ paths:
                       type: string
                       description: "오류 상세 메시지"
                       example: "결제 처리 중 오류가 발생했습니다."
-  /api/v1/payments/payments/{paymentId}:
+  /api/v1/payments/{paymentId}:
     get:
       summary: 결제 내역 조회
       description: >
