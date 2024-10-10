@@ -45,6 +45,8 @@
 [7. Class Diagram](#7-class-diagram)
 
 [8. API Spec](#8-api-명세서)
+
+[9. 기술스택](#9-기술스택)
 * * *
 
 ## 1. 예약 가능 날짜 / 좌석 API
@@ -104,7 +106,7 @@ sequenceDiagram
     deactivate User
 
 ```
-
+* * *
 ## 3. 유저 대기열 토큰 기능
 - - -
 - 서비스를 이용할 토큰을 발급받는 API를 작성합니다.
@@ -135,6 +137,7 @@ sequenceDiagram
         Token-->>client: 토큰 반환
     deactivate Token
 ```
+* * *
 ## 4. 결제 API
 - - -
 - 결제 처리하고 결제 내역을 생성하는 API 를 작성합니다.
@@ -176,7 +179,7 @@ sequenceDiagram
     deactivate User
 ```
 
-
+* * *
 ## 5. 좌석 예약 요청 API
 - - -
 - 날짜와 좌석 정보를 입력받아 좌석을 예약 처리하는 API 를 작성합니다.
@@ -254,7 +257,7 @@ sequenceDiagram
     ConcertSchedule-->>client: 좌석 예약 반환
     deactivate ConcertSchedule
 ```
-
+* * *
 ## 6. ERD
 
 ```mermaid
@@ -342,7 +345,7 @@ erDiagram
   ReservationSeatDetail ||--o{ PaymentHistory : ""
 
 ```
-
+* * *
 
 ## 7. Class Diagram
 
@@ -421,8 +424,7 @@ classDiagram
     User --> ReservationSeatDetail : 
     WaitingQueue --> User : 
 
-```
-
+``` 
 
 ### User (사용자):
 - userId, userName, pointBalance 등의 속성을 가짐
@@ -451,6 +453,27 @@ classDiagram
 ### WaitingQueue (대기열):
 - queueId, userId, position, queueToken 등의 속성을 가짐
 - 유저를 대기열에 추가하거나 제거하고, 토큰을 생성하는 addToQueue(), removeFromQueue(), generateToken() 메서드를 제공함.
-
+* * *
 ## 8. API 명세서
-> API 명세서는 [여기에서](./docs/ApiSpac.md) 확인하실 수 있습니다.
+> API 명세서는 [여기에서](./docs/ApiSpac.md) 확인하실 수 있습니다.<br>
+
+> http 파일은 [여기에서](./src/main/resources/http/Mock-API.http) 확인하실 수 있습니다.
+
+* * *
+## 9. 기술스택
+### 1. Web Application Server 
+   - Java 17
+   - Spring Boot
+   - Spring Web
+   - Spring Security
+   - JWT (Json Web Token)
+### 2. Database
+   - H2 (Domain)
+   - Spring Data JPA
+   - QueryDSL
+### 3. Caching
+   - Redis (Caching)
+### 5. Monitoring System
+   - Prometheus
+### 6. Testing
+   Spring Boot Test
