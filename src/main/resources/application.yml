@@ -15,3 +15,8 @@ spring:
     properties:
       hibernate:
         format_sql: false  # SQL? ?? ?? ??
+
+
+  jwt:
+    secret: "YourSecretKeyForJWTGenerationWhichShouldBeVerySecureAndLongEnough"
+    expiration: 86400000 # 24시간 (밀리초 단위)

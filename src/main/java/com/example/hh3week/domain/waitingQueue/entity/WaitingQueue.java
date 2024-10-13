@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.NaturalIdCache;
 
+import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +19,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WaitingQueue {
 
 	@Id
@@ -31,16 +34,28 @@ public class WaitingQueue {
 
 	private WaitingStatus waitingStatus;
 
-	private Long priority;
+	private long priority;
 
 	@Builder
 	public WaitingQueue(long waitingId, long userId, long concertScheduleId, LocalDateTime reservationDt,
-		WaitingStatus waitingStatus, Long priority) {
+		WaitingStatus waitingStatus, long priority) {
 		this.waitingId = waitingId;
 		this.userId = userId;
 		this.concertScheduleId = concertScheduleId;
 		this.reservationDt = reservationDt;
 		this.waitingStatus = waitingStatus;
 		this.priority = priority;
+	}
+
+
+	public static WaitingQueue ToEntity(WaitingQueueDto waitingQueueDto){
+		return WaitingQueue.builder()
+			.waitingId(waitingQueueDto.getWaitingId())
+			.userId(waitingQueueDto.getUserId())
+			.concertScheduleId(waitingQueueDto.getConcertScheduleId())
+			.reservationDt(waitingQueueDto.getReservationDt())
+			.waitingStatus(waitingQueueDto.getWaitingStatus())
+			.priority(waitingQueueDto.getPriority())
+			.build();
 	}
 }

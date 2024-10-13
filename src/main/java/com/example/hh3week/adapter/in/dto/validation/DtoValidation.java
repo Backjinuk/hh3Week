@@ -7,14 +7,16 @@ import com.example.hh3week.adapter.in.dto.concert.ConcertDto;
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.adapter.in.dto.payment.PaymentHistoryDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
+import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.adapter.in.dto.user.UserDto;
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
+import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 
 @Component
 public class DtoValidation {
 
 	// ConcertDto 검증
-	public void validateConcertDto(ConcertDto concertDto) {
+	public static void  validateConcertDto(ConcertDto concertDto) {
 		if (concertDto == null) {
 			throw new IllegalArgumentException("콘서트 DTO가 null일 수 없습니다.");
 		}
@@ -27,7 +29,7 @@ public class DtoValidation {
 	}
 
 	// UserDto 검증
-	public void validateUserDto(UserDto userDto) {
+	public static void  validateUserDto(UserDto userDto) {
 		if (userDto == null) {
 			throw new IllegalArgumentException("사용자 DTO가 null일 수 없습니다.");
 		}
@@ -40,7 +42,7 @@ public class DtoValidation {
 	}
 
 	// PaymentHistoryDto 검증
-	public void validatePaymentHistoryDto(PaymentHistoryDto paymentHistoryDto) {
+	public static void  validatePaymentHistoryDto(PaymentHistoryDto paymentHistoryDto) {
 		if (paymentHistoryDto == null) {
 			throw new IllegalArgumentException("결제 히스토리 DTO가 null일 수 없습니다.");
 		}
@@ -56,7 +58,7 @@ public class DtoValidation {
 	}
 
 	// ReservationSeatDetailDto 검증
-	public void validateReservationSeatDetailDto(ReservationSeatDetailDto reservationSeatDetailDto) {
+	public static void  validateReservationSeatDetailDto(ReservationSeatDetailDto reservationSeatDetailDto) {
 		if (reservationSeatDetailDto == null) {
 			throw new IllegalArgumentException("예약 좌석 상세 정보 DTO가 null일 수 없습니다.");
 		}
@@ -78,7 +80,7 @@ public class DtoValidation {
 	}
 
 	// ConcertScheduleDto 검증
-	public void validateConcertScheduleDto(ConcertScheduleDto concertScheduleDto) {
+	public static void  validateConcertScheduleDto(ConcertScheduleDto concertScheduleDto) {
 		if (concertScheduleDto == null) {
 			throw new IllegalArgumentException("콘서트 일정 DTO가 null일 수 없습니다.");
 		}
@@ -95,15 +97,15 @@ public class DtoValidation {
 	}
 
 	// UserPointHistoryDto 검증
-	public void validateUserPointHistoryDto(UserPointHistoryDto userPointHistoryDto) {
+	public static void  validateUserPointHistoryDto(UserPointHistoryDto userPointHistoryDto) {
 		if (userPointHistoryDto == null) {
 			throw new IllegalArgumentException("포인트 히스토리 DTO가 null일 수 없습니다.");
 		}
 		if (userPointHistoryDto.getUserId() <= 0) {
 			throw new IllegalArgumentException("유효한 사용자 ID가 필요합니다.");
 		}
-		if ( userPointHistoryDto.getPointAmount() == 0) {
-			throw new IllegalArgumentException("포인트 변화 금액은 0일 수 없습니다.");
+		if (userPointHistoryDto.getPointAmount() < 0) {
+			throw new IllegalArgumentException("포인트 변화 금액은 음수일 수 없습니다.");
 		}
 		if (userPointHistoryDto.getPointStatus() == null) {
 			throw new IllegalArgumentException("포인트 변화 유형은 null일 수 없습니다.");
@@ -111,5 +113,58 @@ public class DtoValidation {
 		if (userPointHistoryDto.getPointDt() == null) {
 			throw new IllegalArgumentException("포인트 변화 시간은 null일 수 없습니다.");
 		}
+	}
+
+	public static void validateWaitingQueueDto(WaitingQueueDto waitingQueueDto){
+
+		if(waitingQueueDto == null){
+			throw new IllegalArgumentException("대기열 Queue는 null일 수 없습니다.");
+		}
+
+
+		if(waitingQueueDto.getUserId() < 0){
+			throw new IllegalArgumentException("유효한 사용자 ID가 필요합니다.");
+		}
+
+
+		if(waitingQueueDto.getConcertScheduleId() < 0){
+			throw new IllegalArgumentException("유효한 콘서트ScheduleID가 필요합니다.");
+		}
+
+		if(waitingQueueDto.getReservationDt() == null){
+			throw new IllegalArgumentException("유효한 예약 날짜가 아닙니다.");
+		}
+
+		if(waitingQueueDto.getWaitingStatus() == null){
+			throw new IllegalArgumentException("유효한 대기열 상태가 아닙니다.");
+		}
+
+		if(waitingQueueDto.getPriority() < 0){
+			throw new IllegalArgumentException("유효한 대기열 순서가 아닙니다.");
+		}
+
+	}
+
+	public static void validateTokenDto(TokenDto tokenDto){
+		if(tokenDto == null){
+			throw new  IllegalArgumentException("tokenDto는 null일 수 없습니다.");
+		}
+
+		if(tokenDto.getUserId() < 0){
+			throw new  IllegalArgumentException("유효한 userID가 아닙니다.");
+		}
+
+		if(!StringUtils.hasText(tokenDto.getToken())){
+			throw new  IllegalArgumentException("유효한 Token값이 아닙니다.");
+		}
+
+		if(tokenDto.getIssuedAt() == null){
+			throw new  IllegalArgumentException("유효한 발생일이 아닙니다.");
+		}
+
+		if(tokenDto.getExpiresAt() == null){
+			throw new  IllegalArgumentException("유효한 만료일이 아닙니다.");
+		}
+
 	}
 }

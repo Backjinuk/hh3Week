@@ -2,6 +2,8 @@ package com.example.hh3week.adapter.in.dto.token;
 
 import java.time.LocalDateTime;
 
+import com.example.hh3week.domain.token.entity.Token;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +29,16 @@ public class TokenDto {
 		this.token = token;
 		this.issuedAt = issuedAt;
 		this.expiresAt = expiresAt;
+	}
+
+
+	public static TokenDto ToDto(Token token){
+		return TokenDto.builder()
+			.tokenId(token.getTokenId())
+			.userId(token.getUserId())
+			.token(token.getToken())
+			.issuedAt(token.getIssuedAt())
+			.expiresAt(token.getExpiresAt())
+			.build();
 	}
 }

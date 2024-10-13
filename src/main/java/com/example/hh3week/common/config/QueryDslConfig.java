@@ -1,4 +1,4 @@
-package com.example.hh3week.common.util.config;
+package com.example.hh3week.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
