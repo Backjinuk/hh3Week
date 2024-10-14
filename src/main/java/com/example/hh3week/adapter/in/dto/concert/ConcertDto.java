@@ -29,7 +29,7 @@ public class ConcertDto {
 
 
 
-	public static ConcertDto toDto(Concert concert){
+	public static ConcertDto ToDto(Concert concert){
 		return ConcertDto.builder()
 			.concertId(concert.getConcertId())
 			.concertName(concert.getConcertName())

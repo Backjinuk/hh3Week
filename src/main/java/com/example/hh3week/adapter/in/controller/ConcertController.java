@@ -13,18 +13,18 @@ import java.util.List;
 public class ConcertController {
 
 	// Mock concert data
-	private static final List<ConcertDto> CONCERTS = Arrays.asList(
+/*	private static final List<ConcertDto> CONCERTS = Arrays.asList(
 		new ConcertDto(1, "Concert A", "Experience the amazing Concert A!"),
 		new ConcertDto(2, "Concert B", "Join us for the spectacular Concert B!")
 	);
 
-	/**
+	*//**
 	 * 모든 콘서트 목록을 조회하는 API
 	 *
 	 * @return List of ConcertDto
-	 */
+	 *//*
 	@GetMapping
 	public ResponseEntity<List<ConcertDto>> getAllConcerts() {
 		return new ResponseEntity<>(CONCERTS, HttpStatus.OK);
-	}
+	}*/
 }

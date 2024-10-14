@@ -37,11 +37,9 @@ public class Concert {
 	}
 
 
-
-
-
 	public static Concert ToEntity(ConcertDto concertDto) {
 		return Concert.builder()
+			.concertId(concertDto.getConcertId())
 			.concertName(concertDto.getConcertName())
 			.concertContent(concertDto.getConcertContent())
 			.build();

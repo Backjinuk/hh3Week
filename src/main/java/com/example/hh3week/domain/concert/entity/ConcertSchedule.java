@@ -51,6 +51,8 @@ public class ConcertSchedule {
 			.concertId(concertScheduleDto.getConcertId())
 			.concertScheduleStatus(concertScheduleDto.getConcertScheduleStatus())
 			.concertPrice(concertScheduleDto.getConcertPrice())
+			.startDt(concertScheduleDto.getStartDt())
+			.endDt(concertScheduleDto.getEndDt())
 			.build();
 	}
 }
