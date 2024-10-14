@@ -27,8 +27,6 @@ public class ConcertDto {
 	}
 
 
-
-
 	public static ConcertDto ToDto(Concert concert){
 		return ConcertDto.builder()
 			.concertId(concert.getConcertId())

@@ -34,24 +34,6 @@ public class WaitingQueueService {
 		return existingQueue != null;
 	}
 
-	/**
-	 * 대기열에 새로운 대기 항목을 생성하는 메서드입니다.
-	 *
-	 * @param userId 사용자의 UUID
-	 * @param concertScheduleId 콘서트 스케줄의 고유 ID
-	 * @return 생성된 WaitingQueueDto
-	 */
-	@Transactional
-	public WaitingQueueDto createWaitingQueue(long userId, long concertScheduleId) {
-		WaitingQueue waitingQueue = WaitingQueue.builder()
-			.userId(userId)
-			.concertScheduleId(concertScheduleId)
-			.waitingStatus(WaitingStatus.WAITING)
-			.priority(1)
-			.reservationDt(LocalDateTime.now())
-			.build();
-		return WaitingQueueDto.ToDto(waitingQueue);
-	}
 
 	/**
 	 * 대기열에 대기 항목을 추가하는 메서드입니다.

@@ -1,5 +1,7 @@
 package com.example.hh3week.application.useCase;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import com.example.hh3week.application.port.in.WaitingQueueUserCase;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
+import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
 @Service
 public class WaitingQueueUserCaseInteract implements WaitingQueueUserCase {
@@ -39,7 +42,14 @@ public class WaitingQueueUserCaseInteract implements WaitingQueueUserCase {
 		}
 
 		// 대기열에 사용자 추가
-		WaitingQueueDto waitingQueueDto = waitingQueueService.createWaitingQueue(userId, concertScheduleId);
+		WaitingQueueDto waitingQueueDto = WaitingQueueDto.builder()
+															.userId(userId)
+															.concertScheduleId(concertScheduleId)
+															.waitingStatus(WaitingStatus.WAITING)
+															.priority(1) //임의의 숫자
+															.reservationDt(LocalDateTime.now())
+															.build();
+
 		waitingQueueService.addWaitingQueue(waitingQueueDto);
 
 		// 대기열 순서 및 잔여 시간 정보를 바탕으로 토큰 생성

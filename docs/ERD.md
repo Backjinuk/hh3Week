@@ -27,7 +27,6 @@ erDiagram
         int concert_id FK
         int max_capacity
         int current_reserved
-        string seat_number
     }
 
     ReservationSeatDetail {

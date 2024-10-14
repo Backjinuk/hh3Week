@@ -1,5 +1,6 @@
 package com.example.hh3week.adapter.out.persistence;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -46,5 +47,10 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 	@Override
 	public ConcertSchedule getConcertScheduleFindById(long concertId) {
 		return null;
+	}
+
+	@Override
+	public List<ConcertSchedule> getConcertsByDate(LocalDateTime startDate, LocalDateTime endDate) {
+		return List.of();
 	}
 }

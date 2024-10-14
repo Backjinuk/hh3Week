@@ -64,32 +64,6 @@ public class WaitingQueueServiceTest {
 		verify(waitingQueueRepository, times(1)).getQueueStatus(userId, concertScheduleId);
 	}
 
-	@Test
-	@DisplayName("createWaitingQueue 메서드는 새로운 WaitingQueueDto를 생성한다.")
-	public void createWaitingQueue_메서드는_새로운_WaitingQueueDto를_생성한다() {
-		long userId = 3L;
-		long concertScheduleId = 300L;
-
-		WaitingQueue waitingQueue = WaitingQueue.builder()
-			.userId(userId)
-			.concertScheduleId(concertScheduleId)
-			.waitingStatus(WaitingStatus.WAITING)
-			.priority(1L)
-			.reservationDt(LocalDateTime.now())
-			.build();
-
-		WaitingQueueDto expectedDto = WaitingQueueDto.ToDto(waitingQueue);
-
-		WaitingQueueDto actualDto = waitingQueueService.createWaitingQueue(userId, concertScheduleId);
-
-		assertNotNull(actualDto);
-		assertEquals(waitingQueue.getUserId(), actualDto.getUserId());
-		assertEquals(waitingQueue.getConcertScheduleId(), actualDto.getConcertScheduleId());
-		assertEquals(waitingQueue.getWaitingStatus(), actualDto.getWaitingStatus());
-		assertEquals(waitingQueue.getPriority(), actualDto.getPriority());
-		assertEquals(waitingQueue.getReservationDt(), actualDto.getReservationDt());
-	}
-
 
 	@Test
 	@DisplayName("getNextInQueue 메서드는 다음 대기 사용자의 WaitingQueueDto를 반환한다.")

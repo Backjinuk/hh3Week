@@ -36,7 +36,7 @@ public class ReservationSeat {
 		this.currentReserved = currentReserved;
 	}
 
-	public static ReservationSeat toEntity(ReservationSeatDto reservationSeatDto){
+	public static ReservationSeat ToEntity(ReservationSeatDto reservationSeatDto){
 		return ReservationSeat.builder()
 			.seatId(reservationSeatDto.getSeatId())
 			.concertId(reservationSeatDto.getConcertId())

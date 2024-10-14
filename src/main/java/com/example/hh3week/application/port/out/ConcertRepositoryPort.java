@@ -1,5 +1,6 @@
 package com.example.hh3week.application.port.out;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.hh3week.domain.concert.entity.Concert;
@@ -13,4 +14,6 @@ public interface ConcertRepositoryPort {
 	List<ConcertSchedule> getAvilbleConcertSchedueList();
 
 	ConcertSchedule getConcertScheduleFindById(long concertId);
+
+	List<ConcertSchedule> getConcertsByDate(LocalDateTime startDate, LocalDateTime endDate);
 }

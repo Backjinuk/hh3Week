@@ -3,20 +3,26 @@ spring:
     name: hh3week
 
   datasource:
-    url: 'jdbc:h2:file:/db/H2/hh3week;AUTO_SERVER=true'
-    username: 'sa'
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://backjin.iptime.org:3306/study_db
+    username: app_user
+    password: 'wlsdnr7^^' # 특수 문자가 포함되어 있으므로 따옴표로 감쌌습니다.
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: true  # SQL? ??
+    show-sql: true # SQL 로그를 콘솔에 출력합니다.
     properties:
       hibernate:
-        format_sql: false  # SQL? ?? ?? ??
+        format_sql: false # SQL 로그의 형식을 포맷하지 않습니다.
 
+  sql:
+    init:
+      mode: always # 애플리케이션 시작 시 데이터베이스 초기화
+      schema-locations: classpath:schema.sql # 스키마 초기화 파일 위치
+      data-locations: classpath:data.sql # 데이터 초기화 파일 위치
 
-  jwt:
-    secret: "YourSecretKeyForJWTGenerationWhichShouldBeVerySecureAndLongEnough"
-    expiration: 86400000 # 24시간 (밀리초 단위)
+# JWT 설정을 spring 섹션 외부로 이동시켰습니다.
+jwt:
+  secret: "YourSecretKeyForJWTGenerationWhichShouldBeVerySecureAndLongEnough"
+  expiration: 86400000 # 24시간 (밀리초 단위)

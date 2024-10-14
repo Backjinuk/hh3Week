@@ -18,7 +18,6 @@ import com.example.hh3week.adapter.in.dto.token.TokenDto;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "tokens")
 public class Token {
 
 	@Id

@@ -39,7 +39,7 @@ public class ReservationSeatDetailDto {
 		this.seatPrice = seatPrice;
 	}
 
-	public static ReservationSeatDetailDto toDto(ReservationSeatDetail reservationSeatDetail){
+	public static ReservationSeatDetailDto ToDto(ReservationSeatDetail reservationSeatDetail){
 		return ReservationSeatDetailDto.builder()
 			.seatDetailId(reservationSeatDetail.getSeatDetailId())
 			.userId(reservationSeatDetail.getUserId())
