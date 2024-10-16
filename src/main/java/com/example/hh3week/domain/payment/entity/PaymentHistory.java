@@ -39,7 +39,7 @@ public class PaymentHistory {
 		this.paymentStatus = paymentStatus;
 	}
 
-	public static PaymentHistory toEntity(PaymentHistoryDto paymentHistoryDto){
+	public static PaymentHistory ToEntity(PaymentHistoryDto paymentHistoryDto){
 		return PaymentHistory.builder()
 			.paymentId(paymentHistoryDto.getPaymentId())
 			.userId(paymentHistoryDto.getUserId())

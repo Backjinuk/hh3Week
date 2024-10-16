@@ -64,7 +64,7 @@ class WaitingQueueUserCaseInteractTest {
 			.build();
 
 		// when
-		doNothing().when(waitingQueueService).addWaitingQueue(waitingQueueDto);
+		when(waitingQueueService.addWaitingQueue(waitingQueueDto)).thenReturn(1L);
 		when(tokenService.createToken(userId, waitingQueueDto.getPriority(), remainingTime)).thenReturn(tokenDto);
 
 		TokenDto resultTokenDto = waitingQueueUserCaseInteract.registerUserInQueueAndGenerateToken(userId, concertScheduleId, remainingTime);

@@ -5,13 +5,13 @@ import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
 public interface WaitingQueueRepositoryPort {
 
-	void addToQueue(WaitingQueue waitingQueue);
+	WaitingQueue addToQueue(WaitingQueue waitingQueue);
 
 	WaitingQueue getNextInQueue(long concertScheduleId);
 
 	void updateStatus(long waitingId, WaitingStatus status);
 
-	WaitingQueue getQueueStatus(long userId, long concertScheduleId);
+	WaitingQueue getQueueStatus(long userId, long seatDetailId);
 
 	int getQueuePosition(long waitingId);
 }

@@ -43,11 +43,12 @@ public class ReservationSeatDetail {
 		this.seatPrice = seatPrice;
 	}
 
-	public static ReservationSeatDetail toEntity(ReservationSeatDetailDto reservationSeatDetailDto){
+	public static ReservationSeatDetail ToEntity(ReservationSeatDetailDto reservationSeatDetailDto){
 		return ReservationSeatDetail.builder()
 			.seatDetailId(reservationSeatDetailDto.getSeatDetailId())
 			.userId(reservationSeatDetailDto.getUserId())
 			.seatId(reservationSeatDetailDto.getSeatId())
+			.seatCode(reservationSeatDetailDto.getSeatCode())
 			.reservationStatus(reservationSeatDetailDto.getReservationStatus())
 			.seatPrice(reservationSeatDetailDto.getSeatPrice())
 			.build();

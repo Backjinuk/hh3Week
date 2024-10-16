@@ -45,6 +45,7 @@ public class ReservationSeatDetailDto {
 			.userId(reservationSeatDetail.getUserId())
 			.seatId(reservationSeatDetail.getSeatId())
 			.seatCode(reservationSeatDetail.getSeatCode())
+			.reservationStatus(reservationSeatDetail.getReservationStatus())
 			.seatPrice(reservationSeatDetail.getSeatPrice())
 			.build();
 	}

@@ -1,7 +1,5 @@
 package com.example.hh3week.application.service;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +23,12 @@ public class WaitingQueueService {
 	 * 사용자가 대기열에 이미 있는지 확인하는 메서드입니다.
 	 *
 	 * @param userId 사용자의 UUID
-	 * @param concertScheduleId 콘서트 스케줄의 고유 ID
+	 * @param seatDetailId 콘서트 스케줄의 고유 ID
 	 * @return 사용자가 대기열에 있는 경우 true, 아니면 false
 	 */
 	@Transactional(readOnly = true)
-	public boolean isUserInQueue(long userId, long concertScheduleId) {
-		WaitingQueue existingQueue = waitingQueueRepository.getQueueStatus(userId, concertScheduleId);
+	public boolean isUserInQueue(long userId, long seatDetailId) {
+		WaitingQueue existingQueue = waitingQueueRepository.getQueueStatus(userId, seatDetailId);
 		return existingQueue != null;
 	}
 
@@ -41,8 +39,9 @@ public class WaitingQueueService {
 	 * @param waitingQueueDto 대기 항목 엔티티
 	 */
 	@Transactional
-	public void addWaitingQueue(WaitingQueueDto waitingQueueDto) {
-		waitingQueueRepository.addToQueue(WaitingQueue.ToEntity(waitingQueueDto));
+	public long addWaitingQueue(WaitingQueueDto waitingQueueDto) {
+	    WaitingQueue savedQueue = waitingQueueRepository.addToQueue(WaitingQueue.ToEntity(waitingQueueDto));
+	    return savedQueue.getWaitingId();
 	}
 
 	/**

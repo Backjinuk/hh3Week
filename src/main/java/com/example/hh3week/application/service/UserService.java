@@ -43,7 +43,7 @@ public class UserService {
 	}
 
 	/**
-	 * 잔액 충전 Use Case
+	 * 잔액 사용 Use Case
 	 *
 	 * @param userDto 사용자 ID
 	 * @param amount 충전할 금액
@@ -56,6 +56,10 @@ public class UserService {
 		}
 		if (amount < 0) {
 			throw new IllegalArgumentException("충전 금액은 음수일 수 없습니다.");
+		}
+
+		if(userDto.getPointBalance() <= amount){
+			throw new IllegalArgumentException("사용할 포인트가 부족합니다.");
 		}
 
 		User user = User.toEntity(userDto);

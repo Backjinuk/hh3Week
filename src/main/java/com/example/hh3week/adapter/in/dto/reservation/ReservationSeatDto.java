@@ -2,6 +2,8 @@ package com.example.hh3week.adapter.in.dto.reservation;
 
 
 
+import java.util.List;
+
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 
 import lombok.Builder;
@@ -20,6 +22,8 @@ public class ReservationSeatDto {
 	private long maxCapacity;
 
 	private long currentReserved;
+
+	private List<ReservationSeatDetailDto> reservationSeatDetailDtoList;
 
 	@Builder
 	public ReservationSeatDto(long seatId, long concertId, long maxCapacity, long currentReserved) {

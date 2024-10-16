@@ -6,9 +6,7 @@ import com.example.hh3week.domain.payment.entity.PaymentStatus;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @NoArgsConstructor
@@ -33,7 +31,7 @@ public class PaymentHistoryDto {
 		this.paymentStatus = paymentStatus;
 	}
 
-	public static PaymentHistoryDto toDto(PaymentHistory paymentHistory){
+	public static PaymentHistoryDto ToDto(PaymentHistory paymentHistory){
 		return PaymentHistoryDto.builder()
 			.paymentId(paymentHistory.getPaymentId())
 			.userId(paymentHistory.getUserId())

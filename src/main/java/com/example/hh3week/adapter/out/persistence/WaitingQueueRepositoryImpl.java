@@ -9,8 +9,9 @@ import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 @Repository
 public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	@Override
-	public void addToQueue(WaitingQueue waitingQueue) {
+	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
 
+		return waitingQueue;
 	}
 
 	@Override
@@ -24,7 +25,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	}
 
 	@Override
-	public WaitingQueue getQueueStatus(long userId, long concertScheduleId) {
+	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
 		return null;
 	}
 
