@@ -68,16 +68,28 @@ public class UserService {
 		userRepositoryPort.updateDepositBalance(user);
 	}
 
+	/**
+	 * 사용자의 정보를 조회하는 메서드입니다.
+	 *
+	 * @param userId 조회할 사용자의 ID
+	 * @return 조회된 사용자의 정보
+	 */
 	public UserDto getUserInfo(long userId) {
 		UserDto userDto = userRepositoryPort.getUserInfo(userId);
 
 		if (userDto == null) {
-			throw new IllegalArgumentException("사용자를 찾을수 없습니다.");
+			throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
 		}
 
 		return userDto;
 	}
 
+	/**
+	 * 사용자의 포인트 히스토리를 추가하는 메서드입니다.
+	 *
+	 * @param userPointHistoryDto 추가할 사용자의 포인트 히스토리 데이터
+	 * @return 추가된 사용자의 포인트 히스토리 정보
+	 */
 	public UserPointHistoryDto addUserPointHistoryInUser(UserPointHistoryDto userPointHistoryDto) {
 		if (userPointHistoryDto == null) {
 			throw new IllegalArgumentException("UserPointHistoryDto는 null일 수 없습니다.");
@@ -87,12 +99,18 @@ public class UserService {
 		return UserPointHistoryDto.toDto(userPointHistory);
 	}
 
+	/**
+	 * 특정 사용자의 포인트 히스토리를 조회하는 메서드입니다.
+	 *
+	 * @param userId 조회할 사용자의 ID
+	 * @return 사용자의 포인트 히스토리 목록
+	 */
 	public List<UserPointHistoryDto> getUserPointHistoryFindByUserId(long userId) {
 		return userRepositoryPort.getUserPointHistoryFindByUserId(userId)
 			.stream()
 			.map(UserPointHistoryDto::toDto)
 			.toList();
-
 	}
+
 
 }

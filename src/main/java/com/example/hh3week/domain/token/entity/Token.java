@@ -43,6 +43,7 @@ public class Token {
 
 	public static Token ToEntity(TokenDto tokenDto){
 		return Token.builder()
+			.tokenId(tokenDto.getTokenId())
 			.token(tokenDto.getToken())
 			.userId(tokenDto.getUserId())
 			.token(tokenDto.getToken())

@@ -105,8 +105,21 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	 * @param queuePosition 대기열에서의 위치
 	 * @return 남은 대기 시간 (초 단위)
 	 */
-	private long calculateRemainingTime(int queuePosition) {
+	public long calculateRemainingTime(int queuePosition) {
 		// 예시: 각 사용자당 10분의 대기 시간 부여
 		return queuePosition * 600L;
 	}
+
+
+
+	/**
+	 * 사용자 토큰의 유효성을 검증하는 메서드입니다.
+	 *
+	 * @param token JWT 토큰
+	 * @return 유효한 토큰인지 여부
+	 */
+	// public Long validateTokenAndGetUserId(String token) {
+	// 	return tokenService.validateTokenAndGetUserId(token);
+	// }
+
 }

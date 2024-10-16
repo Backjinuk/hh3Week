@@ -22,7 +22,6 @@ public class UserUseCaseInteract implements UserUseCase {
 	}
 
 
-
 	/**
 	 * 사용자 포인트 충전 또는 사용을 처리하는 Use Case
 	 *
@@ -64,9 +63,6 @@ public class UserUseCaseInteract implements UserUseCase {
 	public List<UserPointHistoryDto> getUserPointHistoryListByUserId(Long userId) {
 		return userService.getUserPointHistoryFindByUserId(userId);
 	}
-
-
-
 
 
 	/**
