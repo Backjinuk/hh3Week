@@ -2,7 +2,7 @@ package com.example.hh3week.common.util;
 
 import io.jsonwebtoken.*;
 
-import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.function.Function;
@@ -60,8 +60,8 @@ public class JwtUtil {
 	}
 
 	// 토큰 유효성 검사
-	public Boolean validateToken(String token, UserDetails userDetails) {
-		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-	}
+	// public Boolean validateToken(String token, UserDetails userDetails) {
+	// 	final String username = extractUsername(token);
+	// 	return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	// }
 }

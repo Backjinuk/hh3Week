@@ -29,6 +29,11 @@ public class ConcertUseCaseInteractor implements ConcertUseCase {
 	public List<ConcertScheduleDto> getAvailableConcertDates(LocalDateTime startDate, LocalDateTime endDate) {
 		if (startDate != null && endDate != null) {
 			// 특정 날짜 범위로 필터링하여 콘서트를 조회
+
+			if (startDate.isAfter(endDate)) {
+				throw new IllegalArgumentException("startDate는 endDate보다 이전이어야 합니다.");
+			}
+
 			return concertService.getConcertsByDate(startDate, endDate);
 		}
 		// 날짜 없이 전체 예약 가능한 콘서트 조회
