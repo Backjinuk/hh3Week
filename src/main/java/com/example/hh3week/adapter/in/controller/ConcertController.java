@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Null;
 
 @RestController
 @RequestMapping("/api/v1/concerts")
@@ -63,6 +64,10 @@ public class ConcertController {
 	public ResponseEntity<ConcertScheduleDto> getConcertScheduleFindById(
 		@Parameter(description = "조회할 콘서트의 ID를 포함한 콘서트 스케줄 DTO", required = true)
 		@RequestBody ConcertDto concertDto) {
+
+		if(concertDto.getConcertId() <= 0){
+			throw new NullPointerException("콘서트 스케줄을 조회할수 업습니다.");
+		}
 
 		ConcertScheduleDto concert = concertUseCase.getConcertScheduleFindById(concertDto.getConcertId());
 		return ResponseEntity.ok(concert);

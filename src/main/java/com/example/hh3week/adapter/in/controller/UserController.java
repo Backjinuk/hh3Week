@@ -74,7 +74,7 @@ public class UserController {
 		@RequestBody UserDto userDto) {
 
 		long userId = userDto.getUserId();
-		if (userId == 0) {
+		if (userId <= 0) {
 			throw new IllegalArgumentException("userId는 필수 입력 항목입니다.");
 		}
 

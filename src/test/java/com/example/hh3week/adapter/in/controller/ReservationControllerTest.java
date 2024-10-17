@@ -1,18 +1,7 @@
-// src/test/java/com/example/hh3week/adapter/in/controller/ReservationControllerTest.java
-
 package com.example.hh3week.adapter.in.controller;
 
-import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
-import com.example.hh3week.adapter.in.dto.token.TokenDto;
-import com.example.hh3week.application.port.in.ReservationUseCase;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
@@ -21,11 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
+import com.example.hh3week.adapter.in.dto.token.TokenDto;
+import com.example.hh3week.application.port.in.ReservationUseCase;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(ReservationController.class)
 public class ReservationControllerTest {
@@ -41,7 +37,7 @@ public class ReservationControllerTest {
 
 	@Test
 	@DisplayName("예약 가능한 좌석 목록 조회 성공")
-	void getAvailableReservationSeatList_Success() throws Exception {
+	void 예약_가능한_좌석_목록_조회_성공() throws Exception {
 		// Given
 		long concertScheduleId = 1L;
 		Map<String, Long> requestBody = new HashMap<>();
@@ -63,13 +59,12 @@ public class ReservationControllerTest {
 
 		List<ReservationSeatDto> expectedSeats = Arrays.asList(seat1, seat2);
 
-		when(reservationUseCase.getAvailableReservationSeatList(concertScheduleId))
-			.thenReturn(expectedSeats);
+		when(reservationUseCase.getAvailableReservationSeatList(concertScheduleId)).thenReturn(expectedSeats);
 
 		// When & Then
-		mockMvc.perform(post("/api/v1/reservations/getAvailableReservationSeatList")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(requestBody)))
+		mockMvc.perform(
+				post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(requestBody)))
 			.andExpect(status().isOk())
 			.andExpect(content().json(objectMapper.writeValueAsString(expectedSeats)));
 
@@ -78,7 +73,7 @@ public class ReservationControllerTest {
 
 	@Test
 	@DisplayName("좌석 예약 요청 성공")
-	void reserveSeat_Success() throws Exception {
+	void 좌석_예약_요청_성공() throws Exception {
 		// Given
 		long userId = 10L;
 		long seatDetailId = 1001L;
@@ -86,17 +81,12 @@ public class ReservationControllerTest {
 		requestBody.put("userId", userId);
 		requestBody.put("seatDetailId", seatDetailId);
 
-		TokenDto tokenDto = TokenDto.builder()
-			.token("sample-token-12345")
-			.expiresAt(LocalDateTime.now())
-			.build();
+		TokenDto tokenDto = TokenDto.builder().token("sample-token-12345").expiresAt(LocalDateTime.now()).build();
 
-		when(reservationUseCase.reserveSeat(userId, seatDetailId))
-			.thenReturn(tokenDto);
+		when(reservationUseCase.reserveSeat(userId, seatDetailId)).thenReturn(tokenDto);
 
 		// When & Then
-		mockMvc.perform(post("/api/v1/reservations/reserveSeat")
-				.contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestBody)))
 			.andExpect(status().isOk())
 			.andExpect(content().json(objectMapper.writeValueAsString(tokenDto)));
@@ -106,22 +96,22 @@ public class ReservationControllerTest {
 
 	@Test
 	@DisplayName("예약 가능한 좌석 조회 시 concertScheduleId 누락")
-	void getAvailableReservationSeatList_MissingConcertScheduleId() throws Exception {
+	void 예약_가능한_좌석_조회시_concertScheduleId_누락() throws Exception {
 		// Given
 		Map<String, Long> requestBody = new HashMap<>();
 		// concertScheduleId 누락
 
 		// When & Then
-		mockMvc.perform(post("/api/v1/reservations/getAvailableReservationSeatList")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(requestBody)))
+		mockMvc.perform(
+				post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(requestBody)))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().string("concertScheduleId는 필수 입력 항목입니다."));
 	}
 
 	@Test
 	@DisplayName("좌석 예약 요청 시 userId 누락")
-	void reserveSeat_MissingUserId() throws Exception {
+	void 좌석_예약_요청시_userId_누락() throws Exception {
 		// Given
 		long seatDetailId = 1001L;
 		Map<String, Long> requestBody = new HashMap<>();
@@ -129,8 +119,7 @@ public class ReservationControllerTest {
 		requestBody.put("seatDetailId", seatDetailId);
 
 		// When & Then
-		mockMvc.perform(post("/api/v1/reservations/reserveSeat")
-				.contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestBody)))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().string("userId와 seatDetailId는 필수 입력 항목입니다."));
@@ -138,7 +127,7 @@ public class ReservationControllerTest {
 
 	@Test
 	@DisplayName("좌석 예약 요청 시 seatDetailId 누락")
-	void reserveSeat_MissingSeatDetailId() throws Exception {
+	void 좌석_예약_요청시_seatDetailId_누락() throws Exception {
 		// Given
 		long userId = 10L;
 		Map<String, Long> requestBody = new HashMap<>();
@@ -146,8 +135,7 @@ public class ReservationControllerTest {
 		// seatDetailId 누락
 
 		// When & Then
-		mockMvc.perform(post("/api/v1/reservations/reserveSeat")
-				.contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestBody)))
 			.andExpect(status().isBadRequest())
 			.andExpect(content().string("userId와 seatDetailId는 필수 입력 항목입니다."));
