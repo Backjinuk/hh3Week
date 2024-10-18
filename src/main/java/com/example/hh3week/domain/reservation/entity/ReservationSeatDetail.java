@@ -3,6 +3,8 @@ package com.example.hh3week.domain.reservation.entity;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,6 +30,7 @@ public class ReservationSeatDetail {
 
 	private String seatCode;
 
+	@Enumerated(EnumType.STRING)
 	private ReservationStatus reservationStatus;
 
 	private long seatPrice;
@@ -53,4 +56,6 @@ public class ReservationSeatDetail {
 			.seatPrice(reservationSeatDetailDto.getSeatPrice())
 			.build();
 	}
+
+
 }

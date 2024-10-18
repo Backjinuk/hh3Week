@@ -56,7 +56,6 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 	public List<UserPointHistory> getUserPointHistoryFindByUserId(long userId) {
 		return queryFactory.selectFrom(qUserPointHistory)
 			.where(qUserPointHistory.userId.eq(userId))
-			.fetchAll()
 			.fetch();
 	}
 }

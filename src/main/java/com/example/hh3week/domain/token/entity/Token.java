@@ -41,9 +41,10 @@ public class Token {
 		this.expiresAt = expiresAt;
 	}
 
+
 	public static Token ToEntity(TokenDto tokenDto){
 		return Token.builder()
-			.token(tokenDto.getToken())
+			.tokenId(tokenDto.getTokenId())
 			.userId(tokenDto.getUserId())
 			.token(tokenDto.getToken())
 			.issuedAt(tokenDto.getIssuedAt())

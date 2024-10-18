@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS concert;
 DROP TABLE IF EXISTS reservation_seat_detail;
 DROP TABLE IF EXISTS reservation_seat;
 DROP TABLE IF EXISTS payment_history;
-DROP TABLE IF EXISTS point_history;
+DROP TABLE IF EXISTS user_point_history;
 DROP TABLE IF EXISTS user;
 
 -- 3. 외래 키 검사 활성화 (필요 시)
@@ -23,12 +23,12 @@ CREATE TABLE user (
 );
 
 -- PointHistory 테이블
-CREATE TABLE point_history (
+CREATE TABLE user_point_history (
                                history_id INT PRIMARY KEY AUTO_INCREMENT,
                                user_id INT,
-                               point_change_amount BIGINT NOT NULL,
-                               change_type VARCHAR(50) NOT NULL,
-                               change_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                               point_amount BIGINT NOT NULL,
+                               point_status VARCHAR(50) NOT NULL,
+                               point_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- PaymentHistory 테이블
@@ -37,7 +37,9 @@ CREATE TABLE payment_history (
                                  user_id INT,
                                  reservation_id INT,
                                  payment_amount BIGINT NOT NULL,
+                                 payment_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  payment_status VARCHAR(50) NOT NULL
+
 );
 
 -- ReservationSeat 테이블
@@ -50,12 +52,12 @@ CREATE TABLE reservation_seat (
 
 -- ReservationSeatDetail 테이블
 CREATE TABLE reservation_seat_detail (
-                                         reservation_id INT PRIMARY KEY AUTO_INCREMENT,
+                                         seat_detail_id INT PRIMARY KEY AUTO_INCREMENT,
                                          user_id INT,
                                          seat_id INT,
-                                         seat_number VARCHAR(10) NOT NULL,
+                                         seat_code VARCHAR(10) NOT NULL,
                                          reservation_status VARCHAR(50) NOT NULL,
-                                         payment_amount FLOAT NOT NULL
+                                         seat_price FLOAT NOT NULL
 );
 
 -- Concert 테이블
@@ -77,7 +79,7 @@ CREATE TABLE concert_schedule (
 
 -- Token 테이블
 CREATE TABLE token (
-                       token_id VARCHAR(255) PRIMARY KEY,
+                       token_id INT PRIMARY KEY AUTO_INCREMENT,
                        user_id INT,
                        token VARCHAR(255) NOT NULL,
                        issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -89,7 +91,7 @@ CREATE TABLE waiting_queue (
                                waiting_id INT PRIMARY KEY AUTO_INCREMENT,
                                user_id INT,
                                concert_schedule_id INT,
-                               reservation_request_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                               status VARCHAR(50) NOT NULL,
+                               reservation_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               waiting_status VARCHAR(50) NOT NULL,
                                priority INT NOT NULL
 );

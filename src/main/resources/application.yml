@@ -10,17 +10,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true # SQL 로그를 콘솔에 출력합니다.
     properties:
       hibernate:
         format_sql: false # SQL 로그의 형식을 포맷하지 않습니다.
 
-  sql:
-    init:
-      mode: always # 애플리케이션 시작 시 데이터베이스 초기화
-      schema-locations: classpath:schema.sql # 스키마 초기화 파일 위치
-      data-locations: classpath:data.sql # 데이터 초기화 파일 위치
+#  sql:
+#    init:
+#      mode: always # 애플리케이션 시작 시 데이터베이스 초기화
+#      schema-locations: classpath:schema.sql # 스키마 초기화 파일 위치
+#      data-locations: classpath:data.sql # 데이터 초기화 파일 위치
 
 # JWT 설정을 spring 섹션 외부로 이동시켰습니다.
 jwt:

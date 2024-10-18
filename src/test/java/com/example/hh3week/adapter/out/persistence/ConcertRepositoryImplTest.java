@@ -1,5 +1,3 @@
-// src/test/java/com/example/hh3week/adapter/out/persistence/ConcertRepositoryImplTest.java
-
 package com.example.hh3week.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.*;
@@ -11,19 +9,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.hh3week.common.config.QueryDslConfig;
 import com.example.hh3week.domain.concert.entity.Concert;
 import com.example.hh3week.domain.concert.entity.ConcertSchedule;
 import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;
 
 @SpringBootTest
-@Import({ConcertRepositoryImpl.class, QueryDslConfig.class})
 @Transactional
-@Sql(scripts = "classpath:test-data.sql") // 테스트 데이터 삽입 SQL 스크립트
 public class ConcertRepositoryImplTest {
 
 	@Autowired
@@ -73,7 +66,7 @@ public class ConcertRepositoryImplTest {
 		Concert concertFindById = concertRepositoryImpl.getConcertFindById(nonExistentConcertId);
 		// When & Then
 
-		assertThat(concertFindById.getConcertId()).isEqualTo(0);
+		assertThat(concertFindById).isNull();
 	}
 
 	@Test
@@ -114,7 +107,7 @@ public class ConcertRepositoryImplTest {
 			nonExistentScheduleId);
 		// When & Then
 
-		assertThat(concertScheduleFindById.getConcertId()).isEqualTo(0);
+		assertThat(concertScheduleFindById).isNull();
 	}
 
 	@Test

@@ -7,6 +7,8 @@ import org.hibernate.annotations.NaturalIdCache;
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +34,7 @@ public class WaitingQueue {
 
 	private LocalDateTime reservationDt;
 
+	@Enumerated(EnumType.STRING)
 	private WaitingStatus waitingStatus;
 
 	private long priority;

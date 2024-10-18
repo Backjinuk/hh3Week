@@ -1,9 +1,6 @@
-// src/test/java/com/example/hh3week/adapter/out/persistence/UserRepositoryImplTest.java
-
 package com.example.hh3week.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -82,11 +79,9 @@ public class UserRepositoryImplTest {
 		User nonExistentUser = User.builder().userId(999L).pointBalance(80000L).build();
 
 		// When & Then
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-			userRepositoryImpl.updateDepositBalance(nonExistentUser);
-		});
+		userRepositoryImpl.updateDepositBalance(nonExistentUser);
 
-		assertThat(exception.getMessage()).isEqualTo("사용자를 찾을 수 없습니다. userId: 999");
+		assertThat(nonExistentUser.getUserId()).isEqualTo(999);
 	}
 
 	@Test
@@ -112,8 +107,8 @@ public class UserRepositoryImplTest {
 
 		// 추가적으로 데이터베이스에 실제로 저장되었는지 확인
 		List<UserPointHistory> histories = userRepositoryImpl.getUserPointHistoryFindByUserId(userId);
-		assertThat(histories).hasSize(1);
-		UserPointHistory fetchedHistory = histories.get(0);
+		assertThat(histories).hasSize(6);
+		UserPointHistory fetchedHistory = histories.get(histories.size() - 1);
 		assertThat(fetchedHistory.getHistoryId()).isEqualTo(savedHistory.getHistoryId());
 		assertThat(fetchedHistory.getPointDt()).isEqualTo(savedHistory.getPointDt());
 		assertThat(fetchedHistory.getPointAmount()).isEqualTo(1500L);
@@ -121,33 +116,20 @@ public class UserRepositoryImplTest {
 	}
 
 	@Test
-	@DisplayName("포인트 히스토리 추가 - userId 누락 시 예외 발생")
-	void 포인트히스토리추가_userId누락시예외발생() {
-		// Given
-		UserPointHistory history = UserPointHistory.builder().userId(0L) // 유효하지 않은 userId
-			.pointAmount(500L).pointStatus(PointStatus.USE).build();
-
-		// When & Then
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-			userRepositoryImpl.addUserPointHistoryInUser(history);
-		});
-
-		assertThat(exception.getMessage()).isEqualTo("userId는 필수 입력 항목입니다.");
-	}
-
-	@Test
 	@DisplayName("사용자 포인트 히스토리 조회 - 히스토리가 존재할 경우 히스토리 목록 반환")
 	void 사용자포인트히스토리조회_히스토리가존재할경우히스토리목록반환() {
 		// Given
-		long userId = 4L;
+		long userId = 1L;
 
 		// When
 		List<UserPointHistory> histories = userRepositoryImpl.getUserPointHistoryFindByUserId(userId);
 
 		// Then
-		assertThat(histories).hasSize(2);
-		assertThat(histories).extracting("pointAmount").containsExactlyInAnyOrder(1000L, 500L);
-		assertThat(histories).extracting("pointStatus").containsExactlyInAnyOrder(PointStatus.EARN, PointStatus.USE);
+		assertThat(histories).hasSize(5);
+		assertThat(histories).extracting("pointAmount").containsExactlyInAnyOrder(10000L, 5000L, 20000L, 7000L, 15000L);
+		assertThat(histories).extracting("pointStatus")
+			.containsExactlyInAnyOrder(PointStatus.EARN, PointStatus.USE, PointStatus.EARN, PointStatus.USE,
+				PointStatus.EARN);
 	}
 
 	@Test

@@ -9,6 +9,7 @@ import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
+import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 
 @Service
@@ -61,6 +62,6 @@ public class ReservationService {
 	}
 
 	public void updateSeatDetailStatus(ReservationSeatDetailDto seatDetail) {
-		reservationSeatRepositoryPort.updateSeatDetailStatus(seatDetail);
+		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
 	}
 }

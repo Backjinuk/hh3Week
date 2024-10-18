@@ -13,7 +13,7 @@ public interface ReservationSeatRepositoryPort {
 
 	void updateReservationCurrentReserved(ReservationSeat reservationSeat);
 
-	void updateSeatDetailStatus(ReservationSeatDetailDto seatDetail);
+	void updateSeatDetailStatus(ReservationSeatDetail seatDetail);
 
 	ReservationSeatDetail getSeatDetailById(long seatDetailId);
 
