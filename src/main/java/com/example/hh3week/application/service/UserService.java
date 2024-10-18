@@ -69,7 +69,7 @@ public class UserService {
 	}
 
 	public UserDto getUserInfo(long userId) {
-		UserDto userDto = userRepositoryPort.getUserInfo(userId);
+		UserDto userDto = UserDto.toDto(userRepositoryPort.getUserInfo(userId));
 
 		if (userDto == null) {
 			throw new IllegalArgumentException("사용자를 찾을수 없습니다.");

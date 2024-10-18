@@ -9,7 +9,7 @@ import com.example.hh3week.domain.user.entity.UserPointHistory;
 
 public interface UserRepositoryPort {
 
-	public UserDto getUserInfo(long userId);
+	User getUserInfo(long userId);
 
 	void updateDepositBalance(User user);
 

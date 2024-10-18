@@ -195,7 +195,7 @@ class UserServiceTest {
 			.pointBalance(500L)
 			.build();
 
-		when(userRepositoryPort.getUserInfo(userId)).thenReturn(userDto);
+		when(userRepositoryPort.getUserInfo(userId)).thenReturn(User.toEntity(userDto));
 
 		// When
 		UserDto result = userService.getUserInfo(userId);
