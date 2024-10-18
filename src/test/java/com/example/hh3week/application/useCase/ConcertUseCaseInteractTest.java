@@ -1,4 +1,4 @@
-package com.example.hh3week.application.port.in;
+package com.example.hh3week.application.useCase;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -15,10 +15,9 @@ import org.mockito.MockitoAnnotations;
 
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.application.service.ConcertService;
-import com.example.hh3week.application.useCase.ConcertUseCaseInteractor;
 import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;
 
-class ConcertUseCaseTest {
+class ConcertUseCaseInteractTest {
 
 	@Mock
 	private ConcertService concertService;

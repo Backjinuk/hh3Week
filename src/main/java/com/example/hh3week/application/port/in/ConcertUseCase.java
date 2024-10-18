@@ -7,7 +7,7 @@ import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 
 public interface ConcertUseCase {
 
-	public List<ConcertScheduleDto> getAvailableConcertDates(LocalDateTime startDate, LocalDateTime endDate);
+	List<ConcertScheduleDto> getAvailableConcertDates(LocalDateTime startDate, LocalDateTime endDate);
 
-	public ConcertScheduleDto getConcertScheduleFindById(long concertId);
+	ConcertScheduleDto getConcertScheduleFindById(long concertId);
 }

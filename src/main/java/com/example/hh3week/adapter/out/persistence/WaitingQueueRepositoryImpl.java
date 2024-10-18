@@ -95,16 +95,10 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	@Override
 	@Transactional(readOnly = true)
 	public WaitingQueue getQueueStatus(long userId, long concertScheduleId) {
-		Optional<WaitingQueue> queueStatus = Optional.ofNullable(
-			queryFactory.selectFrom(qWaitingQueue)
-				.where(qWaitingQueue.userId.eq(userId)
-					.and(qWaitingQueue.concertScheduleId.eq(concertScheduleId)))
-				.fetchOne()
-		);
-
-		return queueStatus.orElseThrow(() ->
-			new IllegalArgumentException("Waiting Queue not found for userId: " + userId + ", seatDetailId: " + concertScheduleId)
-		);
+		return 	queryFactory.selectFrom(qWaitingQueue)
+			.where(qWaitingQueue.userId.eq(userId)
+				.and(qWaitingQueue.concertScheduleId.eq(concertScheduleId)))
+			.fetchOne();
 	}
 
 	/**

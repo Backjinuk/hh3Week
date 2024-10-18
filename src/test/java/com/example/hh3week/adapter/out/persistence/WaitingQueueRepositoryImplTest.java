@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -135,7 +136,7 @@ public class WaitingQueueRepositoryImplTest {
 
 		// When & Then
 
-		InvalidDataAccessApiUsageException exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+		 assertThrows(NoSuchElementException.class, () -> {
 			waitingQueueRepositoryImpl.getQueueStatus(userId, seatDetailId);
 		});
 

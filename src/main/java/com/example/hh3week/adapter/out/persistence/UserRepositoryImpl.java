@@ -33,7 +33,12 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 
 	@Override
 	public User getUserInfo(long userId) {
-		return queryFactory.selectFrom(qUser).where(qUser.userId.eq(userId)).fetchOne();
+		User user = queryFactory.selectFrom(qUser).where(qUser.userId.eq(userId)).fetchOne();
+
+		if(user == null){
+			throw new NullPointerException("사용자를 찾을 수 없습니다.");
+		}
+		return user;
 	}
 
 	@Override
