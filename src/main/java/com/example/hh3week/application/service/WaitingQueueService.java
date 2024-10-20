@@ -40,8 +40,8 @@ public class WaitingQueueService {
 	 */
 	@Transactional
 	public long addWaitingQueue(WaitingQueueDto waitingQueueDto) {
-	    WaitingQueue savedQueue = waitingQueueRepository.addToQueue(WaitingQueue.ToEntity(waitingQueueDto));
-	    return savedQueue.getWaitingId();
+		WaitingQueue savedQueue = waitingQueueRepository.addToQueue(WaitingQueue.ToEntity(waitingQueueDto));
+		return savedQueue.getWaitingId();
 	}
 
 	/**
@@ -91,3 +91,4 @@ public class WaitingQueueService {
 		return (queueStatus != null) ? WaitingQueueDto.ToDto(queueStatus) : null;
 	}
 }
+

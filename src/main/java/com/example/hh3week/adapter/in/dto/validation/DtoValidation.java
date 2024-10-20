@@ -127,7 +127,7 @@ public class DtoValidation {
 		}
 
 
-		if(waitingQueueDto.getConcertScheduleId() < 0){
+		if(waitingQueueDto.getSeatDetailId() < 0){
 			throw new IllegalArgumentException("유효한 콘서트ScheduleID가 필요합니다.");
 		}
 

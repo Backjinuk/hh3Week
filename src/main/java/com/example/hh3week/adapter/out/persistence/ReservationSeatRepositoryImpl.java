@@ -81,9 +81,16 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 	@Override
 	@Transactional(readOnly = true)
 	public ReservationSeatDetail getSeatDetailById(long seatDetailId) {
-		return queryFactory.selectFrom(qReservationSeatDetail)
+		ReservationSeatDetail reservationSeatDetail = queryFactory.selectFrom(qReservationSeatDetail)
 			.where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
 			.fetchOne();
+
+		if(reservationSeatDetail == null){
+			throw new NullPointerException("해당 좌석을 찾을수 없습니다.");
+		}
+
+		return reservationSeatDetail;
+
 	}
 
 

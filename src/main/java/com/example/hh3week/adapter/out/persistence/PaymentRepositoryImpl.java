@@ -67,7 +67,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 	public List<PaymentHistory> getPaymentHistoryByUserId(long userId) {
 		return queryFactory.selectFrom(qPaymentHistory)
 			.where(qPaymentHistory.userId.eq(userId))
-			.orderBy(qPaymentHistory.paymentDt.desc())
+			.orderBy(qPaymentHistory.paymentId.desc())
 			.fetch();
 	}
 }

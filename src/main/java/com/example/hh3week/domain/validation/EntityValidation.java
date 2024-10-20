@@ -125,7 +125,7 @@ public class EntityValidation {
 			throw new IllegalArgumentException("유효한 사용자 ID가 필요합니다.");
 		}
 
-		if (waitingQueue.getConcertScheduleId() < 0) {
+		if (waitingQueue.getSeatDetailId() < 0) {
 			throw new IllegalArgumentException("유효한 콘서트ScheduleID가 필요합니다.");
 		}
 

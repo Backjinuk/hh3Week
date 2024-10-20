@@ -62,6 +62,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	@Override
 	@Transactional
 	public TokenDto reserveSeat(long userId, long seatDetailId) {
+
+
 		// 1. 대기열에 등록되지 않은 사용자만 진행
 		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
 			throw new IllegalStateException("사용자가 이미 대기열에 등록되어 있습니다.");
@@ -71,6 +73,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		WaitingQueueDto waitingQueueDto = WaitingQueueDto.builder()
 			.userId(userId)
 			.waitingStatus(WaitingStatus.WAITING)
+			.seatDetailId(seatDetailId)
 			.priority(1) // 우선순위 설정 (예시 값)
 			.reservationDt(LocalDateTime.now())
 			.build();

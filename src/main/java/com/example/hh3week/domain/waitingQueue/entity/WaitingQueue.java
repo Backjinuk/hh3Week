@@ -2,8 +2,6 @@ package com.example.hh3week.domain.waitingQueue.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.NaturalIdCache;
-
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 
 import jakarta.persistence.Entity;
@@ -30,7 +28,7 @@ public class WaitingQueue {
 
 	private long userId;
 
-	private long concertScheduleId;
+	private long seatDetailId;
 
 	private LocalDateTime reservationDt;
 
@@ -40,11 +38,11 @@ public class WaitingQueue {
 	private long priority;
 
 	@Builder
-	public WaitingQueue(long waitingId, long userId, long concertScheduleId, LocalDateTime reservationDt,
+	public WaitingQueue(long waitingId, long userId, long seatDetailId, LocalDateTime reservationDt,
 		WaitingStatus waitingStatus, long priority) {
 		this.waitingId = waitingId;
 		this.userId = userId;
-		this.concertScheduleId = concertScheduleId;
+		this.seatDetailId = seatDetailId;
 		this.reservationDt = reservationDt;
 		this.waitingStatus = waitingStatus;
 		this.priority = priority;
@@ -55,7 +53,7 @@ public class WaitingQueue {
 		return WaitingQueue.builder()
 			.waitingId(waitingQueueDto.getWaitingId())
 			.userId(waitingQueueDto.getUserId())
-			.concertScheduleId(waitingQueueDto.getConcertScheduleId())
+			.seatDetailId(waitingQueueDto.getSeatDetailId())
 			.reservationDt(waitingQueueDto.getReservationDt())
 			.waitingStatus(waitingQueueDto.getWaitingStatus())
 			.priority(waitingQueueDto.getPriority())

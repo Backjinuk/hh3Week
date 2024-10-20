@@ -90,7 +90,7 @@ CREATE TABLE token (
 CREATE TABLE waiting_queue (
                                waiting_id INT PRIMARY KEY AUTO_INCREMENT,
                                user_id INT,
-                               concert_schedule_id INT,
+                               seat_detail_id INT,
                                reservation_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                waiting_status VARCHAR(50) NOT NULL,
                                priority INT NOT NULL

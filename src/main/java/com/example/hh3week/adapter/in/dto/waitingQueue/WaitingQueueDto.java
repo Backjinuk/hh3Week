@@ -16,7 +16,7 @@ public class WaitingQueueDto {
 
 	private long userId;
 
-	private long concertScheduleId;
+	private long seatDetailId;
 
 	private LocalDateTime reservationDt;
 
@@ -25,11 +25,11 @@ public class WaitingQueueDto {
 	private long priority;
 
 	@Builder
-	public WaitingQueueDto(long waitingId, long userId, long concertScheduleId, LocalDateTime reservationDt,
+	public WaitingQueueDto(long waitingId, long userId, long seatDetailId, LocalDateTime reservationDt,
 		WaitingStatus waitingStatus, long priority) {
 		this.waitingId = waitingId;
 		this.userId = userId;
-		this.concertScheduleId = concertScheduleId;
+		this.seatDetailId = seatDetailId;
 		this.reservationDt = reservationDt;
 		this.waitingStatus = waitingStatus;
 		this.priority = priority;
@@ -45,7 +45,7 @@ public class WaitingQueueDto {
 
 		return WaitingQueueDto.builder()
 			.waitingId(waitingQueue.getWaitingId())
-			.concertScheduleId(waitingQueue.getConcertScheduleId())
+			.seatDetailId(waitingQueue.getSeatDetailId())
 			.userId(waitingQueue.getUserId())
 			.reservationDt(waitingQueue.getReservationDt())
 			.waitingStatus(waitingQueue.getWaitingStatus())

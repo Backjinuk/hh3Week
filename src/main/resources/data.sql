@@ -3,7 +3,8 @@ INSERT INTO user (user_id, user_name, point_balance)
 VALUES
     (1, '유저 A', 100000),
     (2, '유저 B', 50000),
-    (3, '유저 C', 20000);
+    (3, '유저 C', 20000),
+   (101, '유저 C', 20000);
 
 -- src/test/resources/test-data-payment-history.sql
 
@@ -27,7 +28,7 @@ VALUES
 -- Token 더미 데이터
 INSERT INTO token (token_id, user_id, token, issued_at, expires_at)
 VALUES
-    (1, 101, 'token123', '2024-01-01 10:00:00', '2025-01-01 10:00:00'),
+    (1, 101, 'token123', '2024-01-01 10:00:00', '2025-01-12 10:00:00'),
     (2, 102, 'token456', '2024-01-01 10:00:00', '2024-01-01 10:00:00'); -- 이미 만료된 토큰
 
 
@@ -69,7 +70,7 @@ VALUES
 -- src/test/resources/test-data-waiting-queue.sql
 
 -- WaitingQueue 더미 데이터
-INSERT INTO waiting_queue (waiting_id, user_id, concert_schedule_id, reservation_dt, waiting_status, priority)
+INSERT INTO waiting_queue (waiting_id, user_id, seat_detail_id, reservation_dt, waiting_status, priority)
 VALUES
     (1, 101, 1, '2024-01-01 10:00:00', 'WAITING', 5),
     (2, 102, 1, '2024-01-01 10:05:00', 'WAITING', 3),

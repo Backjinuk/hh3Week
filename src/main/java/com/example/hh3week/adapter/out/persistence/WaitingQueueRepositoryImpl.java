@@ -44,23 +44,23 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	/**
 	 * 특정 콘서트 스케줄에 대한 다음 대기열 항목을 반환합니다.
 	 *
-	 * @param concertScheduleId 콘서트 스케줄 ID
+	 * @param seatDetailId 콘서트 스케줄 ID
 	 * @return 다음 WaitingQueue 객체
 	 * @throws IllegalArgumentException 대기열에 항목이 없을 경우
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public WaitingQueue getNextInQueue(long concertScheduleId) {
+	public WaitingQueue getNextInQueue(long seatDetailId) {
 		Optional<WaitingQueue> nextInQueue = Optional.ofNullable(
 			queryFactory.selectFrom(qWaitingQueue)
-				.where(qWaitingQueue.concertScheduleId.eq(concertScheduleId)
+				.where(qWaitingQueue.seatDetailId.eq(seatDetailId)
 					.and(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING)))
 				.orderBy(qWaitingQueue.priority.desc(), qWaitingQueue.reservationDt.asc())
 				.fetchFirst()
 		);
 
 		return nextInQueue.orElseThrow(() ->
-			new IllegalArgumentException("No waiting queue found for concertScheduleId: " + concertScheduleId)
+			new IllegalArgumentException("No waiting queue found for seatDetailId: " + seatDetailId)
 		);
 	}
 
@@ -88,16 +88,16 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	 * 특정 사용자와 좌석 상세 ID에 대한 대기열 상태를 조회합니다.
 	 *
 	 * @param userId        사용자 ID
-	 * @param concertScheduleId  좌석 상세 ID
+	 * @param seatDetailId  좌석 상세 ID
 	 * @return 해당 WaitingQueue 객체
 	 * @throws IllegalArgumentException 해당 대기열 상태를 찾을 수 없을 경우
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public WaitingQueue getQueueStatus(long userId, long concertScheduleId) {
+	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
 		return 	queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.userId.eq(userId)
-				.and(qWaitingQueue.concertScheduleId.eq(concertScheduleId)))
+				.and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
 			.fetchOne();
 	}
 
@@ -124,7 +124,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		// 대기열 위치 계산을 위한 카운트 조회
 		Long positionCount = queryFactory.select(qWaitingQueue.count())
 			.from(qWaitingQueue)
-			.where(qWaitingQueue.concertScheduleId.eq(waitingQueue.getConcertScheduleId())
+			.where(qWaitingQueue.seatDetailId.eq(waitingQueue.getSeatDetailId())
 				.and(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING))
 				.and(qWaitingQueue.priority.goe(waitingQueue.getPriority()))
 				.and(qWaitingQueue.reservationDt.lt(waitingQueue.getReservationDt())))
