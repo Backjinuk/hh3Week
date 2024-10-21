@@ -1,5 +1,3 @@
-// src/main/java/com/example/hh3week/adapter/out/persistence/ConcertRepositoryImpl.java
-
 package com.example.hh3week.adapter.out.persistence;
 
 import java.time.LocalDateTime;
@@ -15,7 +13,6 @@ import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;
 import com.example.hh3week.domain.concert.entity.QConcert;
 import com.example.hh3week.domain.concert.entity.QConcertSchedule;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.querydsl.jpa.JPAExpressions;
 
 @Repository
 public class ConcertRepositoryImpl implements ConcertRepositoryPort {
@@ -32,49 +29,71 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Concert> getAvilbleConcertList() {
-		return queryFactory.selectFrom(qConcert)
+		List<Concert> concerts = queryFactory.selectFrom(qConcert)
 			.fetch();
+
+		if (concerts.isEmpty()) {
+			throw new NullPointerException("사용 가능한 콘서트를 찾을 수 없습니다.");
+		}
+
+		return concerts;
 	}
 
 
 	@Override
 	@Transactional(readOnly = true)
 	public Concert getConcertFindById(long concertId) {
-
-		return queryFactory.selectFrom(qConcert)
+		Concert concert = queryFactory.selectFrom(qConcert)
 			.where(qConcert.concertId.eq(concertId))
 			.fetchOne();
+
+		if (concert == null) {
+			throw new NullPointerException("콘서트를 찾을 수 없습니다.");
+		}
+
+		return concert;
 	}
 
-	/**
-	 * 사용 가능한 모든 콘서트 스케줄 목록을 반환합니다.
-	 *
-	 * @return List of available ConcertSchedules
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<ConcertSchedule> getAvilbleConcertSchedueList() {
-		return queryFactory.selectFrom(qConcertSchedule)
+		List<ConcertSchedule> concertSchedules = queryFactory.selectFrom(qConcertSchedule)
 			.where(qConcertSchedule.concertScheduleStatus.eq(ConcertScheduleStatus.AVAILABLE))
 			.fetch();
-	}
 
+		if (concertSchedules.isEmpty()) {
+			throw new NullPointerException("사용 가능한 콘서트 스케줄을 찾을 수 없습니다.");
+		}
+
+		return concertSchedules;
+	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public ConcertSchedule getConcertScheduleFindById(long concertScheduleId) {
-
-		return queryFactory.selectFrom(qConcertSchedule)
+		ConcertSchedule concertSchedule = queryFactory.selectFrom(qConcertSchedule)
 			.where(qConcertSchedule.concertScheduleId.eq(concertScheduleId))
 			.fetchOne();
-	}
 
+		if (concertSchedule == null) {
+			throw new NullPointerException("콘서트 스케줄을 찾을 수 없습니다.");
+		}
+
+		return concertSchedule;
+	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<ConcertSchedule> getConcertsByDate(LocalDateTime startDate, LocalDateTime endDate) {
-		return queryFactory.selectFrom(qConcertSchedule)
+
+		List<ConcertSchedule> concertSchedules = queryFactory.selectFrom(qConcertSchedule)
 			.where(qConcertSchedule.startDt.between(startDate, endDate))
 			.fetch();
+
+		if (concertSchedules.isEmpty()) {
+			throw new NullPointerException("콘서트 스케줄을 찾을 수 없습니다.");
+		}
+
+		return concertSchedules;
 	}
 }

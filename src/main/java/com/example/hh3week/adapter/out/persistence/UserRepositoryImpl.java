@@ -25,7 +25,6 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 	private final QUser qUser = QUser.user;
 	private final QUserPointHistory qUserPointHistory = QUserPointHistory.userPointHistory;
 
-	// 생성자 주입
 	public UserRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager) {
 		this.queryFactory = queryFactory;
 		this.entityManager = entityManager;
@@ -59,8 +58,14 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 
 	@Override
 	public List<UserPointHistory> getUserPointHistoryFindByUserId(long userId) {
-		return queryFactory.selectFrom(qUserPointHistory)
+		List<UserPointHistory> userPointHistories = queryFactory.selectFrom(qUserPointHistory)
 			.where(qUserPointHistory.userId.eq(userId))
 			.fetch();
+
+		if(userPointHistories.isEmpty()){
+			throw new NullPointerException("사용자를 찾을 수 없습니다.");
+		}
+
+		return userPointHistories;
 	}
 }

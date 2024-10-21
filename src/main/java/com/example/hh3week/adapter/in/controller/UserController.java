@@ -1,14 +1,16 @@
 package com.example.hh3week.adapter.in.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.hh3week.adapter.in.dto.user.UserDto;
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.application.port.in.UserUseCase;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

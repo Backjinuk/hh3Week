@@ -58,10 +58,13 @@ class ConcertUseCaseIntegrationTest {
 		LocalDateTime endDate = LocalDateTime.of(2024, 6, 30, 23, 59);
 
 		// When
-		List<ConcertScheduleDto> availableConcerts = concertUseCase.getAvailableConcertDates(startDate, endDate);
+
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			concertUseCase.getAvailableConcertDates(startDate, endDate);
+		});
 
 		// Then
-		assertThat(availableConcerts).isEmpty();
+		assertThat(nullPointerException.getMessage()).isEqualTo("콘서트 스케줄을 찾을 수 없습니다.");
 	}
 
 	@Test

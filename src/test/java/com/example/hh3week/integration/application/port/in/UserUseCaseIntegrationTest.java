@@ -207,9 +207,11 @@ public class UserUseCaseIntegrationTest {
 		long nonExistentUserId = 999L;
 
 		// When
-		List<UserPointHistoryDto> histories = userUseCase.getUserPointHistoryListByUserId(nonExistentUserId);
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			userUseCase.getUserPointHistoryListByUserId(nonExistentUserId);
+		});
 
 		// Then
-		assertThat(histories).isEmpty();
+		assertThat(nullPointerException.getMessage()).isEqualTo("사용자를 찾을 수 없습니다.");
 	}
 }

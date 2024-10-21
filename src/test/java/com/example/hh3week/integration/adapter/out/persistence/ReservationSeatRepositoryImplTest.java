@@ -1,6 +1,7 @@
 package com.example.hh3week.integration.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -127,8 +128,11 @@ public class ReservationSeatRepositoryImplTest {
 		long nonExistentSeatId = 999L;
 
 		// When & Then
-		ReservationSeat seatById = reservationSeatRepositoryImpl.getSeatById(nonExistentSeatId);
-		assertThat(seatById).isNull();
+
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			reservationSeatRepositoryImpl.getSeatById(nonExistentSeatId);
+		});
+		assertThat(nullPointerException.getMessage()).isEqualTo("좌석을 찾을 수 없습니다.");
 	}
 
 	/**

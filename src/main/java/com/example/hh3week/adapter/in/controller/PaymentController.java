@@ -1,4 +1,3 @@
-// src/main/java/com/example/hh3week/adapter/in/controller/PaymentController.java
 package com.example.hh3week.adapter.in.controller;
 
 import com.example.hh3week.adapter.in.dto.payment.PaymentHistoryDto;

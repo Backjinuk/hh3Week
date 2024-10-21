@@ -30,7 +30,6 @@ public class UserRepositoryImplTest {
 	@Autowired
 	private EntityManager entityManager;
 
-
 	@Test
 	@DisplayName("사용자 정보 조회 - 사용자 존재 시 사용자 반환")
 	void 사용자정보조회_사용자존재시사용자반환() {
@@ -43,8 +42,6 @@ public class UserRepositoryImplTest {
 		User fetchedUser = userRepositoryImpl.getUserInfo(userId);
 
 		System.out.println("2");
-
-
 
 		// Then
 		assertThat(fetchedUser).isNotNull();
@@ -154,9 +151,9 @@ public class UserRepositoryImplTest {
 		long userId = 999L; // 존재하지 않는 사용자 ID
 
 		// When
-		List<UserPointHistory> histories = userRepositoryImpl.getUserPointHistoryFindByUserId(userId);
 
-		// Then
-		assertThat(histories).isEmpty();
+		assertThatThrownBy(() -> userRepositoryImpl.getUserPointHistoryFindByUserId(userId))
+			.isInstanceOf(NullPointerException.class)
+			.hasMessage("사용자를 찾을 수 없습니다.");
 	}
 }

@@ -1,6 +1,7 @@
 package com.example.hh3week.integration.adapter.out.persistence;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,10 +67,11 @@ public class ConcertRepositoryImplTest {
 		// Given
 		long nonExistentConcertId = 999L;
 
-		Concert concertFindById = concertRepositoryImpl.getConcertFindById(nonExistentConcertId);
 		// When & Then
-
-		assertThat(concertFindById).isNull();
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			concertRepositoryImpl.getConcertFindById(nonExistentConcertId);
+		});
+		assertThat(nullPointerException.getMessage()).isEqualTo("콘서트를 찾을 수 없습니다.");
 	}
 
 	@Test
@@ -106,11 +108,12 @@ public class ConcertRepositoryImplTest {
 		// Given
 		long nonExistentScheduleId = 999L;
 
-		ConcertSchedule concertScheduleFindById = concertRepositoryImpl.getConcertScheduleFindById(
-			nonExistentScheduleId);
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			concertRepositoryImpl.getConcertScheduleFindById(nonExistentScheduleId);
+		});
 		// When & Then
 
-		assertThat(concertScheduleFindById).isNull();
+		assertThat(nullPointerException.getMessage()).isEqualTo("콘서트 스케줄을 찾을 수 없습니다.");
 	}
 
 	@Test
@@ -138,10 +141,10 @@ public class ConcertRepositoryImplTest {
 		LocalDateTime startDate = LocalDateTime.of(2025, 1, 1, 0, 0);
 		LocalDateTime endDate = LocalDateTime.of(2025, 12, 31, 23, 59);
 
-		// When
-		List<ConcertSchedule> schedules = concertRepositoryImpl.getConcertsByDate(startDate, endDate);
-
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			concertRepositoryImpl.getConcertsByDate(startDate, endDate);
+		});
 		// Then
-		assertThat(schedules).isEmpty();
+		assertThat(nullPointerException.getMessage()).isEqualTo("콘서트 스케줄을 찾을 수 없습니다.");
 	}
 }

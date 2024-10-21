@@ -200,37 +200,37 @@ public class UserControllerIntegrationTest {
 			.andExpect(jsonPath("$[2].pointStatus").value("EARN"));
 	}
 
-	// @Test
-	// @DisplayName("사용자 포인트 히스토리 조회 - 존재하지 않는 사용자 ID일 경우 예외 발생")
-	// void 사용자포인트히스토리조회_존재하지않는사용자ID일경우예외발생() throws Exception {
-	// 	// Given
-	// 	long nonExistentUserId = 999L;
-	//
-	// 	UserDto userDto = UserDto.builder().userId(nonExistentUserId).build();
-	// 	String userDtoJson = objectMapper.writeValueAsString(userDto);
-	//
-	// 	// When & Then
-	// 	mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
-	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(userDtoJson))
-	// 		.andExpect(status().isNotFound())
-	// 		.andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다. ID: " + nonExistentUserId));
-	// }
-	//
-	// @Test
-	// @DisplayName("사용자 포인트 히스토리 조회 - 존재하지 않는 사용자 ID일 경우 빈 리스트 반환")
-	// void 사용자포인트히스토리조회_존재하지않는사용자ID일경우빈리스트반환() throws Exception {
-	// 	// Given
-	// 	long nonExistentUserId = 999L;
-	//
-	// 	UserDto userDto = UserDto.builder().userId(nonExistentUserId).build();
-	// 	String userDtoJson = objectMapper.writeValueAsString(userDto);
-	//
-	// 	// When & Then
-	// 	mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
-	// 			.contentType(MediaType.APPLICATION_JSON)
-	// 			.content(userDtoJson))
-	// 		.andExpect(status().isNotFound())
-	// 		.andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다. ID: " + nonExistentUserId));
-	// }
+	@Test
+	@DisplayName("사용자 포인트 히스토리 조회 - 존재하지 않는 사용자 ID일 경우 예외 발생")
+	void 사용자포인트히스토리조회_존재하지않는사용자ID일경우예외발생() throws Exception {
+		// Given
+		long nonExistentUserId = 999L;
+
+		UserDto userDto = UserDto.builder().userId(nonExistentUserId).build();
+		String userDtoJson = objectMapper.writeValueAsString(userDto);
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(userDtoJson))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다."));
+	}
+
+	@Test
+	@DisplayName("사용자 포인트 히스토리 조회 - 존재하지 않는 사용자 ID일 경우 빈 리스트 반환")
+	void 사용자포인트히스토리조회_존재하지않는사용자ID일경우빈리스트반환() throws Exception {
+		// Given
+		long nonExistentUserId = 999L;
+
+		UserDto userDto = UserDto.builder().userId(nonExistentUserId).build();
+		String userDtoJson = objectMapper.writeValueAsString(userDto);
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(userDtoJson))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("사용자를 찾을 수 없습니다." ));
+	}
 }

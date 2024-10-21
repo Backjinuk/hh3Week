@@ -88,7 +88,8 @@ class ConcertControllerIntegrationTest {
 
 		// then
 		mockMvc.perform(post("/api/v1/concerts/getAvailableConcertDates").contentType(MediaType.APPLICATION_JSON)
-			.content(concertDtoJson)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+			.content(concertDtoJson)).andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.message").value("콘서트 스케줄을 찾을 수 없습니다."));
 	}
 
 	@Test
