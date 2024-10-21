@@ -2,12 +2,15 @@ package com.example.hh3week.application.service;
 
 import java.util.List;
 
+import javax.swing.text.DefaultEditorKit;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
@@ -46,7 +49,7 @@ public class ReservationService {
 		seat.setCurrentReserved(seat.getCurrentReserved() + 1);
 
 		if(seat.getCurrentReserved() >= seat.getMaxCapacity()){
-			throw new IllegalArgumentException("이미 최대 예약 수에 도달했습니다.");
+			CustomException.illegalArgument("이미 최대 예약 수에 도달했습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 

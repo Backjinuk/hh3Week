@@ -15,11 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
-import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -44,7 +42,7 @@ public class ReservationControllerIntegrationTest {
 		ConcertScheduleDto concertScheduleDto = ConcertScheduleDto.builder().concertScheduleId(1L).build();
 
 		// When
-	 mockMvc.perform(
+		mockMvc.perform(
 				post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(concertScheduleDto)))
 			.andExpect(status().isOk())
@@ -70,9 +68,8 @@ public class ReservationControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(
-				post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(concertScheduleDto)))
-			.andExpect(status().isBadRequest());
+			post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(concertScheduleDto))).andExpect(status().isBadRequest());
 	}
 
 	/**
@@ -85,11 +82,6 @@ public class ReservationControllerIntegrationTest {
 		Map<String, Long> requestBodyMap = new HashMap<>();
 		requestBodyMap.put("userId", 1L);
 		requestBodyMap.put("seatDetailId", 1L); // 예약 가능한 좌석
-
-		TokenDto mockToken = TokenDto.builder().tokenId(1).token("token1234").userId(101L).build();
-
-		// 예약 요청 시 실제 서비스 계층이 동작하므로, 별도의 목(Mock)이 필요 없습니다.
-		// 단, 예약 로직이 정상적으로 동작하도록 데이터베이스 상태를 설정해야 합니다.
 
 		// When & Then
 		MvcResult mvcResult = mockMvc.perform(
@@ -168,16 +160,9 @@ public class ReservationControllerIntegrationTest {
 		requestBodyMap.put("userId", 1L);
 		requestBodyMap.put("seatDetailId", 101L); // 정상적인 좌석
 
-		// 예약 로직이 이미 좌석을 예약했거나 기타 비즈니스 로직에 의해 예외가 발생했다고 가정
-		// 이를 위해 데이터베이스 상태를 미리 설정하거나, 서비스 계층을 Mocking 해야 하지만
-		// 통합 테스트에서는 실제 서비스 계층을 사용하므로, 예외를 발생시키는 조건을 데이터베이스에 맞게 설정해야 합니다.
-
-		// 예를 들어, 이미 예약된 좌석을 다시 예약하려고 시도하는 경우
-
 		// 먼저, 좌석을 예약하여 상태를 변경
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(requestBodyMap))).andExpect(status().isOk());
-
 
 		// 다시 같은 좌석을 예약하려고 시도
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)

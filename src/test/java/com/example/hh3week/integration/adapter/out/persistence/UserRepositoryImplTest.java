@@ -91,9 +91,11 @@ public class UserRepositoryImplTest {
 		User nonExistentUser = User.builder().userId(999L).pointBalance(80000L).build();
 
 		// When & Then
-		userRepositoryImpl.updateDepositBalance(nonExistentUser);
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+			userRepositoryImpl.updateDepositBalance(nonExistentUser);
+		});
 
-		assertThat(nonExistentUser.getUserId()).isEqualTo(999);
+		assertThat(nullPointerException.getMessage()).isEqualTo("사용자를 찾을 수 없습니다.");
 	}
 
 	@Test

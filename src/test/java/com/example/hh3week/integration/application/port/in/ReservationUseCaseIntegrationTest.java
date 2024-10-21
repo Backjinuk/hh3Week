@@ -70,7 +70,7 @@ class ReservationUseCaseIntegrationTest {
 		long seatDetailId = 1L; // SeatDetail for seatId 1 (A1)
 
 		// When & Then
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
 			reservationUseCase.reserveSeat(userId, seatDetailId);
 		});
 

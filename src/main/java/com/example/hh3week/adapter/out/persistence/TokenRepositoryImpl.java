@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.token.entity.QToken;
 import com.example.hh3week.domain.token.entity.Token;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -76,7 +77,7 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 			.execute();
 
 		if (updatedCount == 0) {
-			throw new IllegalArgumentException("만료할 토큰을 찾을 수 없습니다: " + tokenStr);
+			CustomException.illegalArgument("만료할 토큰을 찾을 수 없습니다", new IllegalArgumentException() , this.getClass());
 		}
 	}
 

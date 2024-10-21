@@ -10,6 +10,7 @@ import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.adapter.in.dto.validation.DtoValidation;
 import com.example.hh3week.application.port.in.UserUseCase;
 import com.example.hh3week.application.service.UserService;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.user.entity.PointStatus;
 
 @Service
@@ -41,7 +42,7 @@ public class UserUseCaseInteract implements UserUseCase {
 		} else if (userPointHistoryDto.getPointStatus() == PointStatus.USE) {
 			useUserPoints(userInfo, userPointHistoryDto.getPointAmount());
 		} else {
-			throw new IllegalArgumentException("유효하지 않은 포인트 상태입니다.");
+			CustomException.illegalArgument("유효하지 않은 포인트 상태입니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 		return userService.addUserPointHistoryInUser(userPointHistoryDto);

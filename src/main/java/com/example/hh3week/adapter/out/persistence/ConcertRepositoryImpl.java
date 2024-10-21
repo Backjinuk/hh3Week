@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.ConcertRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.concert.entity.Concert;
 import com.example.hh3week.domain.concert.entity.ConcertSchedule;
 import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;
@@ -33,7 +34,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 			.fetch();
 
 		if (concerts.isEmpty()) {
-			throw new NullPointerException("사용 가능한 콘서트를 찾을 수 없습니다.");
+			CustomException.nullPointer("사용 가능한 콘서트를 찾을 수 없습니다.", this.getClass());
 		}
 
 		return concerts;
@@ -48,7 +49,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 			.fetchOne();
 
 		if (concert == null) {
-			throw new NullPointerException("콘서트를 찾을 수 없습니다.");
+			CustomException.nullPointer("콘서트를 찾을 수 없습니다.", this.getClass());
 		}
 
 		return concert;
@@ -62,7 +63,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 			.fetch();
 
 		if (concertSchedules.isEmpty()) {
-			throw new NullPointerException("사용 가능한 콘서트 스케줄을 찾을 수 없습니다.");
+			CustomException.nullPointer("사용 가능한 콘서트 스케줄을 찾을 수 없습니다." , this.getClass());
 		}
 
 		return concertSchedules;
@@ -76,7 +77,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 			.fetchOne();
 
 		if (concertSchedule == null) {
-			throw new NullPointerException("콘서트 스케줄을 찾을 수 없습니다.");
+			CustomException.nullPointer("콘서트 스케줄을 찾을 수 없습니다.", this.getClass());
 		}
 
 		return concertSchedule;
@@ -91,7 +92,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 			.fetch();
 
 		if (concertSchedules.isEmpty()) {
-			throw new NullPointerException("콘서트 스케줄을 찾을 수 없습니다.");
+			CustomException.nullPointer("콘서트 스케줄을 찾을 수 없습니다.", this.getClass());
 		}
 
 		return concertSchedules;

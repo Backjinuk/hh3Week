@@ -14,6 +14,7 @@ import com.example.hh3week.application.port.in.ReservationUseCase;
 import com.example.hh3week.application.service.ReservationService;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
@@ -66,7 +67,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 		// 1. 대기열에 등록되지 않은 사용자만 진행
 		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
-			throw new IllegalStateException("사용자가 이미 대기열에 등록되어 있습니다.");
+			CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException() , this.getClass());
 		}
 
 		// 2. 대기열에 사용자 추가

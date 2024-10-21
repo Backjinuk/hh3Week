@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.hh3week.adapter.in.dto.user.UserDto;
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.application.port.out.UserRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.user.entity.User;
 import com.example.hh3week.domain.user.entity.UserPointHistory;
 
@@ -30,10 +31,10 @@ public class UserService {
 	public void depositBalance(UserDto userDto, long amount) {
 		if (userDto == null) {
 
-			throw new NullPointerException("UserDto는 null일 수 없습니다.");
+			CustomException.nullPointer("UserDto는 null일 수 없습니다.", this.getClass());
 		}
 		if (amount < 0) {
-			throw new IllegalArgumentException("충전 금액은 음수일 수 없습니다.");
+			CustomException.illegalArgument("충전 금액은 음수일 수 없습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 		User user = User.toEntity(userDto);
@@ -52,14 +53,15 @@ public class UserService {
 	public void useBalance(UserDto userDto, long amount) {
 		if (userDto == null) {
 
-			throw new NullPointerException("UserDto는 null일 수 없습니다.");
+			CustomException.nullPointer("UserDto는 null일 수 없습니다.", this.getClass());
+
 		}
 		if (amount < 0) {
-			throw new IllegalArgumentException("충전 금액은 음수일 수 없습니다.");
+			CustomException.illegalArgument("충전 금액은 음수일 수 없습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 		if(userDto.getPointBalance() <= amount){
-			throw new IllegalArgumentException("사용할 포인트가 부족합니다.");
+			CustomException.illegalArgument("사용할 포인트가 부족합니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 		User user = User.toEntity(userDto);
@@ -72,7 +74,7 @@ public class UserService {
 		UserDto userDto = UserDto.toDto(userRepositoryPort.getUserInfo(userId));
 
 		if (userDto.getUserId() <= 0) {
-			throw new IllegalArgumentException("사용자를 찾을수 없습니다.");
+			CustomException.illegalArgument("사용자를 찾을수 없습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 		return userDto;
@@ -80,7 +82,7 @@ public class UserService {
 
 	public UserPointHistoryDto addUserPointHistoryInUser(UserPointHistoryDto userPointHistoryDto) {
 		if (userPointHistoryDto == null) {
-			throw new IllegalArgumentException("UserPointHistoryDto는 null일 수 없습니다.");
+			CustomException.illegalArgument("UserPointHistoryDto는 null일 수 없습니다.", new IllegalArgumentException(), this.getClass());
 		}
 		UserPointHistory userPointHistory = userRepositoryPort.addUserPointHistoryInUser(
 			UserPointHistory.toEntity(userPointHistoryDto));

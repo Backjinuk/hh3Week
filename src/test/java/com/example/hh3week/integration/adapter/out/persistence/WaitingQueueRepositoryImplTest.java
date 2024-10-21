@@ -17,6 +17,9 @@ import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @SpringBootTest
 @Transactional
 @Sql({"classpath:schema.sql", "classpath:data.sql"})
@@ -74,10 +77,11 @@ public class WaitingQueueRepositoryImplTest {
 
 		// When & Then
 
-		InvalidDataAccessApiUsageException exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
 			waitingQueueRepositoryImpl.getNextInQueue(seatDetailId);
 		});
 
+		assertThat(nullPointerException.getMessage()).isEqualTo("대기열 항목을 찾을 수 없습니다.");
 	}
 
 	@Test
@@ -104,10 +108,11 @@ public class WaitingQueueRepositoryImplTest {
 
 		// When & Then
 
-		InvalidDataAccessApiUsageException exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+		NullPointerException exception = assertThrows(NullPointerException.class, () -> {
 			waitingQueueRepositoryImpl.updateStatus(waitingId, newStatus);
 		});
 
+		assertThat(exception.getMessage()).isEqualTo("대기열 항목을 찾을 수 없습니다.");
 	}
 
 	@Test
@@ -163,9 +168,10 @@ public class WaitingQueueRepositoryImplTest {
 		long waitingId = 999L;
 
 		// When & Then
-		InvalidDataAccessApiUsageException exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+		NullPointerException exception = assertThrows(NullPointerException.class, () -> {
 			waitingQueueRepositoryImpl.getQueuePosition(waitingId);
 		});
 
+		assertThat(exception.getMessage()).isEqualTo("대기열 항목을 찾을 수 없습니다.");
 	}
 }

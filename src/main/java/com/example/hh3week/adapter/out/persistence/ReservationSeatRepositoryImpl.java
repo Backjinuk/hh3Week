@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.reservation.entity.QReservationSeat;
 import com.example.hh3week.domain.reservation.entity.QReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
@@ -34,7 +35,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 			.fetch();
 
 		if (seatDetails.isEmpty()) {
-			throw new NullPointerException("해당 좌석을 찾을수 없습니다.");
+			CustomException.nullPointer("해당 좌석을 찾을수 없습니다.", this.getClass());
 		}
 
 		return seatDetails;
@@ -48,7 +49,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 			.fetch();
 
 		if (seats.isEmpty()) {
-			throw new NullPointerException("해당 콘서트 스케줄에 사용 가능한 좌석이 없습니다.");
+			CustomException.nullPointer("해당 콘서트 스케줄에 사용 가능한 좌석이 없습니다.", this.getClass());
 		}
 
 		return seats;
@@ -71,7 +72,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 			.fetchOne();
 
 		if (seatDetail == null) {
-			throw new NullPointerException("해당 좌석을 찾을수 없습니다.");
+			CustomException.nullPointer("해당 좌석을 찾을수 없습니다.", this.getClass());
 		}
 
 		return seatDetail;
@@ -94,7 +95,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 			.fetchOne();
 
 		if (seat == null) {
-			throw new NullPointerException("좌석을 찾을 수 없습니다.");
+			CustomException.nullPointer("좌석을 찾을 수 없습니다.", this.getClass());
 		}
 
 		return seat;

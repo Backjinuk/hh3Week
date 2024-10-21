@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.UserRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.user.entity.QUser;
 import com.example.hh3week.domain.user.entity.QUserPointHistory;
 import com.example.hh3week.domain.user.entity.User;
@@ -35,17 +36,21 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 		User user = queryFactory.selectFrom(qUser).where(qUser.userId.eq(userId)).fetchOne();
 
 		if(user == null){
-			throw new NullPointerException("사용자를 찾을 수 없습니다.");
+			CustomException.nullPointer("사용자를 찾을 수 없습니다.", this.getClass());
 		}
 		return user;
 	}
 
 	@Override
 	public void updateDepositBalance(User user) {
-		queryFactory.update(qUser)
+		long execute = queryFactory.update(qUser)
 			.set(qUser.pointBalance, user.getPointBalance())
 			.where(qUser.userId.eq(user.getUserId()))
 			.execute();
+
+		if(execute == 0){
+			CustomException.nullPointer("사용자를 찾을 수 없습니다.", this.getClass());
+		}
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 			.fetch();
 
 		if(userPointHistories.isEmpty()){
-			throw new NullPointerException("사용자를 찾을 수 없습니다.");
+			CustomException.nullPointer("사용자를 찾을 수 없습니다.", this.getClass());
 		}
 
 		return userPointHistories;

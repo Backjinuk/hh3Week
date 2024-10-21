@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.application.port.in.ConcertUseCase;
 import com.example.hh3week.application.service.ConcertService;
+import com.example.hh3week.common.config.CustomException;
 
 @Service
 public class ConcertUseCaseInteractor implements ConcertUseCase {
@@ -31,7 +32,7 @@ public class ConcertUseCaseInteractor implements ConcertUseCase {
 			// 특정 날짜 범위로 필터링하여 콘서트를 조회
 
 			if (startDate.isAfter(endDate)) {
-				throw new IllegalArgumentException("startDate는 endDate보다 이전이어야 합니다.");
+				CustomException.illegalArgument("startDate는 endDate보다 이전이어야 합니다.", new IllegalArgumentException(), this.getClass());
 			}
 
 			return concertService.getConcertsByDate(startDate, endDate);
