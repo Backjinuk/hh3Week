@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtProvider {
@@ -15,15 +16,17 @@ public class JwtProvider {
 	@Value("${jwt.expiration}")
 	private long jwtExpirationInMs;
 
+
 	/**
 	 * JWT 토큰 생성 메서드
 	 *
-	 * @param userId 사용자 고유 ID
-	 * @param queueOrder 대기열 순서
+	 * @param userId        사용자 고유 ID
+	 * @param queueOrder    대기열 순서
 	 * @param remainingTime 남은 대기 시간
+	 * @param seatDetailId
 	 * @return 생성된 JWT 토큰
 	 */
-	public String generateToken(long userId, long queueOrder, long remainingTime) {
+	public String generateToken(long userId, long queueOrder, long remainingTime, long seatDetailId) {
 		Date now = new Date();
 		Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
@@ -31,6 +34,7 @@ public class JwtProvider {
 			.setSubject(Long.toString(userId))
 			.claim("queueOrder", queueOrder)
 			.claim("remainingTime", remainingTime)
+			.claim("seatDetailId", seatDetailId)
 			.setIssuedAt(now)
 			.setExpiration(expiryDate)
 			.signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -50,6 +54,26 @@ public class JwtProvider {
 			.getBody();
 
 		return Long.parseLong(claims.getSubject());
+	}
+
+	/**
+	 * JWT 토큰에서 모든값 추출
+	 *
+	 * @param token
+	 * @return map
+	 * */
+	public Map<String, Object> getMapFromJWT(String token){
+		Claims claims = Jwts.parser()
+			.setSigningKey(jwtSecret)
+			.parseClaimsJws(token)
+			.getBody();
+
+		return Map.of(
+			"userId", Long.parseLong(claims.getSubject()),
+			"queueOrder", claims.get("queueOrder"),
+			"seatDetailId", claims.get("seatDetailId"),
+			"remainingTime", claims.get("remainingTime")
+		);
 	}
 
 	/**

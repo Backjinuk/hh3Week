@@ -6,10 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
+import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.common.util.JwtProvider;
 import com.example.hh3week.domain.token.entity.Token;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class TokenService {
@@ -26,18 +28,19 @@ public class TokenService {
 	/**
 	 * 사용자 정보 및 대기열 정보를 받아 JWT 토큰을 생성하고 저장합니다.
 	 *
-	 * @param userId 사용자 고유 ID
-	 * @param queueOrder 대기열 순서
+	 * @param userId        사용자 고유 ID
+	 * @param queueOrder    대기열 순서
 	 * @param remainingTime 남은 대기 시간 (초 단위)
+	 * @param seatDetailId
 	 * @return 생성된 토큰의 DTO
 	 */
 	@Transactional
-	public TokenDto createToken(long userId, long queueOrder, long remainingTime) {
+	public TokenDto createToken(long userId, long queueOrder, long remainingTime, long seatDetailId) {
 		// JWT 토큰 생성
-		String token = jwtProvider.generateToken(userId, queueOrder, remainingTime);
+		String token = jwtProvider.generateToken(userId, queueOrder, remainingTime, seatDetailId);
 
 		// 토큰 엔티티 생성
-		Token tokenEntity = Token.builder()
+		TokenDto tokenEntity = TokenDto.builder()
 			.userId(userId)
 			.token(token)
 			.issuedAt(LocalDateTime.now())
@@ -45,7 +48,7 @@ public class TokenService {
 			.build();
 
 		// 토큰 엔티티를 DB에 저장
-		Token savedToken = tokenRepository.createToken(tokenEntity);
+		Token savedToken = tokenRepository.createToken(Token.ToEntity(tokenEntity));
 
 		// DTO로 변환하여 반환
 		return TokenDto.ToDto(savedToken);
@@ -61,6 +64,15 @@ public class TokenService {
 		if (jwtProvider.validateToken(token)) {
 			return jwtProvider.getUserIdFromJWT(token);
 		}
+
+		return null;
+	}
+
+	public Map<String, Object> getTokensAllValue(String token){
+		if(jwtProvider.validateToken(token)){
+			return jwtProvider.getMapFromJWT(token);
+		}
+
 		return null;
 	}
 
@@ -71,6 +83,7 @@ public class TokenService {
 	 * @return 만료되었으면 true, 아니면 false
 	 */
 	public boolean isTokenExpired(String token) {
+
 		return jwtProvider.isTokenExpired(token);
 	}
 }

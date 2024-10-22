@@ -48,11 +48,13 @@ class ReservationUseCaseIntegrationTest {
 	@DisplayName("좌석 예약 - 정상적으로 대기열에 추가되고 토큰이 발급됨")
 	void 좌석예약_정상적으로대기열에추가되고토큰이발급됨() {
 		// Given
-		long userId = 1L;
-		long seatDetailId = 3L; // SeatDetail for seatId 2 (B1)
+		long userId = 2L;
+		long seatDetailId = 5L; // SeatDetail for seatId 2 (B1)
 
 		// When
 		TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);
+
+		System.out.println(tokenDto.getToken());
 
 		// Then
 		assertThat(tokenDto).isNotNull();

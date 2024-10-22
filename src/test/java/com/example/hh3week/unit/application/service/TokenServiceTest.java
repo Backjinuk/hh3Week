@@ -1,5 +1,6 @@
 package com.example.hh3week.unit.application.service;
 
+import static org.assertj.core.api.FactoryBasedNavigableListAssert.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -44,7 +45,7 @@ public class TokenServiceTest {
 		String expectedToken = "test-jwt-token";
 
 		// Mock the JwtProvider to return a token
-		when(jwtProvider.generateToken(userId, queueOrder, remainingTime)).thenReturn(expectedToken);
+		when(jwtProvider.generateToken(userId, queueOrder, remainingTime, 1)).thenReturn(expectedToken);
 
 		// Mock the repository to return the saved token
 		Token savedToken = Token.builder()
@@ -57,13 +58,13 @@ public class TokenServiceTest {
 		when(tokenRepository.createToken(any(Token.class))).thenReturn(savedToken);
 
 		// when
-		TokenDto tokenDto = tokenService.createToken(userId, queueOrder, remainingTime);
+		TokenDto tokenDto = tokenService.createToken(userId, queueOrder, remainingTime, 1);
 
 		// then
 		assertNotNull(tokenDto);
 		assertEquals(expectedToken, tokenDto.getToken());
 		assertEquals(userId, tokenDto.getUserId());
-		verify(jwtProvider, times(1)).generateToken(userId, queueOrder, remainingTime);
+		verify(jwtProvider, times(1)).generateToken(userId, queueOrder, remainingTime, 1);
 		verify(tokenRepository, times(1)).createToken(any(Token.class));
 	}
 
@@ -98,6 +99,7 @@ public class TokenServiceTest {
 		when(jwtProvider.validateToken(token)).thenReturn(false);
 
 		// when
+
 		Long actualUserId = tokenService.validateTokenAndGetUserId(token);
 
 		// then

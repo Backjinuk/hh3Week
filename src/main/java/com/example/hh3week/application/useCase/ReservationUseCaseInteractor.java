@@ -64,10 +64,9 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	@Transactional
 	public TokenDto reserveSeat(long userId, long seatDetailId) {
 
-
 		// 1. 대기열에 등록되지 않은 사용자만 진행
 		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
-			CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException() , this.getClass());
+			CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
 		// 2. 대기열에 사용자 추가
@@ -86,7 +85,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 		// 4. 토큰 발급
 		long remainingTime = calculateRemainingTime(queuePosition); // 남은 시간 계산 로직 (예시)
-		TokenDto tokenDto = tokenService.createToken(userId, queuePosition, remainingTime);
+		TokenDto tokenDto = tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
 
 		// 5. 좌석의 상태를 예약 상태로 변경
 		ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailById(seatDetailId);
@@ -101,7 +100,6 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		// 5. 대기열 정보 및 토큰을 반환
 		return tokenDto;
 	}
-
 
 	/**
 	 * 대기열에서 남은 시간을 계산하는 메서드 (예시)

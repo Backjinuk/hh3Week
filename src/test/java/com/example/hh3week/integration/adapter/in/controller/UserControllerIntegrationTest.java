@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -35,6 +36,9 @@ public class UserControllerIntegrationTest {
 	private ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper
 
 
+	@Value("${testToken}")
+	private String testToken;
+
 	@Test
 	@DisplayName("사용자 포인트 충전 - 정상적으로 포인트가 증가하고 히스토리에 기록됨")
 	void 사용자포인트충전_정상적으로증가하고히스토리에기록됨() throws Exception {
@@ -52,6 +56,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/handleUserPoint")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isOk()) // ResponseEntity.ok() returns 200
@@ -65,6 +70,7 @@ public class UserControllerIntegrationTest {
 		String userDtoJson = objectMapper.writeValueAsString(userDto);
 
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isOk())
@@ -89,6 +95,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/handleUserPoint")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isOk())
@@ -102,6 +109,7 @@ public class UserControllerIntegrationTest {
 		String userDtoJson = objectMapper.writeValueAsString(userDto);
 
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isOk())
@@ -131,6 +139,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/handleUserPoint")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isBadRequest());
@@ -140,6 +149,7 @@ public class UserControllerIntegrationTest {
 		String userDtoJson = objectMapper.writeValueAsString(userDto);
 
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isOk())
@@ -162,6 +172,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/handleUserPoint")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isBadRequest());
@@ -171,6 +182,7 @@ public class UserControllerIntegrationTest {
 		String userDtoJson = objectMapper.writeValueAsString(userDto);
 
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isOk())
@@ -188,6 +200,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isOk())
@@ -211,6 +224,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isBadRequest())
@@ -228,6 +242,7 @@ public class UserControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/users/getUserPointHistoryListByUserId")
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userDtoJson))
 			.andExpect(status().isBadRequest())

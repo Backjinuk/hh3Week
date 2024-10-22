@@ -122,7 +122,7 @@ public class TokenRepositoryImplTest {
 	@DisplayName("사용자 ID로 토큰 조회 - 해당 사용자에게 할당된 토큰이 없을 경우 Optional.empty() 반환")
 	void 사용자ID로토큰조회_해당사용자에게할당된토큰이없을경우OptionalEmpty반환() {
 		// Given
-		long userId = 999L;
+		long userId = 9999L;
 
 		// When
 		Optional<Token> tokenOpt = tokenRepositoryImpl.getTokenByUserId(userId);

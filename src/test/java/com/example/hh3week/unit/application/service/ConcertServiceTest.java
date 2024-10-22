@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import com.example.hh3week.adapter.in.dto.concert.ConcertDto;
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;

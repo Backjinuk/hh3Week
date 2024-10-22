@@ -22,7 +22,14 @@ spring:
 #      schema-locations: classpath:schema.sql # 스키마 초기화 파일 위치
 #      data-locations: classpath:data.sql # 데이터 초기화 파일 위치
 
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace # 파라미터 바인딩 로그 출력
+
 # JWT 설정을 spring 섹션 외부로 이동시켰습니다.
 jwt:
   secret: "c3ByaW5nYm9vdC1qd3QtdHV0b3JpYWwtc3ByaW5nYm9vdC1qd3QtdHV0b3JpYWwtc3ByaW5nYm9vdC1qd3QtdHV0b3JpYWwK"
   expiration: 86400000 # 24시간 (밀리초 단위)
+
+testToken: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg"

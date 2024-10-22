@@ -22,9 +22,9 @@ public class PaymentHistoryService {
 	 *
 	 * 결제 내역 등록
 	 */
-	public void registerPaymentHistory(PaymentHistoryDto paymentHistoryDto) {
+	public PaymentHistoryDto registerPaymentHistory(PaymentHistoryDto paymentHistoryDto) {
 		// 결제 내역 등록 로직 구현 예정
-		paymentHistoryRepositoryPort.registerPaymentHistory(PaymentHistory.ToEntity(paymentHistoryDto));
+		return PaymentHistoryDto.ToDto(paymentHistoryRepositoryPort.registerPaymentHistory(PaymentHistory.ToEntity(paymentHistoryDto)));
 	}
 
 	/*

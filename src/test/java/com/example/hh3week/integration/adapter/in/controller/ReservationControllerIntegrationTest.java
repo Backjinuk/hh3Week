@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -32,6 +33,8 @@ public class ReservationControllerIntegrationTest {
 	@Autowired
 	private ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper
 
+	@Value("${testToken}")
+	private String testToken;
 	/**
 	 * 예약 가능한 좌석 목록 조회 - 정상 요청 시 좌석 목록 반환
 	 */
@@ -44,6 +47,7 @@ public class ReservationControllerIntegrationTest {
 		// When
 		mockMvc.perform(
 				post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
+					.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 					.content(objectMapper.writeValueAsString(concertScheduleDto)))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -69,6 +73,7 @@ public class ReservationControllerIntegrationTest {
 		// When & Then
 		mockMvc.perform(
 			post("/api/v1/reservations/getAvailableReservationSeatList").contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.content(objectMapper.writeValueAsString(concertScheduleDto))).andExpect(status().isBadRequest());
 	}
 
@@ -86,10 +91,11 @@ public class ReservationControllerIntegrationTest {
 		// When & Then
 		MvcResult mvcResult = mockMvc.perform(
 				post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
+					.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 					.content(objectMapper.writeValueAsString(requestBodyMap)))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.tokenId").value(3))
+			.andExpect(jsonPath("$.tokenId").value(7))
 			.andExpect(jsonPath("$.userId").value(1))
 			.andReturn();
 
@@ -108,6 +114,7 @@ public class ReservationControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.content(objectMapper.writeValueAsString(requestBodyMap)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("userId와 seatDetailId는 필수 입력 항목입니다."));
@@ -126,6 +133,7 @@ public class ReservationControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.content(objectMapper.writeValueAsString(requestBodyMap)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("userId와 seatDetailId는 필수 입력 항목입니다."));
@@ -144,6 +152,7 @@ public class ReservationControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.content(objectMapper.writeValueAsString(requestBodyMap)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("해당 좌석을 찾을수 없습니다."));
@@ -162,10 +171,12 @@ public class ReservationControllerIntegrationTest {
 
 		// 먼저, 좌석을 예약하여 상태를 변경
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
+			.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 			.content(objectMapper.writeValueAsString(requestBodyMap))).andExpect(status().isOk());
 
 		// 다시 같은 좌석을 예약하려고 시도
 		mockMvc.perform(post("/api/v1/reservations/reserveSeat").contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + testToken) // 실제 JWT 토큰 사용 시 주석 해제
 				.content(objectMapper.writeValueAsString(requestBodyMap)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("사용자가 이미 대기열에 등록되어 있습니다."));

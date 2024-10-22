@@ -3,7 +3,6 @@
 package com.example.hh3week.adapter.out.persistence;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +34,13 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 	 * 결제 내역을 등록합니다.
 	 *
 	 * @param paymentHistory 등록할 PaymentHistory 객체
+	 * @return
 	 */
 	@Override
 	@Transactional
-	public void registerPaymentHistory(PaymentHistory paymentHistory) {
+	public PaymentHistory registerPaymentHistory(PaymentHistory paymentHistory) {
 		entityManager.persist(paymentHistory);
+		return paymentHistory;
 	}
 
 	/**

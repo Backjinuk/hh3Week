@@ -43,13 +43,17 @@ class PaymentHistoryServiceTest {
 			.paymentStatus(PaymentStatus.COMPLETED)
 			.build();
 
-		doNothing().when(paymentHistoryRepositoryPort).registerPaymentHistory(any(PaymentHistory.class));
+		PaymentHistory paymentHistory = PaymentHistory.ToEntity(paymentHistoryDto);
+
+		when(paymentHistoryRepositoryPort.registerPaymentHistory(any())).thenReturn(paymentHistory);
 
 		// when
-		paymentHistoryService.registerPaymentHistory(paymentHistoryDto);
+		PaymentHistoryDto paymentHistoryDto1 = paymentHistoryService.registerPaymentHistory(paymentHistoryDto);
 
 		// then
-		verify(paymentHistoryRepositoryPort, times(1)).registerPaymentHistory(any(PaymentHistory.class));
+		assertThat(paymentHistoryDto1.getPaymentId()).isEqualTo(1);
+		assertThat(paymentHistoryDto1.getPaymentAmount()).isEqualTo(10000L);
+		assertThat(paymentHistoryDto1.getPaymentStatus()).isEqualTo(PaymentStatus.COMPLETED);
 	}
 
 	@Test

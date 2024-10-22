@@ -6,8 +6,12 @@ import com.example.hh3week.domain.payment.entity.PaymentStatus;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 public class PaymentHistoryDto {
@@ -20,6 +24,8 @@ public class PaymentHistoryDto {
 	private long paymentAmount;
 
 	private PaymentStatus paymentStatus;
+
+	private String token;
 
 	@Builder
 	public PaymentHistoryDto(long paymentId, long userId, long reservationId, long paymentAmount,
@@ -35,6 +41,7 @@ public class PaymentHistoryDto {
 		return PaymentHistoryDto.builder()
 			.paymentId(paymentHistory.getPaymentId())
 			.userId(paymentHistory.getUserId())
+			.reservationId(paymentHistory.getReservationId())
 			.paymentAmount(paymentHistory.getPaymentAmount())
 			.paymentStatus(paymentHistory.getPaymentStatus())
 			.build();

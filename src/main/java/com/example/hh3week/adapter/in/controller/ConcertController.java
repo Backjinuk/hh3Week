@@ -53,7 +53,7 @@ public class ConcertController {
 		@Parameter(description = "조회할 콘서트의 ID를 포함한 콘서트 스케줄 DTO", required = true) @RequestBody ConcertDto concertDto) {
 
 		if (concertDto.getConcertId() <= 0) {
-			throw new NullPointerException("콘서트 스케줄을 조회할수 업습니다.");
+			throw new NullPointerException("콘서트 스케줄을 조회할 수 없습니다.");
 		}
 
 		ConcertScheduleDto concert = concertUseCase.getConcertScheduleFindById(concertDto.getConcertId());

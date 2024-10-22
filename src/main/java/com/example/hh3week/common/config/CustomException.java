@@ -45,9 +45,9 @@ public class CustomException {
 
 		// 원인 예외에 따라 로그를 다르게 처리 (cause가 null이면 원인 없이 기록)
 		if (cause == null) {
-			log.error(logMessage);
+			log.info(logMessage);
 		} else {
-			log.error(logMessage, cause);
+			log.info(logMessage, cause);
 		}
 	}
 }
