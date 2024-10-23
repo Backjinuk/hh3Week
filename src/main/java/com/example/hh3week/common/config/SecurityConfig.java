@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.hh3week.common.util.JwtFilter;
 import com.example.hh3week.common.util.JwtProvider;
@@ -29,14 +29,14 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+		System.out.println("filter 도착");
 		http
-			.csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화
+			.csrf(AbstractHttpConfigurer::disable)  // CSRF 보호 비활성화
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/v1/payment/registerPaymentHistory").authenticated()  // 임시로 결재시에만 JWT 인증 필요
+				// .requestMatchers("/api/v1/payment/registerPaymentHistory").authenticated()  // 임시로 결재시에만 JWT 인증 필요
 				.anyRequest().permitAll()  // 나머지 경로는 인증 없이 허용
-			)
-		 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
+			);
+		 // .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 }

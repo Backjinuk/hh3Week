@@ -1,3 +1,4 @@
+
 package com.example.hh3week.common.util;
 
 import java.io.IOException;
@@ -15,14 +16,25 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtProvider jwtProvider;
 
+	// 적용할 경로를 설정합니다.
+	private static final String AUTHENTICATION_URL = "/api/v1/payment/registerPaymentHistory";
+
 	public JwtFilter(JwtProvider jwtProvider) {
 		this.jwtProvider = jwtProvider;
 	}
 
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		// 필터를 적용하지 않을 경로를 설정합니다.
+		// 여기서는 특정 경로가 아닐 때 필터를 적용하지 않도록 설정합니다.
+		String path = request.getRequestURI();
+		return !AUTHENTICATION_URL.equals(path);
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-		throws ServletException, IOException, IOException {
+		throws ServletException, IOException {
+		// 여기부터는 AUTHENTICATION_URL에 해당하는 요청에만 필터가 적용됩니다.
 
 		String authorizationHeader = request.getHeader("Authorization");
 

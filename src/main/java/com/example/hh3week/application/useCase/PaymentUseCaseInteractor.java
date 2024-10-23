@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.payment.PaymentHistoryDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
+import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.user.UserDto;
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.application.port.in.PaymentUseCase;
@@ -93,6 +94,11 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 
 		// 좌석 상태값 업데이트
 		waitingQueueService.updateStatus(queueOrder, WaitingStatus.EXPIRED);
+
+		// 현재 남은 좌석 갯수 update
+		ReservationSeatDto seatDto = reservationService.getSeatById(seatDetailDto.getSeatId());
+		reservationService.updateSeatReservation(seatDto);
+
 		log.info("Queue order: {} updated to status: {}", queueOrder, WaitingStatus.EXPIRED);
 
 		// 유저 포인트 히스토리 등록

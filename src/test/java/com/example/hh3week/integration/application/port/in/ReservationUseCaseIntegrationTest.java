@@ -49,7 +49,7 @@ class ReservationUseCaseIntegrationTest {
 	void 좌석예약_정상적으로대기열에추가되고토큰이발급됨() {
 		// Given
 		long userId = 2L;
-		long seatDetailId = 5L; // SeatDetail for seatId 2 (B1)
+		long seatDetailId = 100L; // SeatDetail for seatId 2 (B1)
 
 		// When
 		TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);

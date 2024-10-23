@@ -12,7 +12,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
@@ -44,7 +46,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 			.fetchFirst();
 
 		if (nextInQueue == null) {
-			CustomException.nullPointer("대기열 항목을 찾을 수 없습니다.", this.getClass());
+			return WaitingQueue.builder().priority(1).build();
 		}
 
 		return nextInQueue;
@@ -84,7 +86,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 			CustomException.nullPointer("대기열 항목을 찾을 수 없습니다.", this.getClass());
 		}
 
-		Long positionCount = queryFactory.select(qWaitingQueue.count())
+		Long positionCount = queryFactory.select(qWaitingQueue.priority)
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(waitingQueue.getSeatDetailId())
 				.and(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING))

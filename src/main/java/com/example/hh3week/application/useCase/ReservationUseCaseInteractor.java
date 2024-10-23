@@ -69,12 +69,19 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
+		ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailById(seatDetailId);
+
+		// 좌석이 상태 확인
+		if (seatDetailDto.getReservationStatus() != ReservationStatus.AVAILABLE) {
+			CustomException.illegalArgument("해당 좌석은 이미 예약 중이거나 예약되었습니다.", new IllegalArgumentException(), this.getClass());
+		}
+
 		// 2. 대기열에 사용자 추가
 		WaitingQueueDto waitingQueueDto = WaitingQueueDto.builder()
 			.userId(userId)
 			.waitingStatus(WaitingStatus.WAITING)
 			.seatDetailId(seatDetailId)
-			.priority(1) // 우선순위 설정 (예시 값)
+			.priority(waitingQueueService.getNextInQueue(seatDetailId).getPriority() + 1) // 우선순위 설정 (예시 값)
 			.reservationDt(LocalDateTime.now())
 			.build();
 
@@ -88,14 +95,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		TokenDto tokenDto = tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
 
 		// 5. 좌석의 상태를 예약 상태로 변경
-		ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailById(seatDetailId);
-
 		seatDetailDto.setReservationStatus(ReservationStatus.PENDING);
 		reservationService.updateSeatDetailStatus(seatDetailDto);
-
-		// 현재 남은 좌석 갯수 update
-		ReservationSeatDto seatDto = reservationService.getSeatById(seatDetailDto.getSeatId());
-		reservationService.updateSeatReservation(seatDto);
 
 		// 5. 대기열 정보 및 토큰을 반환
 		return tokenDto;

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,6 @@ class ConcertControllerIntegrationTest {
 	 */
 	@Test
 	@DisplayName("특정 날짜 범위 내의 콘서트 조회 성공 - 날짜 있을때")
-	@WithMockUser(roles = "USER")
 	// JWT 인증이 필요한 경우, 실제 토큰을 헤더에 추가하는 방식으로 변경 필요
 	void 특정_날짜_범위_내의_콘서트_조회_성공() throws Exception {
 		// Given
@@ -64,7 +62,6 @@ class ConcertControllerIntegrationTest {
 	 */
 	@Test
 	@DisplayName("특정 날짜 범위 내의 콘서트 조회 성공 - 날짜 없을때")
-	@WithMockUser(roles = "USER")
 	void 특정_날짜_범위_내의_콘서트_조회_성공_날짜_없을때() throws Exception {
 		// Given
 		ConcertScheduleDto concertScheduleDto = ConcertScheduleDto.builder().build();
@@ -88,7 +85,6 @@ class ConcertControllerIntegrationTest {
 	 */
 	@Test
 	@DisplayName("특정 날짜 범위 내의 콘서트 조회 - 일치하는 날짜 없을때")
-	@WithMockUser(roles = "USER")
 	void 특정_날짜_범위_내의_콘서트_조회_실패_일치하는_날짜_없을때() throws Exception {
 		// Given
 		LocalDateTime startDt = LocalDateTime.of(2024, 11, 1, 19, 0, 0);
@@ -100,8 +96,6 @@ class ConcertControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/concerts/getAvailableConcertDates").contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization",
-					"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg ") // 실제 JWT 토큰 사용 시 주석 해제
 				.content(concertDtoJson))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("콘서트 스케줄을 찾을 수 없습니다."));
@@ -112,7 +106,6 @@ class ConcertControllerIntegrationTest {
 	 */
 	@Test
 	@DisplayName("특정 콘서트 조회 성공")
-	@WithMockUser(roles = "USER")
 	void 특정_콘서트_조회_성공() throws Exception {
 		// Given
 		ConcertDto concertDto = ConcertDto.builder().concertId(1).build();
@@ -121,8 +114,6 @@ class ConcertControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/concerts/getConcertScheduleFindById").contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization",
-					"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg ") // 실제 JWT 토큰 사용 시 주석 해제
 				.content(concertDtoJson))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.concertScheduleId").value(1))
@@ -135,7 +126,6 @@ class ConcertControllerIntegrationTest {
 	 */
 	@Test
 	@DisplayName("특정 콘서트 조회 실패 - 아이디 없음")
-	@WithMockUser(roles = "USER")
 	void 특정_콘서트_조회_실패_아이디_없음() throws Exception {
 		// Given
 		ConcertDto concertDto = ConcertDto.builder().build();
@@ -144,8 +134,6 @@ class ConcertControllerIntegrationTest {
 
 		// When & Then
 		mockMvc.perform(post("/api/v1/concerts/getConcertScheduleFindById").contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization",
-					"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg ") // 실제 JWT 토큰 사용 시 주석 해제
 				.content(concertDtoJson))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.message").value("콘서트 스케줄을 조회할 수 없습니다."));

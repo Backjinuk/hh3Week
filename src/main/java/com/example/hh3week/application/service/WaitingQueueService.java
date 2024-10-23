@@ -47,12 +47,12 @@ public class WaitingQueueService {
 	/**
 	 * 대기열에서 다음 사용자를 가져오는 메서드입니다.
 	 *
-	 * @param concertScheduleId 콘서트 스케줄의 고유 ID
+	 * @param seatDetailId 콘서트 스케줄의 고유 ID
 	 * @return 다음 대기 중인 사용자의 WaitingQueueDto 또는 null
 	 */
 	@Transactional(readOnly = true)
-	public WaitingQueueDto getNextInQueue(long concertScheduleId) {
-		WaitingQueue nextInQueue = waitingQueueRepository.getNextInQueue(concertScheduleId);
+	public WaitingQueueDto getNextInQueue(long seatDetailId) {
+		WaitingQueue nextInQueue = waitingQueueRepository.getNextInQueue(seatDetailId);
 		return WaitingQueueDto.ToDto(nextInQueue);
 	}
 
