@@ -11,12 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
 import com.example.hh3week.domain.token.entity.Token;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @Transactional
 @Sql({"classpath:schema.sql", "classpath:data.sql"})

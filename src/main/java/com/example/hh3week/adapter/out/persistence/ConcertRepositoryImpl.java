@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.ConcertRepositoryPort;
 import com.example.hh3week.common.config.CustomException;
@@ -28,7 +27,6 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<Concert> getAvilbleConcertList() {
 		List<Concert> concerts = queryFactory.selectFrom(qConcert)
 			.fetch();
@@ -42,7 +40,6 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 
 
 	@Override
-	@Transactional(readOnly = true)
 	public Concert getConcertFindById(long concertId) {
 		Concert concert = queryFactory.selectFrom(qConcert)
 			.where(qConcert.concertId.eq(concertId))
@@ -56,7 +53,6 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<ConcertSchedule> getAvilbleConcertSchedueList() {
 		List<ConcertSchedule> concertSchedules = queryFactory.selectFrom(qConcertSchedule)
 			.where(qConcertSchedule.concertScheduleStatus.eq(ConcertScheduleStatus.AVAILABLE))
@@ -70,7 +66,6 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public ConcertSchedule getConcertScheduleFindById(long concertScheduleId) {
 		ConcertSchedule concertSchedule = queryFactory.selectFrom(qConcertSchedule)
 			.where(qConcertSchedule.concertScheduleId.eq(concertScheduleId))
@@ -84,7 +79,6 @@ public class ConcertRepositoryImpl implements ConcertRepositoryPort {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<ConcertSchedule> getConcertsByDate(LocalDateTime startDate, LocalDateTime endDate) {
 
 		List<ConcertSchedule> concertSchedules = queryFactory.selectFrom(qConcertSchedule)

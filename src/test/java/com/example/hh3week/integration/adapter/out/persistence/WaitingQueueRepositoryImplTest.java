@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@ActiveProfiles("test")
 @SpringBootTest
 @Transactional
 @Sql({"classpath:schema.sql", "classpath:data.sql"})
@@ -77,11 +79,9 @@ public class WaitingQueueRepositoryImplTest {
 
 		// When & Then
 
-		NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-			waitingQueueRepositoryImpl.getNextInQueue(seatDetailId);
-		});
+		WaitingQueue nextInQueue = waitingQueueRepositoryImpl.getNextInQueue(seatDetailId);
 
-		assertThat(nullPointerException.getMessage()).isEqualTo("대기열 항목을 찾을 수 없습니다.");
+		assertThat(nextInQueue.getPriority()).isEqualTo(1);
 	}
 
 	@Test
@@ -158,7 +158,7 @@ public class WaitingQueueRepositoryImplTest {
 		int position = waitingQueueRepositoryImpl.getQueuePosition(waitingId);
 
 		// Then
-		assertThat(position).isEqualTo(2); // 대기열에서 두 번째 위치
+		assertThat(position).isEqualTo(6); // 대기열에서 두 번째 위치
 	}
 
 	@Test

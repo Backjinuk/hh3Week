@@ -1,5 +1,5 @@
 
-package com.example.hh3week.common.util;
+package com.example.hh3week.common.util.jwt;
 
 import java.io.IOException;
 

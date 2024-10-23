@@ -59,7 +59,6 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 
 		// 토큰값 검증
 		boolean tokenExpired = tokenService.isTokenExpired(paymentHistoryDto.getToken());
-		log.info("Token expired status: {}", tokenExpired);
 
 		if (tokenExpired) {
 			CustomException.illegalArgument("토큰값이 만료되었습니다.", new IllegalArgumentException(), this.getClass());
@@ -67,7 +66,6 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 
 		// 토큰의 모든 값 가져오기
 		Map<String, Object> tokensAllValue = tokenService.getTokensAllValue(paymentHistoryDto.getToken());
-		log.info("Tokens all values: {}", tokensAllValue);
 
 		if (tokensAllValue.isEmpty()) {
 			CustomException.illegalArgument("토큰값에 정보를 찾을수 없습니다.", new IllegalArgumentException(), this.getClass());
@@ -78,19 +76,14 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 		long userId = Long.parseLong(tokensAllValue.get("userId").toString());
 		long queueOrder = Long.parseLong(tokensAllValue.get("queueOrder").toString());
 
-		log.info("SeatDetailId: {}, UserId: {}, QueueOrder: {}", seatDetailId, userId, queueOrder);
-
 		// 좌석 상세 정보 받기
 		ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailById(seatDetailId);
-		log.info("Seat detail: {}", seatDetailDto);
 
 		// 유저 정보 가져오기
 		UserDto userDto = userService.getUserInfo(userId);
-		log.info("User info: {}", userDto);
 
 		// 유저 포인트 차감
 		userService.useBalance(userDto, seatDetailDto.getSeatPrice());
-		log.info("Used balance: {}, Seat price: {}", userDto.getPointBalance(), seatDetailDto.getSeatPrice());
 
 		// 좌석 상태값 업데이트
 		waitingQueueService.updateStatus(queueOrder, WaitingStatus.EXPIRED);
@@ -98,8 +91,6 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 		// 현재 남은 좌석 갯수 update
 		ReservationSeatDto seatDto = reservationService.getSeatById(seatDetailDto.getSeatId());
 		reservationService.updateSeatReservation(seatDto);
-
-		log.info("Queue order: {} updated to status: {}", queueOrder, WaitingStatus.EXPIRED);
 
 		// 유저 포인트 히스토리 등록
 		UserPointHistoryDto userPointHistoryDto = UserPointHistoryDto.builder()
@@ -109,7 +100,6 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 			.pointStatus(PointStatus.USE)
 			.build();
 		userService.addUserPointHistoryInUser(userPointHistoryDto);
-		log.info("UserPointHistory added: {}", userPointHistoryDto);
 
 		// 결제 히스토리 등록
 		PaymentHistoryDto reqHistoryDto = PaymentHistoryDto.builder()
@@ -118,7 +108,6 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 			.paymentStatus(PaymentStatus.COMPLETED)
 			.userId(userId)
 			.build();
-		log.info("Payment history to be registered: {}", reqHistoryDto);
 
 		return paymentHistoryService.registerPaymentHistory(reqHistoryDto);
 	}

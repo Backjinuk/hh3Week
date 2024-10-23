@@ -67,4 +67,8 @@ public class ReservationService {
 	public void updateSeatDetailStatus(ReservationSeatDetailDto seatDetail) {
 		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
 	}
+
+	public ReservationSeatDetailDto getSeatDetailByIdForUpdate(long seatDetailId) {
+		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailByIdForUpdate(seatDetailId));
+	}
 }

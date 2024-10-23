@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.in.ReservationUseCase;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @Transactional
 @Sql({"classpath:schema.sql", "classpath:data.sql"})

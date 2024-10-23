@@ -1,3 +1,4 @@
+# 실제 운영될 DB 프로필
 spring:
   application:
     name: hh3week
@@ -15,17 +16,14 @@ spring:
     properties:
       hibernate:
         format_sql: false # SQL 로그의 형식을 포맷하지 않습니다.
-
-
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      connection:
+        isolation: 2
 
   main:
     allow-bean-definition-overriding: true
 
-#  sql:
-#    init:
-#      mode: always # 애플리케이션 시작 시 데이터베이스 초기화
-#      schema-locations: classpath:schema.sql # 스키마 초기화 파일 위치
-#      data-locations: classpath:data.sql # 데이터 초기화 파일 위치
+
 
 logging:
   level:
@@ -38,7 +36,6 @@ jwt:
   expiration: 86400000 # 24시간 (밀리초 단위)
 
 testToken: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg"
-
 
 
 

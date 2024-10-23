@@ -2,6 +2,7 @@ package com.example.hh3week.application.useCase;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +17,19 @@ import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
 import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
+import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 	private final ReservationService reservationService;
-	private final WaitingQueueService waitingQueueService; // 대기열 서비스 추가
-	private final TokenService tokenService; // 토큰 서비스 추가
+	private final WaitingQueueService waitingQueueService;
+	private final TokenService tokenService;
+	private final AtomicLong tokenIdGenerator = new AtomicLong(1);
 
 	public ReservationUseCaseInteractor(ReservationService reservationService, WaitingQueueService waitingQueueService,
 		TokenService tokenService) {
@@ -32,18 +38,6 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		this.tokenService = tokenService;
 	}
 
-	/*
-	 * 예약 가능 좌석 조회 및 예약
-	 * 1. 예약 가능한 좌석 list를 return 해줌
-	 * 2. 사용자가 선택한 좌석을 보내면 그 좌석에 대기열을 걸어서 대기열 발급, 토큰값 내려줌
-	 */
-
-	/**
-	 * 예약 가능한 좌석 목록을 반환하는 메서드
-	 *
-	 * @param concertScheduleId 콘서트 스케줄 ID
-	 * @return 예약 가능한 좌석 목록
-	 */
 	@Override
 	public List<ReservationSeatDto> getAvailableReservationSeatList(long concertScheduleId) {
 		return reservationService.getAvailableReservationSeatList(concertScheduleId)
@@ -54,52 +48,75 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	}
 
 	/**
-	 * 사용자가 좌석 예약을 요청할 때, 대기열을 생성하고 토큰을 발급하는 메서드
+	 * 예약 가능한 좌석을 예약하거나, 대기열에 추가하고 토큰을 발급하는 메서드
 	 *
-	 * @param userId 사용자 ID
-	 * @param seatDetailId 좌석 ID
-	 * @return 대기열 및 토큰 정보
+	 * @param userId       사용자 ID
+	 * @param seatDetailId 좌석 상세 ID
+	 * @return 발급된 토큰 정보
 	 */
-	@Override
 	@Transactional
 	public TokenDto reserveSeat(long userId, long seatDetailId) {
+		log.info("사용자 {}가 좌석 상세 ID {}를 예약하려고 시도합니다.", userId, seatDetailId);
+		try {
+			// Step 1: 대기열에 이미 등록된 사용자 확인
+			if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
+				log.warn("사용자 {}가 이미 좌석 상세 ID {}에 대한 대기열에 등록되어 있습니다.", userId, seatDetailId);
+				 CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(),
+					this.getClass());
+			}
 
-		// 1. 대기열에 등록되지 않은 사용자만 진행
-		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
-			CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(), this.getClass());
+			// Step 2: 비관적 잠금을 사용하여 좌석 상세 정보 조회
+			ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailByIdForUpdate(seatDetailId);
+
+			// Step 3: 좌석 상태 확인 및 예약 처리
+			if (seatDetailDto.getReservationStatus() == ReservationStatus.AVAILABLE) {
+				// 좌석이 AVAILABLE인 경우, PENDING으로 상태 변경
+				seatDetailDto.setReservationStatus(ReservationStatus.PENDING);
+				reservationService.updateSeatDetailStatus(seatDetailDto);
+				log.info("좌석 상세 ID {}가 사용자 {}에 의해 PENDING 상태로 변경되었습니다.", seatDetailId, userId);
+
+				// 토큰 발급 (queueOrder=0)
+				TokenDto tokenDto = tokenService.createToken(userId, 0, calculateRemainingTime(0), seatDetailId);
+
+				WaitingQueue waitingQueue = WaitingQueue.builder()
+					.userId(userId)
+					.seatDetailId(seatDetailId)
+					.priority(0)
+					.waitingStatus(WaitingStatus.WAITING)
+					.reservationDt(LocalDateTime.now())
+					.build();
+
+				long waitingId = waitingQueueService.addWaitingQueue(WaitingQueueDto.ToDto(waitingQueue));
+				log.info("사용자 {}에게 토큰이 발급되었습니다: {}", userId, tokenDto);
+				return tokenDto;
+			} else {
+				// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
+				long nextPriority = waitingQueueService.getNextPriority(seatDetailId);
+				WaitingQueue waitingQueue = WaitingQueue.builder()
+					.userId(userId)
+					.seatDetailId(seatDetailId)
+					.priority(nextPriority)
+					.waitingStatus(WaitingStatus.WAITING)
+					.reservationDt(LocalDateTime.now())
+					.build();
+
+				long waitingId = waitingQueueService.addWaitingQueue(WaitingQueueDto.ToDto(waitingQueue));
+				log.info("사용자 {}가 대기열에 ID {}로 추가되었습니다.", userId, waitingId);
+
+				// 대기열 위치 계산
+				int queuePosition = waitingQueueService.getQueuePosition(waitingId);
+				log.info("사용자 {}의 대기열 위치는 {}입니다. (좌석 상세 ID {})", userId, queuePosition, seatDetailId);
+
+				// 토큰 발급
+				long remainingTime = calculateRemainingTime(queuePosition);
+				TokenDto tokenDto = tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
+				log.info("사용자 {}에게 토큰이 발급되었습니다: {}", userId, tokenDto);
+				return tokenDto;
+			}
+		} catch (Exception e) {
+			log.error("사용자 {}의 좌석 예약 중 오류 발생: {}", userId, e.getMessage());
+			throw e;
 		}
-
-		ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailById(seatDetailId);
-
-		// 좌석이 상태 확인
-		if (seatDetailDto.getReservationStatus() != ReservationStatus.AVAILABLE) {
-			CustomException.illegalArgument("해당 좌석은 이미 예약 중이거나 예약되었습니다.", new IllegalArgumentException(), this.getClass());
-		}
-
-		// 2. 대기열에 사용자 추가
-		WaitingQueueDto waitingQueueDto = WaitingQueueDto.builder()
-			.userId(userId)
-			.waitingStatus(WaitingStatus.WAITING)
-			.seatDetailId(seatDetailId)
-			.priority(waitingQueueService.getNextInQueue(seatDetailId).getPriority() + 1) // 우선순위 설정 (예시 값)
-			.reservationDt(LocalDateTime.now())
-			.build();
-
-		long waitingId = waitingQueueService.addWaitingQueue(waitingQueueDto);
-
-		// 3. 대기열 위치 계산
-		int queuePosition = waitingQueueService.getQueuePosition(waitingId);
-
-		// 4. 토큰 발급
-		long remainingTime = calculateRemainingTime(queuePosition); // 남은 시간 계산 로직 (예시)
-		TokenDto tokenDto = tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
-
-		// 5. 좌석의 상태를 예약 상태로 변경
-		seatDetailDto.setReservationStatus(ReservationStatus.PENDING);
-		reservationService.updateSeatDetailStatus(seatDetailDto);
-
-		// 5. 대기열 정보 및 토큰을 반환
-		return tokenDto;
 	}
 
 	/**

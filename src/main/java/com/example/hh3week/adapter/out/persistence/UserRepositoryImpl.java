@@ -17,7 +17,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
 @Repository
-@Transactional
 public class UserRepositoryImpl implements UserRepositoryPort {
 
 	private final JPAQueryFactory queryFactory;
@@ -55,7 +54,6 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 
 	@Override
 	public UserPointHistory addUserPointHistoryInUser(UserPointHistory userPointHistory) {
-
 		userPointHistory.setPointDt(LocalDateTime.now());
 		entityManager.persist(userPointHistory);
 		return userPointHistory;

@@ -8,8 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.example.hh3week.common.util.JwtFilter;
-import com.example.hh3week.common.util.JwtProvider;
+import com.example.hh3week.common.util.jwt.JwtFilter;
+import com.example.hh3week.common.util.jwt.JwtProvider;
 
 @Configuration
 @EnableWebSecurity
@@ -29,7 +29,6 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		System.out.println("filter 도착");
 		http
 			.csrf(AbstractHttpConfigurer::disable)  // CSRF 보호 비활성화
 			.authorizeHttpRequests(auth -> auth

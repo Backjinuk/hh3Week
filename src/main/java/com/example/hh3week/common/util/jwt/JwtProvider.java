@@ -1,4 +1,4 @@
-package com.example.hh3week.common.util;
+package com.example.hh3week.common.util.jwt;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;

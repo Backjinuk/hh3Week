@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import com.example.hh3week.domain.user.entity.UserPointHistory;
 
 import jakarta.persistence.EntityManager;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @Transactional // 각 테스트가 트랜잭션 내에서 실행되고, 테스트 후 롤백됨
 @Sql({"classpath:schema.sql", "classpath:data.sql"})

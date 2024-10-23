@@ -18,4 +18,6 @@ public interface ReservationSeatRepositoryPort {
 	ReservationSeatDetail getSeatDetailById(long seatDetailId);
 
 	ReservationSeat getSeatById(long seatId);
+
+	ReservationSeatDetail getSeatDetailByIdForUpdate(long seatDetailId);
 }

@@ -1,5 +1,8 @@
 package com.example.hh3week.application.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,34 +23,35 @@ public class WaitingQueueService {
 	}
 
 	/**
-	 * 사용자가 대기열에 이미 있는지 확인하는 메서드입니다.
+	 * 사용자가 대기열에 이미 등록되어 있는지 확인하는 메서드입니다.
 	 *
-	 * @param userId 사용자의 UUID
-	 * @param seatDetailId 콘서트 스케줄의 고유 ID
-	 * @return 사용자가 대기열에 있는 경우 true, 아니면 false
+	 * @param userId        사용자의 ID
+	 * @param seatDetailId  좌석 상세 정보의 ID
+	 * @return 대기열에 등록되어 있으면 true, 아니면 false
 	 */
 	@Transactional(readOnly = true)
 	public boolean isUserInQueue(long userId, long seatDetailId) {
 		WaitingQueue existingQueue = waitingQueueRepository.getQueueStatus(userId, seatDetailId);
-		return existingQueue != null;
+		return existingQueue != null && existingQueue.getWaitingStatus() == WaitingStatus.WAITING;
 	}
 
-
 	/**
-	 * 대기열에 대기 항목을 추가하는 메서드입니다.
+	 * 사용자를 대기열에 추가하고, 생성된 대기열 항목의 ID를 반환하는 메서드입니다.
 	 *
-	 * @param waitingQueueDto 대기 항목 엔티티
+	 * @param waitingQueueDto 대기열에 추가할 사용자의 정보가 담긴 DTO
+	 * @return 생성된 대기열 항목의 ID
 	 */
 	@Transactional
 	public long addWaitingQueue(WaitingQueueDto waitingQueueDto) {
-		WaitingQueue savedQueue = waitingQueueRepository.addToQueue(WaitingQueue.ToEntity(waitingQueueDto));
+		WaitingQueue waitingQueue = WaitingQueue.ToEntity(waitingQueueDto);
+		WaitingQueue savedQueue = waitingQueueRepository.addToQueue(waitingQueue);
 		return savedQueue.getWaitingId();
 	}
 
 	/**
-	 * 대기열에서 다음 사용자를 가져오는 메서드입니다.
+	 * 특정 좌석에 대해 대기열의 다음 사용자를 조회하는 메서드입니다.
 	 *
-	 * @param seatDetailId 콘서트 스케줄의 고유 ID
+	 * @param seatDetailId 좌석 상세 정보의 ID
 	 * @return 다음 대기 중인 사용자의 WaitingQueueDto 또는 null
 	 */
 	@Transactional(readOnly = true)
@@ -57,10 +61,10 @@ public class WaitingQueueService {
 	}
 
 	/**
-	 * 대기열에서 사용자의 위치를 계산하는 메서드입니다.
+	 * 특정 대기열 항목의 대기 위치를 계산하는 메서드입니다.
 	 *
-	 * @param waitingId 대기열 항목의 고유 ID
-	 * @return 대기열에서의 위치
+	 * @param waitingId 대기열 항목의 ID
+	 * @return 대기열 내에서의 위치 (1부터 시작)
 	 */
 	@Transactional(readOnly = true)
 	public int getQueuePosition(long waitingId) {
@@ -68,10 +72,10 @@ public class WaitingQueueService {
 	}
 
 	/**
-	 * 대기열 항목의 상태를 업데이트하는 메서드입니다.
+	 * 특정 대기열 항목의 상태를 업데이트하는 메서드입니다.
 	 *
-	 * @param waitingId 대기열 항목의 고유 ID
-	 * @param status 업데이트할 상태 (예: "NOTIFIED", "EXPIRED")
+	 * @param waitingId 대기열 항목의 ID
+	 * @param status    업데이트할 상태 (예: WAITING, EXPIRED, COMPLETED)
 	 */
 	@Transactional
 	public void updateStatus(long waitingId, WaitingStatus status) {
@@ -79,10 +83,10 @@ public class WaitingQueueService {
 	}
 
 	/**
-	 * 사용자의 대기열 상태를 조회하는 메서드입니다.
+	 * 특정 사용자가 특정 좌석에 대해 현재 대기열에 등록되어 있는지 조회하는 메서드입니다.
 	 *
-	 * @param userId 사용자의 UUID
-	 * @param concertScheduleId 콘서트 스케줄의 고유 ID
+	 * @param userId             사용자의 ID
+	 * @param concertScheduleId  콘서트 스케줄의 ID (좌석 상세 정보와 연관됨)
 	 * @return 사용자의 WaitingQueueDto 또는 null
 	 */
 	@Transactional(readOnly = true)
@@ -90,5 +94,62 @@ public class WaitingQueueService {
 		WaitingQueue queueStatus = waitingQueueRepository.getQueueStatus(userId, concertScheduleId);
 		return (queueStatus != null) ? WaitingQueueDto.ToDto(queueStatus) : null;
 	}
-}
 
+	/**
+	 * 특정 대기열 항목을 만료 상태로 변경하는 메서드입니다.
+	 *
+	 * @param waitingId 대기열 항목의 ID
+	 */
+	@Transactional
+	public void expireQueue(long waitingId) {
+		waitingQueueRepository.expireQueue(waitingId);
+	}
+
+	/**
+	 * 특정 좌석에 대한 모든 대기열 항목을 조회하는 메서드입니다.
+	 *
+	 * @param seatDetailId 좌석 상세 정보의 ID
+	 * @return 해당 좌석에 대한 모든 대기열 항목의 리스트
+	 */
+	@Transactional(readOnly = true)
+	public List<WaitingQueue> getQueueBySeatDetailId(long seatDetailId) {
+		return waitingQueueRepository.getQueueBySeatDetailId(seatDetailId);
+	}
+
+	/**
+	 * 모든 대기열 항목을 초기화(삭제)하는 메서드입니다.
+	 * 주로 테스트 환경에서 사용됩니다.
+	 */
+	@Transactional
+	public void clearQueue() {
+		waitingQueueRepository.clearQueue();
+	}
+
+	/**
+	 * 특정 좌석에 대한 다음 우선권 번호를 계산하는 메서드입니다.
+	 *
+	 * @param seatDetailId 좌석 상세 정보의 ID
+	 * @return 다음 우선권 번호
+	 */
+	@Transactional
+	public long getNextPriority(long seatDetailId) {
+		Long maxPriority = waitingQueueRepository.findMaxPriorityBySeatDetailIdForUpdate(seatDetailId);
+		return (maxPriority != null) ? maxPriority + 1 : 1;
+	}
+
+
+	/**
+	 * 현재 시각을 기준으로 만료된 대기열 항목들을 조회하는 메서드입니다.
+	 *
+	 * @param currentTime 현재 시각
+	 * @return 만료된 대기열 항목들의 리스트
+	 */
+	@Transactional(readOnly = true)
+	public List<WaitingQueueDto> getExpiredQueues(LocalDateTime currentTime) {
+		return waitingQueueRepository.findExpiredQueues(currentTime)
+			.stream()
+			.map(WaitingQueueDto::ToDto)
+			.toList();
+	}
+
+}

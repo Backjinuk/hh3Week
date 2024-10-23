@@ -1,17 +1,16 @@
 package com.example.hh3week.application.service;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
-import com.example.hh3week.common.util.JwtProvider;
+import com.example.hh3week.common.util.jwt.JwtProvider;
 import com.example.hh3week.domain.token.entity.Token;
-
-import java.time.LocalDateTime;
-import java.util.Map;
 
 @Service
 public class TokenService {
@@ -68,8 +67,8 @@ public class TokenService {
 		return null;
 	}
 
-	public Map<String, Object> getTokensAllValue(String token){
-		if(jwtProvider.validateToken(token)){
+	public Map<String, Object> getTokensAllValue(String token) {
+		if (jwtProvider.validateToken(token)) {
 			return jwtProvider.getMapFromJWT(token);
 		}
 

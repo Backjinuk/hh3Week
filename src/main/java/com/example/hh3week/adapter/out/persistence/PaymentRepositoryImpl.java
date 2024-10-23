@@ -37,7 +37,6 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 	 * @return
 	 */
 	@Override
-	@Transactional
 	public PaymentHistory registerPaymentHistory(PaymentHistory paymentHistory) {
 		entityManager.persist(paymentHistory);
 		return paymentHistory;
@@ -50,7 +49,6 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 	 * @return 해당 결제 내역이 있으면 Optional로 반환, 없으면 Optional.empty()
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public PaymentHistory getPaymentHistory(long paymentId) {
 		return queryFactory.selectFrom(qPaymentHistory)
 			.where(qPaymentHistory.paymentId.eq(paymentId))
@@ -64,7 +62,6 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 	 * @return 해당 사용자의 모든 결제 내역 리스트
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public List<PaymentHistory> getPaymentHistoryByUserId(long userId) {
 		return queryFactory.selectFrom(qPaymentHistory)
 			.where(qPaymentHistory.userId.eq(userId))

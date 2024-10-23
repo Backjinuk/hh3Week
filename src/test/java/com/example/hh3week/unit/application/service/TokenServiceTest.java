@@ -1,6 +1,5 @@
 package com.example.hh3week.unit.application.service;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -16,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
 import com.example.hh3week.application.service.TokenService;
-import com.example.hh3week.common.util.JwtProvider;
+import com.example.hh3week.common.util.jwt.JwtProvider;
 import com.example.hh3week.domain.token.entity.Token;
 
 public class TokenServiceTest {

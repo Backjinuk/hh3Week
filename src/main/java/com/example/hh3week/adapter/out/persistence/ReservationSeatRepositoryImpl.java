@@ -14,6 +14,8 @@ import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import jakarta.persistence.LockModeType;
+
 @Repository
 public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryPort {
 
@@ -100,4 +102,19 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 		return seat;
 	}
+
+    @Override
+    @Transactional
+    public ReservationSeatDetail getSeatDetailByIdForUpdate(long seatDetailId) {
+        ReservationSeatDetail seatDetail = queryFactory.selectFrom(qReservationSeatDetail)
+            .where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
+            .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+            .fetchOne();
+
+        if (seatDetail == null) {
+            CustomException.nullPointer("해당 좌석을 찾을 수 없습니다.", this.getClass());
+        }
+
+        return seatDetail;
+    }
 }

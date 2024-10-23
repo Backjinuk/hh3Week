@@ -39,7 +39,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	 * @return 저장된 Token 객체
 	 */
 	@Override
-	@Transactional
 	public Token createToken(Token token) {
 		entityManager.persist(token);
 		return token;
@@ -52,7 +51,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	 * @return 유효한 Token 객체가 있으면 Optional로 반환, 없으면 Optional.empty()
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public Optional<Token> authenticateToken(String tokenStr) {
 		Token token = queryFactory.selectFrom(qToken)
 			.where(qToken.token.eq(tokenStr)
@@ -68,7 +66,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	 * @throws IllegalArgumentException 토큰이 존재하지 않을 경우
 	 */
 	@Override
-	@Transactional
 	public void expireToken(String tokenStr) {
 		int updatedCount = (int) queryFactory.update(qToken)
 			.set(qToken.expiresAt, LocalDateTime.now())
@@ -88,7 +85,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	 * @return 사용자에게 할당된 Token 객체가 있으면 Optional로 반환, 없으면 Optional.empty()
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public Optional<Token> getTokenByUserId(long userId) {
 		Token token = queryFactory.selectFrom(qToken)
 			.where(qToken.userId.eq(userId)

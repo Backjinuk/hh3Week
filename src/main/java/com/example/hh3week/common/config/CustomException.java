@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * 예외 발생 시, 예외 메시지와 함께 호출한 클래스, 메서드 이름, 라인 번호를 자동으로 로그에 남깁니다.
  */
 @Slf4j
-public class CustomException {
+public class CustomException extends Throwable {
 
 
 	public static void nullPointer(String message, Class<?> clazz) {
