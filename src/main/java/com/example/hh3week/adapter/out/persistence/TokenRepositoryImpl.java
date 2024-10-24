@@ -39,6 +39,7 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	 * @return 저장된 Token 객체
 	 */
 	@Override
+	@Transactional
 	public Token createToken(Token token) {
 		entityManager.persist(token);
 		return token;

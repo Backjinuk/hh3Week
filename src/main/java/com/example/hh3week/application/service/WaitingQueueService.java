@@ -42,10 +42,9 @@ public class WaitingQueueService {
 	 * @return 생성된 대기열 항목의 ID
 	 */
 	@Transactional
-	public long addWaitingQueue(WaitingQueueDto waitingQueueDto) {
+	public WaitingQueueDto addWaitingQueue(WaitingQueueDto waitingQueueDto) {
 		WaitingQueue waitingQueue = WaitingQueue.ToEntity(waitingQueueDto);
-		WaitingQueue savedQueue = waitingQueueRepository.addToQueue(waitingQueue);
-		return savedQueue.getWaitingId();
+		return WaitingQueueDto.ToDto(waitingQueueRepository.addToQueue(waitingQueue));
 	}
 
 	/**

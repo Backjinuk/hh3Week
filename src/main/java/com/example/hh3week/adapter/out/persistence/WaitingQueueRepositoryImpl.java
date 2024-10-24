@@ -34,10 +34,31 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		this.queryFactory = queryFactory;
 	}
 
+
 	@Override
 	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
+		long seatDetailId = waitingQueue.getSeatDetailId();
+
+		// Step 1: 현재 최대 우선순위 조회 (비관적 잠금 적용)
+		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
+			.from(qWaitingQueue)
+			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
+			.setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+			.fetchOne();
+
+		if (maxPriority == null) {
+			maxPriority = 0L;
+		}
+
+		// Step 2: 새로운 우선순위 할당
+		long newPriority = maxPriority + 1;
+		waitingQueue.setPriority(newPriority);
+
+		// Step 3: 대기열에 사용자 추가
 		entityManager.persist(waitingQueue);
+		log.info("대기열에 사용자 {}가 추가되었습니다. 우선순위: {}", waitingQueue.getUserId(), newPriority);
+
 		return waitingQueue;
 	}
 
@@ -72,6 +93,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
 		return queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
+			.setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
 			.fetchOne();
 	}
 

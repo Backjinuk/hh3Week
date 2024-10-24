@@ -17,7 +17,6 @@ import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
 import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
-import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +56,11 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	@Transactional
 	public TokenDto reserveSeat(long userId, long seatDetailId) {
 		log.info("사용자 {}가 좌석 상세 ID {}를 예약하려고 시도합니다.", userId, seatDetailId);
+
 		try {
 			// Step 1: 대기열에 이미 등록된 사용자 확인
 			if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
-				log.warn("사용자 {}가 이미 좌석 상세 ID {}에 대한 대기열에 등록되어 있습니다.", userId, seatDetailId);
-				 CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(),
+				CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(),
 					this.getClass());
 			}
 
@@ -73,38 +72,17 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 				// 좌석이 AVAILABLE인 경우, PENDING으로 상태 변경
 				seatDetailDto.setReservationStatus(ReservationStatus.PENDING);
 				reservationService.updateSeatDetailStatus(seatDetailDto);
-				log.info("좌석 상세 ID {}가 사용자 {}에 의해 PENDING 상태로 변경되었습니다.", seatDetailId, userId);
 
 				// 토큰 발급 (queueOrder=0)
 				TokenDto tokenDto = tokenService.createToken(userId, 0, calculateRemainingTime(0), seatDetailId);
 
-				WaitingQueue waitingQueue = WaitingQueue.builder()
-					.userId(userId)
-					.seatDetailId(seatDetailId)
-					.priority(0)
-					.waitingStatus(WaitingStatus.WAITING)
-					.reservationDt(LocalDateTime.now())
-					.build();
-
-				long waitingId = waitingQueueService.addWaitingQueue(WaitingQueueDto.ToDto(waitingQueue));
-				log.info("사용자 {}에게 토큰이 발급되었습니다: {}", userId, tokenDto);
 				return tokenDto;
 			} else {
 				// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
-				long nextPriority = waitingQueueService.getNextPriority(seatDetailId);
-				WaitingQueue waitingQueue = WaitingQueue.builder()
-					.userId(userId)
-					.seatDetailId(seatDetailId)
-					.priority(nextPriority)
-					.waitingStatus(WaitingStatus.WAITING)
-					.reservationDt(LocalDateTime.now())
-					.build();
-
-				long waitingId = waitingQueueService.addWaitingQueue(WaitingQueueDto.ToDto(waitingQueue));
-				log.info("사용자 {}가 대기열에 ID {}로 추가되었습니다.", userId, waitingId);
+				WaitingQueueDto waitingId = waitingQueueService.addWaitingQueue(buildWaitingQueueDto(userId, seatDetailId));
 
 				// 대기열 위치 계산
-				int queuePosition = waitingQueueService.getQueuePosition(waitingId);
+				int queuePosition = waitingQueueService.getQueuePosition(waitingId.getWaitingId());
 				log.info("사용자 {}의 대기열 위치는 {}입니다. (좌석 상세 ID {})", userId, queuePosition, seatDetailId);
 
 				// 토큰 발급
@@ -127,6 +105,15 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	 */
 	private long calculateRemainingTime(int queuePosition) {
 		// 예시: 각 사용자당 10분의 대기 시간 부여
-		return queuePosition * 600L;
+		return queuePosition * 300L;
+	}
+
+	private WaitingQueueDto buildWaitingQueueDto(long userId, long seatDetailId) {
+		return WaitingQueueDto.builder()
+			.userId(userId)
+			.seatDetailId(seatDetailId)
+			.waitingStatus(WaitingStatus.WAITING)
+			.reservationDt(LocalDateTime.now())
+			.build();
 	}
 }
