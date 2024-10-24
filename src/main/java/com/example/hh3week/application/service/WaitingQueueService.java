@@ -29,10 +29,18 @@ public class WaitingQueueService {
 	 * @param seatDetailId  좌석 상세 정보의 ID
 	 * @return 대기열에 등록되어 있으면 true, 아니면 false
 	 */
-	@Transactional(readOnly = true)
 	public boolean isUserInQueue(long userId, long seatDetailId) {
 		WaitingQueue existingQueue = waitingQueueRepository.getQueueStatus(userId, seatDetailId);
-		return existingQueue != null && existingQueue.getWaitingStatus() == WaitingStatus.WAITING;
+
+		boolean isUserInQueue = false;
+
+		if(existingQueue == null){
+			return isUserInQueue;
+		}
+
+		isUserInQueue = existingQueue != null && existingQueue.getWaitingStatus() == WaitingStatus.WAITING;
+
+		return isUserInQueue;
 	}
 
 	/**
@@ -41,7 +49,6 @@ public class WaitingQueueService {
 	 * @param waitingQueueDto 대기열에 추가할 사용자의 정보가 담긴 DTO
 	 * @return 생성된 대기열 항목의 ID
 	 */
-	@Transactional
 	public WaitingQueueDto addWaitingQueue(WaitingQueueDto waitingQueueDto) {
 		WaitingQueue waitingQueue = WaitingQueue.ToEntity(waitingQueueDto);
 		return WaitingQueueDto.ToDto(waitingQueueRepository.addToQueue(waitingQueue));
@@ -53,7 +60,6 @@ public class WaitingQueueService {
 	 * @param seatDetailId 좌석 상세 정보의 ID
 	 * @return 다음 대기 중인 사용자의 WaitingQueueDto 또는 null
 	 */
-	@Transactional(readOnly = true)
 	public WaitingQueueDto getNextInQueue(long seatDetailId) {
 		WaitingQueue nextInQueue = waitingQueueRepository.getNextInQueue(seatDetailId);
 		return WaitingQueueDto.ToDto(nextInQueue);
@@ -65,7 +71,6 @@ public class WaitingQueueService {
 	 * @param waitingId 대기열 항목의 ID
 	 * @return 대기열 내에서의 위치 (1부터 시작)
 	 */
-	@Transactional(readOnly = true)
 	public int getQueuePosition(long waitingId) {
 		return waitingQueueRepository.getQueuePosition(waitingId);
 	}
@@ -76,7 +81,6 @@ public class WaitingQueueService {
 	 * @param waitingId 대기열 항목의 ID
 	 * @param status    업데이트할 상태 (예: WAITING, EXPIRED, COMPLETED)
 	 */
-	@Transactional
 	public void updateStatus(long waitingId, WaitingStatus status) {
 		waitingQueueRepository.updateStatus(waitingId, status);
 	}
@@ -88,7 +92,6 @@ public class WaitingQueueService {
 	 * @param concertScheduleId  콘서트 스케줄의 ID (좌석 상세 정보와 연관됨)
 	 * @return 사용자의 WaitingQueueDto 또는 null
 	 */
-	@Transactional(readOnly = true)
 	public WaitingQueueDto getQueueStatus(long userId, long concertScheduleId) {
 		WaitingQueue queueStatus = waitingQueueRepository.getQueueStatus(userId, concertScheduleId);
 		return (queueStatus != null) ? WaitingQueueDto.ToDto(queueStatus) : null;
@@ -99,7 +102,6 @@ public class WaitingQueueService {
 	 *
 	 * @param waitingId 대기열 항목의 ID
 	 */
-	@Transactional
 	public void expireQueue(long waitingId) {
 		waitingQueueRepository.expireQueue(waitingId);
 	}
@@ -110,7 +112,6 @@ public class WaitingQueueService {
 	 * @param seatDetailId 좌석 상세 정보의 ID
 	 * @return 해당 좌석에 대한 모든 대기열 항목의 리스트
 	 */
-	@Transactional(readOnly = true)
 	public List<WaitingQueue> getQueueBySeatDetailId(long seatDetailId) {
 		return waitingQueueRepository.getQueueBySeatDetailId(seatDetailId);
 	}
@@ -124,18 +125,6 @@ public class WaitingQueueService {
 		waitingQueueRepository.clearQueue();
 	}
 
-	/**
-	 * 특정 좌석에 대한 다음 우선권 번호를 계산하는 메서드입니다.
-	 *
-	 * @param seatDetailId 좌석 상세 정보의 ID
-	 * @return 다음 우선권 번호
-	 */
-	@Transactional
-	public long getNextPriority(long seatDetailId) {
-		Long maxPriority = waitingQueueRepository.findMaxPriorityBySeatDetailIdForUpdate(seatDetailId);
-		return (maxPriority != null) ? maxPriority + 1 : 1;
-	}
-
 
 	/**
 	 * 현재 시각을 기준으로 만료된 대기열 항목들을 조회하는 메서드입니다.
@@ -143,7 +132,6 @@ public class WaitingQueueService {
 	 * @param currentTime 현재 시각
 	 * @return 만료된 대기열 항목들의 리스트
 	 */
-	@Transactional(readOnly = true)
 	public List<WaitingQueueDto> getExpiredQueues(LocalDateTime currentTime) {
 		return waitingQueueRepository.findExpiredQueues(currentTime)
 			.stream()

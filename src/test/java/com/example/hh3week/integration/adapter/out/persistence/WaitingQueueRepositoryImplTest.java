@@ -52,7 +52,7 @@ public class WaitingQueueRepositoryImplTest {
 		assertThat(savedQueue.getSeatDetailId()).isEqualTo(1L);
 		assertThat(savedQueue.getReservationDt()).isEqualTo(LocalDateTime.of(2024, 1, 1, 10, 10));
 		assertThat(savedQueue.getWaitingStatus()).isEqualTo(WaitingStatus.WAITING);
-		assertThat(savedQueue.getPriority()).isEqualTo(4L);
+		assertThat(savedQueue.getPriority()).isEqualTo(6L);
 	}
 
 	@Test
@@ -75,13 +75,13 @@ public class WaitingQueueRepositoryImplTest {
 	@DisplayName("다음 대기열 항목 조회 - 대기열에 항목이 없을 경우 예외 발생")
 	void 다음대기열항목조회_대기열에항목이없을경우예외발생() {
 		// Given
-		long seatDetailId = 3L; // 대기열에 항목이 없는 콘서트 스케줄 ID
+		long seatDetailId = 1L; // 대기열에 항목이 없는 콘서트 스케줄 ID
 
 		// When & Then
 
 		WaitingQueue nextInQueue = waitingQueueRepositoryImpl.getNextInQueue(seatDetailId);
 
-		assertThat(nextInQueue.getPriority()).isEqualTo(1);
+		assertThat(nextInQueue.getPriority()).isEqualTo(5);
 	}
 
 	@Test

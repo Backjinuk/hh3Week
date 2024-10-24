@@ -27,7 +27,6 @@ public class UserService {
 	 * @param userDto 사용자 ID
 	 * @param amount 충전할 금액
 	 */
-	@Transactional
 	public void depositBalance(UserDto userDto, long amount) {
 		if (userDto == null) {
 
@@ -49,7 +48,6 @@ public class UserService {
 	 * @param userDto 사용자 ID
 	 * @param amount 충전할 금액
 	 */
-	@Transactional
 	public void useBalance(UserDto userDto, long amount) {
 		if (userDto == null) {
 

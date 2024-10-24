@@ -4,7 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
@@ -15,7 +20,6 @@ import com.example.hh3week.application.port.in.ReservationUseCase;
 import com.example.hh3week.application.service.ReservationService;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
-import com.example.hh3week.common.config.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
@@ -46,54 +50,37 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			.toList();
 	}
 
-	/**
-	 * 예약 가능한 좌석을 예약하거나, 대기열에 추가하고 토큰을 발급하는 메서드
-	 *
-	 * @param userId       사용자 ID
-	 * @param seatDetailId 좌석 상세 ID
-	 * @return 발급된 토큰 정보
-	 */
-	@Transactional
+
+	@Retryable(value = {CannotAcquireLockException.class,
+		DeadlockLoserDataAccessException.class}, maxAttempts = 3, backoff = @Backoff(delay = 100, multiplier = 2))
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public TokenDto reserveSeat(long userId, long seatDetailId) {
-		log.info("사용자 {}가 좌석 상세 ID {}를 예약하려고 시도합니다.", userId, seatDetailId);
 
-		try {
-			// Step 1: 대기열에 이미 등록된 사용자 확인
-			if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
-				CustomException.illegalArgument("사용자가 이미 대기열에 등록되어 있습니다.", new IllegalArgumentException(),
-					this.getClass());
-			}
+		// Step 1: 대기열에 이미 등록된 사용자 확인
+		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
+			throw new IllegalArgumentException("사용자가 이미 대기열에 등록되어 있습니다.");
+		}
 
-			// Step 2: 비관적 잠금을 사용하여 좌석 상세 정보 조회
-			ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailByIdForUpdate(seatDetailId);
+		// Step 2: 비관적 잠금을 사용하여 좌석 상세 정보 조회
+		ReservationSeatDetailDto seatDetailDto = reservationService.getSeatDetailByIdForUpdate(seatDetailId);
 
-			// Step 3: 좌석 상태 확인 및 예약 처리
-			if (seatDetailDto.getReservationStatus() == ReservationStatus.AVAILABLE) {
-				// 좌석이 AVAILABLE인 경우, PENDING으로 상태 변경
-				seatDetailDto.setReservationStatus(ReservationStatus.PENDING);
-				reservationService.updateSeatDetailStatus(seatDetailDto);
+		// Step 3: 좌석 상태 확인 및 예약 처리
+		if (seatDetailDto.getReservationStatus() == ReservationStatus.AVAILABLE) {
+			seatDetailDto.setReservationStatus(ReservationStatus.PENDING);
+			reservationService.updateSeatDetailStatus(seatDetailDto);
 
-				// 토큰 발급 (queueOrder=0)
-				TokenDto tokenDto = tokenService.createToken(userId, 0, calculateRemainingTime(0), seatDetailId);
+			return tokenService.createToken(userId, 0, calculateRemainingTime(0), seatDetailId);
+		} else {
 
-				return tokenDto;
-			} else {
-				// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
-				WaitingQueueDto waitingId = waitingQueueService.addWaitingQueue(buildWaitingQueueDto(userId, seatDetailId));
+			// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
+			WaitingQueueDto waitingId = waitingQueueService.addWaitingQueue(buildWaitingQueueDto(userId, seatDetailId));
 
-				// 대기열 위치 계산
-				int queuePosition = waitingQueueService.getQueuePosition(waitingId.getWaitingId());
-				log.info("사용자 {}의 대기열 위치는 {}입니다. (좌석 상세 ID {})", userId, queuePosition, seatDetailId);
+			// 대기열 위치 계산
+			int queuePosition = waitingQueueService.getQueuePosition(waitingId.getWaitingId());
 
-				// 토큰 발급
-				long remainingTime = calculateRemainingTime(queuePosition);
-				TokenDto tokenDto = tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
-				log.info("사용자 {}에게 토큰이 발급되었습니다: {}", userId, tokenDto);
-				return tokenDto;
-			}
-		} catch (Exception e) {
-			log.error("사용자 {}의 좌석 예약 중 오류 발생: {}", userId, e.getMessage());
-			throw e;
+			// 토큰 발급
+			long remainingTime = calculateRemainingTime(queuePosition);
+			return tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
 		}
 	}
 
@@ -116,4 +103,5 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			.reservationDt(LocalDateTime.now())
 			.build();
 	}
+
 }

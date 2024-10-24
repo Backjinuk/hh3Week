@@ -94,4 +94,4 @@ CREATE TABLE waiting_queue (
                                reservation_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                waiting_status VARCHAR(50) NOT NULL,
                                priority INT NOT NULL
-);
+                           );

@@ -30,24 +30,12 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 		this.entityManager = entityManager;
 	}
 
-	/**
-	 * 결제 내역을 등록합니다.
-	 *
-	 * @param paymentHistory 등록할 PaymentHistory 객체
-	 * @return
-	 */
 	@Override
 	public PaymentHistory registerPaymentHistory(PaymentHistory paymentHistory) {
 		entityManager.persist(paymentHistory);
 		return paymentHistory;
 	}
 
-	/**
-	 * 특정 결제 ID에 대한 결제 내역을 조회합니다.
-	 *
-	 * @param paymentId 조회할 결제 ID
-	 * @return 해당 결제 내역이 있으면 Optional로 반환, 없으면 Optional.empty()
-	 */
 	@Override
 	public PaymentHistory getPaymentHistory(long paymentId) {
 		return queryFactory.selectFrom(qPaymentHistory)
@@ -55,12 +43,6 @@ public class PaymentRepositoryImpl implements PaymentRepositoryPort {
 			.fetchOne();
 	}
 
-	/**
-	 * 특정 사용자 ID에 대한 모든 결제 내역을 조회합니다.
-	 *
-	 * @param userId 조회할 사용자 ID
-	 * @return 해당 사용자의 모든 결제 내역 리스트
-	 */
 	@Override
 	public List<PaymentHistory> getPaymentHistoryByUserId(long userId) {
 		return queryFactory.selectFrom(qPaymentHistory)

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,30 +35,26 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		this.queryFactory = queryFactory;
 	}
 
-
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Override
 	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
 		long seatDetailId = waitingQueue.getSeatDetailId();
 
-		// Step 1: 현재 최대 우선순위 조회 (비관적 잠금 적용)
 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+			// .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
 			.fetchOne();
 
 		if (maxPriority == null) {
 			maxPriority = 0L;
 		}
 
-		// Step 2: 새로운 우선순위 할당
 		long newPriority = maxPriority + 1;
 		waitingQueue.setPriority(newPriority);
 
-		// Step 3: 대기열에 사용자 추가
 		entityManager.persist(waitingQueue);
-		log.info("대기열에 사용자 {}가 추가되었습니다. 우선순위: {}", waitingQueue.getUserId(), newPriority);
 
 		return waitingQueue;
 	}
@@ -90,7 +87,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
 	@Override
 	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
-
 		return queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
 			.setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
@@ -130,7 +126,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 			CustomException.nullPointer("대기열 항목을 찾을 수 없습니다.", this.getClass());
 		}
 
-		// 상태를 EXPIRED로 변경
 		Objects.requireNonNull(waitingQueue).setWaitingStatus(WaitingStatus.EXPIRED);
 		entityManager.merge(waitingQueue);
 	}
@@ -150,7 +145,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
 	@Override
 	public List<WaitingQueue> findExpiredQueues(LocalDateTime currentTime) {
-		// QueryDSL을 사용하여 대기 상태이고 reservationDt가 cutoffTime보다 이전인 레코드를 조회
 		return queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING)
 				.and(qWaitingQueue.reservationDt.before(currentTime)))
@@ -161,7 +155,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	@Override
 	@Transactional
 	public Long findMaxPriorityBySeatDetailIdForUpdate(long seatDetailId) {
-		// 비관적 잠금을 적용하여 seatDetailId에 대한 최대 우선순위를 조회
 		return queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))

@@ -43,7 +43,6 @@ public class ReservationService {
 	 * 좌석 예약 상태를 업데이트하는 메서드
 	 * @param seat 예약할 좌석 엔티티
 	 */
-	@Transactional
 	public void updateSeatReservation(ReservationSeatDto seat) {
 
 		seat.setCurrentReserved(seat.getCurrentReserved() + 1);

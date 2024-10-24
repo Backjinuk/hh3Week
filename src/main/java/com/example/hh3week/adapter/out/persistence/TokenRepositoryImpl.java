@@ -32,12 +32,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 		this.entityManager = entityManager;
 	}
 
-	/**
-	 * 새로운 토큰을 생성하고 저장합니다.
-	 *
-	 * @param token 저장할 Token 객체
-	 * @return 저장된 Token 객체
-	 */
 	@Override
 	@Transactional
 	public Token createToken(Token token) {
@@ -45,12 +39,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 		return token;
 	}
 
-	/**
-	 * 주어진 토큰 문자열을 인증하고 유효한 경우 Token 객체를 반환합니다.
-	 *
-	 * @param tokenStr 인증할 토큰 문자열
-	 * @return 유효한 Token 객체가 있으면 Optional로 반환, 없으면 Optional.empty()
-	 */
 	@Override
 	public Optional<Token> authenticateToken(String tokenStr) {
 		Token token = queryFactory.selectFrom(qToken)
@@ -60,12 +48,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 		return Optional.ofNullable(token);
 	}
 
-	/**
-	 * 주어진 토큰 문자열을 만료 상태로 업데이트합니다.
-	 *
-	 * @param tokenStr 만료시킬 토큰 문자열
-	 * @throws IllegalArgumentException 토큰이 존재하지 않을 경우
-	 */
 	@Override
 	public void expireToken(String tokenStr) {
 		int updatedCount = (int) queryFactory.update(qToken)
@@ -79,12 +61,6 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 		}
 	}
 
-	/**
-	 * 주어진 사용자 ID에 해당하는 토큰을 조회합니다.
-	 *
-	 * @param userId 조회할 사용자 ID
-	 * @return 사용자에게 할당된 Token 객체가 있으면 Optional로 반환, 없으면 Optional.empty()
-	 */
 	@Override
 	public Optional<Token> getTokenByUserId(long userId) {
 		Token token = queryFactory.selectFrom(qToken)
