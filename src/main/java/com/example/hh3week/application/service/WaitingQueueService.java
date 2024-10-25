@@ -31,16 +31,7 @@ public class WaitingQueueService {
 	 */
 	public boolean isUserInQueue(long userId, long seatDetailId) {
 		WaitingQueue existingQueue = waitingQueueRepository.getQueueStatus(userId, seatDetailId);
-
-		boolean isUserInQueue = false;
-
-		if(existingQueue == null){
-			return isUserInQueue;
-		}
-
-		isUserInQueue = existingQueue != null && existingQueue.getWaitingStatus() == WaitingStatus.WAITING;
-
-		return isUserInQueue;
+		return  existingQueue != null && existingQueue.getWaitingStatus() == WaitingStatus.WAITING;
 	}
 
 	/**

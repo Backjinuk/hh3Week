@@ -112,10 +112,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
             CustomException.nullPointer("해당 좌석을 찾을 수 없습니다.", this.getClass());
         }
 
-		// ReservationSeatDetail seatDetail = entityManager.find(ReservationSeatDetail.class, seatDetailId, LockModeType.PESSIMISTIC_WRITE);
-		// if (seatDetail == null) {
-		// 	 CustomException.nullPointer("해당 좌석을 찾을 수 없습니다.", this.getClass());
-		// }
+
 
         return seatDetail;
     }

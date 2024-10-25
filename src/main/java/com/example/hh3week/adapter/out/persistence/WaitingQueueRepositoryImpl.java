@@ -35,7 +35,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		this.queryFactory = queryFactory;
 	}
 
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Override
 	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
@@ -44,7 +43,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			// .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+			.setLockMode(LockModeType.PESSIMISTIC_READ) // 비관적 잠금 설정
 			.fetchOne();
 
 		if (maxPriority == null) {
