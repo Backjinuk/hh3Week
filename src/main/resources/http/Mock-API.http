@@ -1,0 +1,48 @@
+### 토큰 생성
+POST http://localhost:8080/api/v1/tokens
+Content-Type: application/json
+
+{
+  "userId": 1
+}
+
+
+### 추출된 토큰을 사용하여 대기 번호 조회
+### 토큰을 넣어주세요
+GET http://localhost:8080/api/v1/tokens/6bae3198-f268-4c21-9636-fb67820b7f30/queue
+
+
+### 예약 가능한 날짜 조회
+GET http://localhost:8080/api/v1/reservations/dates
+
+
+### 특정 날짜의 예약 가능한 좌석 조회
+GET http://localhost:8080/api/v1/reservations/dates/2024-10-10/seats
+
+
+### 사용자 잔액 충전
+POST http://localhost:8080/api/v1/balance
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "pointAmount": 5000
+}
+
+
+### 사용자 잔액 조회
+GET http://localhost:8080/api/v1/balance/1
+
+
+### 결제 처리
+POST http://localhost:8080/api/v1/payments
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "reservationId": 2,
+  "paymentAmount": 10000
+}
+
+### 결제 내역 조회
+GET http://localhost:8080/api/v1/payments/1
