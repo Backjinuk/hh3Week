@@ -1,5 +1,7 @@
 package com.example.hh3week.adapter.out.persistence;
 
+import static jakarta.persistence.LockModeType.*;
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Lock;
@@ -105,7 +107,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
     public ReservationSeatDetail getSeatDetailByIdForUpdate(long seatDetailId) {
         ReservationSeatDetail seatDetail = queryFactory.selectFrom(qReservationSeatDetail)
             .where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
-            .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+            .setLockMode(OPTIMISTIC) // 비관적 잠금 설정
             .fetchOne();
 
         if (seatDetail == null) {

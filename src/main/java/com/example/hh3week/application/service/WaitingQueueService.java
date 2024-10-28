@@ -45,6 +45,11 @@ public class WaitingQueueService {
 		return WaitingQueueDto.ToDto(waitingQueueRepository.addToQueue(waitingQueue));
 	}
 
+
+	public WaitingQueue addWaitingQueue2(WaitingQueue waitingQueue) {
+		return waitingQueueRepository.addToQueue(waitingQueue);
+	}
+
 	/**
 	 * 특정 좌석에 대해 대기열의 다음 사용자를 조회하는 메서드입니다.
 	 *

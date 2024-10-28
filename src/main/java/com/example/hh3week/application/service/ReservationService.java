@@ -59,6 +59,10 @@ public class ReservationService {
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailById(seatDetailId));
 	}
 
+	public ReservationSeatDetail getSeatDetailById2(long seatDetailId) {
+		return reservationSeatRepositoryPort.getSeatDetailById(seatDetailId);
+	}
+
 	public ReservationSeatDto getSeatById(long seatId){
 		return ReservationSeatDto.ToDto(reservationSeatRepositoryPort.getSeatById(seatId));
 	}
@@ -67,6 +71,9 @@ public class ReservationService {
 		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
 	}
 
+	public void updateSeatDetailStatus2(ReservationSeatDetail seatDetail) {
+		reservationSeatRepositoryPort.updateSeatDetailStatus(seatDetail);
+	}
 	public ReservationSeatDetailDto getSeatDetailByIdForUpdate(long seatDetailId) {
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailByIdForUpdate(seatDetailId));
 	}

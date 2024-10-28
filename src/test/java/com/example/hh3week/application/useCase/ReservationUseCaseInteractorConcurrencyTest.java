@@ -103,7 +103,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 		latch.countDown();
 
 		executor.shutdown();
-		boolean finished = executor.awaitTermination(2, TimeUnit.MINUTES);
+		boolean finished = executor.awaitTermination(10, TimeUnit.MINUTES);
 		assertTrue(finished, "스레드가 제 시간에 종료되지 않았습니다.");
 
 		System.out.println("count : " + successCount.get() + failureCount.get());

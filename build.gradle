@@ -55,6 +55,13 @@ dependencies {
     // Jackson Datatype for Java 8 Date/Time API
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 
+    // Redis
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.5'
+    implementation 'redis.clients:jedis:4.2.3' // 필요 시 주석 해제
+
+    //Kafka
+    implementation 'org.apache.kafka:kafka-clients:3.5.1'
+
     // Development Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

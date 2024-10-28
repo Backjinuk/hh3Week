@@ -22,6 +22,9 @@
 [3. API 명세서](#3-api-명세서--swagger-ui)
 
 [4. 기술스택](#4-기술스택)
+
+[5. 기술스택](#5-기술스택)
+
 * * *
 ## 1. 요구사항 별 시퀸스 다이어그램/ 클래스 다이어그램
 > 요구사항 별 시퀸스 다이어그램은 [여기에서](./docs/SequenceDiagram.md) 확인하실 수 있습니다.<br>
@@ -116,10 +119,10 @@ erDiagram
 * * *
 
 ## 3. API 명세서 / Swagger Ui
-> API 명세서는 [여기에서](./docs/SwaggerUi.md) 확인하실 수 있습니다.<br>
+> Swagger Ui 명세서는 [여기에서](./docs/SwaggerUi.md) 확인하실 수 있습니다.<br>
 > 
 > API 명세서는 [여기에서](./docs/ApiSpac.md) 확인하실 수 있습니다.<br>
-
+>
 > http 파일은 [여기에서](./src/main/resources/http/Mock-API.http) 확인하실 수 있습니다.
 * * *
 
