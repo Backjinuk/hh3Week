@@ -26,8 +26,6 @@ import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
-
-import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -57,7 +55,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 	@Retryable(
 		value = { OptimisticLockingFailureException.class },
-		maxAttempts = 100,
+		maxAttempts = 30,
 		backoff = @Backoff(delay = 50, multiplier = 1.2)
 	)
 	@Transactional

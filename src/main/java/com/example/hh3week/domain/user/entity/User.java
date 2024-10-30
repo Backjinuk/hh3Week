@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +27,9 @@ public class User {
 	private String userName;
 
 	private long pointBalance;
+
+	// @Version
+	// private long version;
 
 	@Builder
 	public User(long userId, String userName, long pointBalance) {

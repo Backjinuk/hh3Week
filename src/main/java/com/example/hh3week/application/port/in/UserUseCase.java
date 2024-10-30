@@ -9,6 +9,9 @@ public interface UserUseCase {
 
 	UserPointHistoryDto handleUserPoint(UserPointHistoryDto userPointHistoryDto);
 
+
+	UserPointHistoryDto handleUserPoint2(UserPointHistoryDto userPointHistoryDto);
+
 	UserDto getUserInfo(Long userId);
 
 	List<UserPointHistoryDto> getUserPointHistoryListByUserId(Long userId);

@@ -42,6 +42,23 @@ public class UserService {
 		userRepositoryPort.updateDepositBalance(user);
 	}
 
+
+
+	public void depositBalance2(User userDto, long amount) {
+		if (userDto == null) {
+
+			CustomException.nullPointer("UserDto는 null일 수 없습니다.", this.getClass());
+		}
+		if (amount < 0) {
+			CustomException.illegalArgument("충전 금액은 음수일 수 없습니다.", new IllegalArgumentException(), this.getClass());
+		}
+
+
+		userDto.setPointBalance(userDto.getPointBalance() + amount);
+		userRepositoryPort.updateDepositBalance(userDto);
+	}
+
+
 	/**
 	 * 잔액 사용 Use Case
 	 *
@@ -68,6 +85,20 @@ public class UserService {
 		userRepositoryPort.updateDepositBalance(user);
 	}
 
+
+	/**
+	 * 잔액 사용 Use Case
+	 *
+	 * @param userDto 사용자 ID
+	 * @param amount 충전할 금액
+	 */
+	public void useBalance2(User userDto, long amount) {
+
+		userDto.setPointBalance(userDto.getPointBalance() - amount);
+		userRepositoryPort.updateDepositBalance(userDto);
+	}
+
+
 	public UserDto getUserInfo(long userId) {
 		UserDto userDto = UserDto.toDto(userRepositoryPort.getUserInfo(userId));
 
@@ -77,6 +108,18 @@ public class UserService {
 
 		return userDto;
 	}
+
+
+	public User getUserInfo2(long userId) {
+		User userInfo = userRepositoryPort.getUserInfo(userId);
+
+		if (userInfo.getUserId() <= 0) {
+			CustomException.illegalArgument("사용자를 찾을수 없습니다.", new IllegalArgumentException(), this.getClass());
+		}
+
+		return userInfo;
+	}
+
 
 	public UserPointHistoryDto addUserPointHistoryInUser(UserPointHistoryDto userPointHistoryDto) {
 		if (userPointHistoryDto == null) {

@@ -15,6 +15,7 @@ import com.example.hh3week.domain.user.entity.UserPointHistory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 
 @Repository
 public class UserRepositoryImpl implements UserRepositoryPort {
@@ -32,7 +33,10 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 
 	@Override
 	public User getUserInfo(long userId) {
-		User user = queryFactory.selectFrom(qUser).where(qUser.userId.eq(userId)).fetchOne();
+		User user = queryFactory.selectFrom(qUser)
+			.where(qUser.userId.eq(userId))
+			// .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+			.fetchOne();
 
 		if(user == null){
 			CustomException.nullPointer("사용자를 찾을 수 없습니다.", this.getClass());

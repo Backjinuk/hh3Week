@@ -69,6 +69,7 @@ create table user
 (
     point_balance bigint not null,
     user_id       bigint not null auto_increment,
+    version        bigint not null default 0,
     user_name     varchar(255),
     primary key (user_id)
 ) engine = InnoDB;
@@ -78,6 +79,7 @@ create table user_point_history
     point_amount bigint not null,
     point_dt     datetime(6),
     user_id      bigint not null,
+    version      bigint not null default 0,
     point_status varchar(255),
     primary key (history_id)
 ) engine = InnoDB;
