@@ -100,7 +100,7 @@ create table waiting_queue
 
 
 
-ALTER TABLE waiting_queue ADD CONSTRAINT unique_priority_per_seat UNIQUE (seat_detail_id, priority);
+-- ALTER TABLE waiting_queue ADD CONSTRAINT unique_priority_per_seat UNIQUE (seat_detail_id, priority);
 
 
 

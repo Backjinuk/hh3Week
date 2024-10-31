@@ -24,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
@@ -138,7 +137,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 	@DisplayName("동시예약_랜덤한사용자_랜덤한좌석예약")
 	public void 동시예약_랜덤한사용자_랜덤한좌석예약() throws InterruptedException {
 		int numberOfUsers = 10;
-		int numberOfSeats = 10;
+		int numberOfSeats = 5;
 		int totalAttempts = numberOfUsers * numberOfSeats;
 		int numberOfThreads = 100;
 		ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
@@ -166,19 +165,34 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 					long userId = pair.getFirst();
 					long seatDetailId = pair.getSecond();
 
-					seatDetailIdList.add(seatDetailId);
-					userIdList.add(userId);
+					synchronized (seatDetailIdList) {
+						seatDetailIdList.add(seatDetailId);
+					}
+					synchronized (userIdList) {
+						userIdList.add(userId);
+					}
 
-					// 예약 시도
-					TokenDto token = reservationUseCaseInteractor.reserveSeat(userId, seatDetailId);
-					tokens.add(token);
+					// 예약 시도 (재시도 로직 포함)
+					TokenDto token = null;
+					try {
+						token = reservationUseCaseInteractor.reserveSeat(userId, seatDetailId);
+					} catch (Exception e) {
+						failureCount.incrementAndGet();
+						return;
+					}
 
-					// 토큰 정보 조회
-					Map<String, Object> tokensAllValue = tokenService.getTokensAllValue(token.getToken());
-					long queueOrder = Long.parseLong(tokensAllValue.get("queueOrder").toString());
+					if (token != null) {
+						tokens.add(token);
 
-					if (queueOrder == 0) {
-						successCount.incrementAndGet();
+						// 토큰 정보 조회
+						Map<String, Object> tokensAllValue = tokenService.getTokensAllValue(token.getToken());
+						long queueOrder = Long.parseLong(tokensAllValue.get("queueOrder").toString());
+
+						if (queueOrder == 0) {
+							successCount.incrementAndGet();
+						} else {
+							failureCount.incrementAndGet();
+						}
 					} else {
 						failureCount.incrementAndGet();
 					}

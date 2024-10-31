@@ -10,7 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,8 +37,8 @@ public class ConcertSchedule {
 
 	private LocalDateTime endDt;
 
-	@Version
-	private long version;
+	// @Version
+	// private long version;
 
 	@Builder
 	public ConcertSchedule(long concertScheduleId, long concertId, ConcertScheduleStatus concertScheduleStatus,

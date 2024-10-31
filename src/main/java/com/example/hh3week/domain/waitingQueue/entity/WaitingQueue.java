@@ -38,8 +38,8 @@ public class WaitingQueue {
 
 	private long priority;
 
-	@Version
-	private long version;
+	// @Version
+	// private long version;
 
 	@Builder
 	public WaitingQueue(long waitingId, long userId, long seatDetailId, LocalDateTime reservationDt,

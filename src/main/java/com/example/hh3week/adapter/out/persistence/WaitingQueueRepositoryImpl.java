@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
 import com.example.hh3week.common.config.CustomException;
@@ -16,10 +15,8 @@ import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,7 +41,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.setLockMode(LockModeType.OPTIMISTIC_FORCE_INCREMENT) // 비관적 락으로 변경
+			// .setLockMode(LockModeType.OPTIMISTIC_FORCE_INCREMENT) // 비관적 락으로 변경
 			.fetchOne();
 
 		if (maxPriority == null) {
@@ -80,7 +77,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		long updatedCount = queryFactory.update(qWaitingQueue)
 			.set(qWaitingQueue.waitingStatus, status)
 			.where(qWaitingQueue.waitingId.eq(waitingId))
-			.setLockMode(LockModeType.OPTIMISTIC)
+			// .setLockMode(LockModeType.OPTIMISTIC)
 			.execute();
 
 		if (updatedCount == 0) {
@@ -92,7 +89,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
 		return queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
-			.setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
+			// .setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
 			.fetchOne();
 	}
 
@@ -100,7 +97,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	public int getQueuePosition(long waitingId) {
 		WaitingQueue waitingQueue = queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.waitingId.eq(waitingId))
-			.setLockMode(LockModeType.OPTIMISTIC)
+			// .setLockMode(LockModeType.OPTIMISTIC)
 			.fetchOne();
 
 		if (waitingQueue == null) {
@@ -160,7 +157,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		return queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
+			// .setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
 			.fetchOne();
 	}
 }

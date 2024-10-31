@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Version;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,8 +31,8 @@ public class Token {
 
 	private LocalDateTime expiresAt;
 
-	@Version
-	private long version;
+	// @Version
+	// private long version;
 
 	@Builder
 	public Token(long tokenId, long userId, String token, LocalDateTime issuedAt, LocalDateTime expiresAt,

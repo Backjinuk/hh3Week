@@ -8,7 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,8 +35,8 @@ public class ReservationSeatDetail {
 
 	private long seatPrice;
 
-	@Version
-	private long version;
+	// @Version
+	// private long version;
 
 	@Builder
 	public ReservationSeatDetail(long seatDetailId, long userId, long seatId, String seatCode,
