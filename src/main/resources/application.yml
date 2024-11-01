@@ -25,6 +25,12 @@ spring:
     username: app_user
     password: 'wlsdnr7^^' # 특수 문자가 포함되어 있으므로 따옴표로 감쌌습니다.
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20  # 기존 10에서 20으로 증가
+      minimum-idle: 10
+      idle-timeout: 600000  # 10분
+      connection-timeout: 30000  # 30초
+      max-lifetime: 1800000  # 30분
 
   jpa:
     hibernate:

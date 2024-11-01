@@ -1,4 +1,4 @@
-package com.example.hh3week.domain.reservation;
+package com.example.hh3week.adapter.out.messaging.kafka.dto;
 
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 

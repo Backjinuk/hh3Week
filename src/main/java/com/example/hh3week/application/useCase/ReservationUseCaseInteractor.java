@@ -2,6 +2,7 @@ package com.example.hh3week.application.useCase;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -76,6 +77,11 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		}
 	}
 
+	@Override
+	public CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatId) {
+		return reservationService.sendReservationRequest(userId, seatId);
+	}
+
 	public TokenDto reserveSeatTransactional(long userId, long seatDetailId) {
 		// Step 1: 대기열에 이미 등록된 사용자 확인
 		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
@@ -105,6 +111,11 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			return tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
 		}
 	}
+
+
+
+
+
 
 	/**
 	 * 대기열에서 남은 시간을 계산하는 메서드 (예시)

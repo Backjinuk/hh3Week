@@ -1,4 +1,4 @@
-package com.example.hh3week.application.useCase;
+package com.example.hh3week.concurrency;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,6 +32,7 @@ import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 import com.example.hh3week.application.service.ReservationService;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
+import com.example.hh3week.application.useCase.ReservationUseCaseInteractor;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;

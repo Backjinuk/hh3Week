@@ -1,4 +1,4 @@
-package com.example.hh3week.application.service.kafka;
+package com.example.hh3week.adapter.out.messaging.kafka.adapter;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;

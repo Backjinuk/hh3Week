@@ -1,4 +1,4 @@
-package com.example.hh3week.application.service.kafka;
+package com.example.hh3week.adapter.out.messaging.kafka.adapter;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -8,19 +8,20 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
-import com.example.hh3week.domain.reservation.SeatReservationRequest;
+import com.example.hh3week.application.port.out.ReservationMessagingPort;
+import com.example.hh3week.adapter.out.messaging.kafka.dto.SeatReservationRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ReservationProducerService {
+public class ReservationProducerAdapter implements ReservationMessagingPort {
 	private final KafkaTemplate<String, SeatReservationRequest> kafkaTemplate;
 	private final String requestTopic = "seat-reservations";
 	private final ResponseHolder responseHolder;
 
 	@Autowired
-	public ReservationProducerService(KafkaTemplate<String, SeatReservationRequest> kafkaTemplate,
+	public ReservationProducerAdapter(KafkaTemplate<String, SeatReservationRequest> kafkaTemplate,
 		ResponseHolder responseHolder) {
 		this.kafkaTemplate = kafkaTemplate;
 		this.responseHolder = responseHolder;

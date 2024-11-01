@@ -19,7 +19,6 @@ import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.in.ReservationUseCase;
-import com.example.hh3week.application.service.kafka.ReservationProducerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,19 +26,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/v1")
 public class ReservationController {
 
 	private final ReservationUseCase reservationUseCase;
-	private final ReservationProducerService reservationProducerService;
 
-	public ReservationController(ReservationUseCase reservationUseCase,
-		ReservationProducerService reservationProducerService) {
+	public ReservationController(ReservationUseCase reservationUseCase ) {
 		this.reservationUseCase = reservationUseCase;
-		this.reservationProducerService = reservationProducerService;
 	}
 
 	/**
@@ -88,8 +83,8 @@ public class ReservationController {
 		@ApiResponse(responseCode = "500", description = "서버 오류",
 			content = @Content)
 	})
+
 	@PostMapping("/reservations/reserveSeat")
-	@Transactional
 	public ResponseEntity<TokenDto> reserveSeat(
 		@Parameter(description = "좌석 예약을 위한 사용자 ID와 좌석 상세 ID", required = true)
 		@RequestBody Map<String, Long> requestBody) throws ExecutionException, InterruptedException, TimeoutException {
@@ -100,8 +95,20 @@ public class ReservationController {
 		if (userId == null || seatDetailId == null) {
 			throw new IllegalArgumentException("userId와 seatDetailId는 필수 입력 항목입니다.");
 		}
-		CompletableFuture<TokenDto> future = reservationProducerService.sendReservationRequest(userId, seatDetailId);
-		//TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);
-		return ResponseEntity.ok(future.get(10, TimeUnit.SECONDS));
+		CompletableFuture<TokenDto> future = reservationUseCase.sendReservationRequest(userId, seatDetailId);
+
+		try {
+			// 타임아웃을 설정하여 기다림 (예: 10초)
+			TokenDto tokenDto = future.get(30, TimeUnit.SECONDS);
+			return ResponseEntity.ok(tokenDto);
+		} catch (TimeoutException e) {
+			throw new IllegalArgumentException("예약 요청이 타임아웃되었습니다.", e);
+		} catch (ExecutionException e) {
+			throw new IllegalArgumentException("예약 처리 중 오류가 발생했습니다.", e.getCause());
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalArgumentException("예약 요청이 인터럽트되었습니다.", e);
+		}
 	}
+
 }

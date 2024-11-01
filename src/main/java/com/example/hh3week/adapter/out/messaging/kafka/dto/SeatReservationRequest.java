@@ -1,4 +1,4 @@
-package com.example.hh3week.domain.reservation;
+package com.example.hh3week.adapter.out.messaging.kafka.dto;
 
 import lombok.Data;
 

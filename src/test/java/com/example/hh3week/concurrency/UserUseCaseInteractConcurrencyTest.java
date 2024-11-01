@@ -1,4 +1,4 @@
-package com.example.hh3week.application.useCase;
+package com.example.hh3week.concurrency;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,6 +21,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.application.service.UserService;
+import com.example.hh3week.application.useCase.UserUseCaseInteract;
 import com.example.hh3week.domain.user.entity.PointStatus;
 import com.example.hh3week.domain.user.entity.User;
 
