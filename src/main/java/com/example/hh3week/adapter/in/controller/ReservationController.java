@@ -2,16 +2,24 @@
 
 package com.example.hh3week.adapter.in.controller;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.in.ReservationUseCase;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
+import com.example.hh3week.application.service.kafka.ReservationProducerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,9 +34,12 @@ import jakarta.transaction.Transactional;
 public class ReservationController {
 
 	private final ReservationUseCase reservationUseCase;
+	private final ReservationProducerService reservationProducerService;
 
-	public ReservationController(ReservationUseCase reservationUseCase) {
+	public ReservationController(ReservationUseCase reservationUseCase,
+		ReservationProducerService reservationProducerService) {
 		this.reservationUseCase = reservationUseCase;
+		this.reservationProducerService = reservationProducerService;
 	}
 
 	/**
@@ -81,7 +92,7 @@ public class ReservationController {
 	@Transactional
 	public ResponseEntity<TokenDto> reserveSeat(
 		@Parameter(description = "좌석 예약을 위한 사용자 ID와 좌석 상세 ID", required = true)
-		@RequestBody Map<String, Long> requestBody) {
+		@RequestBody Map<String, Long> requestBody) throws ExecutionException, InterruptedException, TimeoutException {
 
 		Long userId = requestBody.get("userId");
 		Long seatDetailId = requestBody.get("seatDetailId");
@@ -89,8 +100,8 @@ public class ReservationController {
 		if (userId == null || seatDetailId == null) {
 			throw new IllegalArgumentException("userId와 seatDetailId는 필수 입력 항목입니다.");
 		}
-
-		TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);
-		return ResponseEntity.ok(tokenDto);
+		CompletableFuture<TokenDto> future = reservationProducerService.sendReservationRequest(userId, seatDetailId);
+		//TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);
+		return ResponseEntity.ok(future.get(10, TimeUnit.SECONDS));
 	}
 }

@@ -63,6 +63,8 @@ dependencies {
 
     //Kafka
     implementation 'org.apache.kafka:kafka-clients:3.5.1'
+    implementation 'org.springframework.kafka:spring-kafka'
+
 
     // Development Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

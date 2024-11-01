@@ -58,24 +58,22 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		RLock lock = redissonClient.getLock(lockKey);
 		boolean isLocked = false;
 		try {
-			isLocked = lock.tryLock(5, 60, TimeUnit.SECONDS); // 락 유지 시간을 120초로 증가
-
+			isLocked = lock.tryLock(5, 60, TimeUnit.SECONDS);
 			if (!isLocked) {
+
 				throw new IllegalArgumentException("좌석 락을 획득할 수 없습니다. 다시 시도해주세요.");
 			}
-
-			// 락 획득 후 트랜잭션 실행
-			return reserveSeatTransactional(userId, seatDetailId);
-
+			 return reserveSeatTransactional(userId, seatDetailId);
 		} catch (InterruptedException e) {
+
 			Thread.currentThread().interrupt();
 			throw new IllegalArgumentException("락 획득이 인터럽트되었습니다.");
+
 		} finally {
 			if (isLocked && lock.isHeldByCurrentThread()) {
 				lock.unlock();
 			}
 		}
-
 	}
 
 	public TokenDto reserveSeatTransactional(long userId, long seatDetailId) {
