@@ -4,10 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.UserRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.user.entity.QUser;
 import com.example.hh3week.domain.user.entity.QUserPointHistory;
 import com.example.hh3week.domain.user.entity.User;
@@ -15,7 +14,6 @@ import com.example.hh3week.domain.user.entity.UserPointHistory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 
 @Repository
 public class UserRepositoryImpl implements UserRepositoryPort {

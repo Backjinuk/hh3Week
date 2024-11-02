@@ -6,10 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.token.entity.QToken;
 import com.example.hh3week.domain.token.entity.Token;
 import com.querydsl.jpa.impl.JPAQueryFactory;

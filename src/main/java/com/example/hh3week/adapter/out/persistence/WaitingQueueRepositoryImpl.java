@@ -8,7 +8,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
 
 import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.waitingQueue.entity.QWaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;

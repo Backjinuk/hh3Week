@@ -29,6 +29,7 @@ import org.springframework.test.context.jdbc.Sql;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
+import com.example.hh3week.application.port.in.ReservationUseCase;
 import com.example.hh3week.application.service.ReservationService;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
@@ -47,6 +48,9 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 
 	@Autowired
 	private ReservationUseCaseInteractor reservationUseCaseInteractor;
+
+	@Autowired
+	private	ReservationUseCase useCase;
 
 	@Autowired
 	private WaitingQueueService waitingQueueService;
@@ -83,7 +87,8 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 				try {
 					latch.await();
 
-					TokenDto token = reservationUseCaseInteractor.reserveSeat(uid, seatDetailId);
+					TokenDto token = useCase.sendReservationRequest(uid, seatDetailId)
+						.get(30, TimeUnit.SECONDS);
 					tokens.add(token);
 
 					Map<String, Object> tokensAllValue = tokenService.getTokensAllValue(token.getToken());
@@ -132,8 +137,6 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 		assertEquals(waitingQueues.size(), uniquePriorities.size(), "대기열의 모든 우선순위는 고유해야 합니다.");
 	}
 
-
-
 	@Test
 	@DisplayName("동시예약_랜덤한사용자_랜덤한좌석예약")
 	public void 동시예약_랜덤한사용자_랜덤한좌석예약() throws InterruptedException {
@@ -176,7 +179,8 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 					// 예약 시도 (재시도 로직 포함)
 					TokenDto token = null;
 					try {
-						token = reservationUseCaseInteractor.reserveSeat(userId, seatDetailId);
+						token = useCase.sendReservationRequest(userId, seatDetailId)
+							.get(30, TimeUnit.SECONDS);
 					} catch (Exception e) {
 						failureCount.incrementAndGet();
 						return;
@@ -244,8 +248,6 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 		}
 	}
 
-
-
 	@Test
 	@DisplayName("동시예약_랜덤한사용자_고정한좌석예약")
 	public void 동시예약_랜덤한사용자_고정한좌석예약() throws InterruptedException {
@@ -274,7 +276,8 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 					latch.await();
 
 					// 예약 시도
-					TokenDto token = reservationUseCaseInteractor.reserveSeat(userId, fixedSeatDetailId);
+					TokenDto token = useCase.sendReservationRequest(userId, fixedSeatDetailId)
+						.get(30, TimeUnit.SECONDS);
 					tokens.add(token);
 
 					// 토큰 정보 조회
@@ -326,16 +329,12 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 			.collect(Collectors.toList());
 
 		for (int i = 0; i < sortedPriorities.size(); i++) {
-			assertEquals(i + 1, sortedPriorities.get(i),
-				"대기열 우선순위가 올바르게 연속적으로 증가해야 합니다.");
+			assertEquals(i + 1, sortedPriorities.get(i), "대기열 우선순위가 올바르게 연속적으로 증가해야 합니다.");
 		}
 
 		// 대기열 우선순위의 고유성 확인
-		Set<Long> uniquePriorities = waitingQueues.stream()
-			.map(WaitingQueue::getPriority)
-			.collect(Collectors.toSet());
-		assertEquals(waitingQueues.size(), uniquePriorities.size(),
-			"대기열의 모든 우선순위는 고유해야 합니다.");
+		Set<Long> uniquePriorities = waitingQueues.stream().map(WaitingQueue::getPriority).collect(Collectors.toSet());
+		assertEquals(waitingQueues.size(), uniquePriorities.size(), "대기열의 모든 우선순위는 고유해야 합니다.");
 	}
 
 	/**
@@ -374,7 +373,8 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 					setList.add(seatId);
 
 					// 예약 시도
-					TokenDto token = reservationUseCaseInteractor.reserveSeat(fixedUserId, seatId);
+					TokenDto token = useCase.sendReservationRequest(fixedUserId, seatId)
+						.get(30, TimeUnit.SECONDS);
 					tokens.add(token);
 
 					// 토큰 정보 조회
@@ -421,8 +421,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 		// 대기열에 나머지 사용자가 추가되었는지 확인
 		for (long seatId = 1; seatId <= numberOfSeats; seatId++) {
 			List<WaitingQueue> waitingQueues = waitingQueueService.getQueueBySeatDetailId(seatId);
-			assertEquals(numberOfUsers - 1, waitingQueues.size(),
-				"대기열에 나머지 사용자가 추가되어야 합니다. (좌석 ID: " + seatId + ")");
+			assertEquals(numberOfUsers - 1, waitingQueues.size(), "대기열에 나머지 사용자가 추가되어야 합니다. (좌석 ID: " + seatId + ")");
 		}
 
 		// 대기열 우선순위 검증
@@ -434,8 +433,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 				.collect(Collectors.toList());
 
 			for (int i = 0; i < sortedPriorities.size(); i++) {
-				assertEquals(i + 1, sortedPriorities.get(i),
-					"우선순위가 올바르게 연속적으로 증가해야 합니다. (좌석 ID: " + seatId + ")");
+				assertEquals(i + 1, sortedPriorities.get(i), "우선순위가 올바르게 연속적으로 증가해야 합니다. (좌석 ID: " + seatId + ")");
 			}
 
 			// 대기열 우선순위의 고유성 확인
@@ -446,7 +444,6 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 				"대기열의 모든 우선순위는 고유해야 합니다. (좌석 ID: " + seatId + ")");
 		}
 	}
-
 
 	@Test
 	public void testConcurrentReservations2() throws InterruptedException {
@@ -465,7 +462,9 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 			Future<TokenDto> future = executorService.submit(() -> {
 				try {
 					latch.await(); // 모든 스레드가 준비될 때까지 대기
-					return reservationUseCaseInteractor.reserveSeat(uid, seatDetailId);
+					return useCase.sendReservationRequest(uid, seatDetailId)
+						.get(30, TimeUnit.SECONDS);
+
 				} catch (Exception e) {
 					System.err.println("사용자 " + uid + "의 예약 실패: " + e.getMessage());
 					return null;
@@ -572,10 +571,6 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 		Set<Long> uniquePriorities = waitingQueues.stream().map(WaitingQueue::getPriority).collect(Collectors.toSet());
 		assertEquals(waitingQueues.size(), uniquePriorities.size(), "모든 우선순위는 고유해야 합니다.");
 	}
-
-
-
-
 
 	private static class Pair<F, S> {
 		private final F first;

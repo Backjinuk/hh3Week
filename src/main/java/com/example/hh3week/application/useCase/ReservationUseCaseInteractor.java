@@ -64,7 +64,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 				throw new IllegalArgumentException("좌석 락을 획득할 수 없습니다. 다시 시도해주세요.");
 			}
-			 return reserveSeatTransactional(userId, seatDetailId);
+			return reserveSeatTransactional(userId, seatDetailId);
 		} catch (InterruptedException e) {
 
 			Thread.currentThread().interrupt();
@@ -111,11 +111,6 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			return tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
 		}
 	}
-
-
-
-
-
 
 	/**
 	 * 대기열에서 남은 시간을 계산하는 메서드 (예시)

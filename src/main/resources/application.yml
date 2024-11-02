@@ -1,6 +1,13 @@
 # 실제 운영될 DB 프로필
 spring:
 
+  data:
+    redis:
+      host: BJW_RedisDB
+      port: 6379
+      url: redis://backjin.iptime.org:6379
+      password:
+
   kafka:
     bootstrap-servers: backjin.iptime.org:9092
     producer:
@@ -15,7 +22,6 @@ spring:
           json:
             trusted:
               packages: "*"
-
 
   application:
     name: hh3week

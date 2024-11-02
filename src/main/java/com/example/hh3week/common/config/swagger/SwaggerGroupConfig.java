@@ -1,4 +1,4 @@
-package com.example.hh3week.common.config;
+package com.example.hh3week.common.config.swagger;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;

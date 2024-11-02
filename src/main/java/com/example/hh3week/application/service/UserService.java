@@ -3,12 +3,11 @@ package com.example.hh3week.application.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.user.UserDto;
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.application.port.out.UserRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.user.entity.User;
 import com.example.hh3week.domain.user.entity.UserPointHistory;
 

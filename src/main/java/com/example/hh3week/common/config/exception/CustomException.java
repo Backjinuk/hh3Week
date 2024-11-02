@@ -1,4 +1,4 @@
-package com.example.hh3week.common.config;
+package com.example.hh3week.common.config.exception;
 
 import lombok.extern.slf4j.Slf4j;
 

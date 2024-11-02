@@ -4,12 +4,10 @@ import static jakarta.persistence.LockModeType.*;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.reservation.entity.QReservationSeat;
 import com.example.hh3week.domain.reservation.entity.QReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
@@ -18,7 +16,6 @@ import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 
 @Repository
 public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryPort {

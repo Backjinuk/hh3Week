@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.application.port.in.ConcertUseCase;
 import com.example.hh3week.application.service.ConcertService;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 
 @Service
 public class ConcertUseCaseInteractor implements ConcertUseCase {

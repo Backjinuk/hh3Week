@@ -1,5 +1,5 @@
 
-package com.example.hh3week.common.config;
+package com.example.hh3week.common.config.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

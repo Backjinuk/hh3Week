@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.example.hh3week.application.port.out.ConcertRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.concert.entity.Concert;
 import com.example.hh3week.domain.concert.entity.ConcertSchedule;
 import com.example.hh3week.domain.concert.entity.ConcertScheduleStatus;

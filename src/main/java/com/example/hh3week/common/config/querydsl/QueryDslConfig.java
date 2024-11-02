@@ -1,4 +1,4 @@
-package com.example.hh3week.common.config;
+package com.example.hh3week.common.config.querydsl;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

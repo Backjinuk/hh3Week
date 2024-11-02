@@ -1,4 +1,4 @@
-package com.example.hh3week.config;
+package com.example.hh3week.common.config.Kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

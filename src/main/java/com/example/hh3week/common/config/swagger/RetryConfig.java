@@ -1,4 +1,4 @@
-package com.example.hh3week.common.config;
+package com.example.hh3week.common.config.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -14,7 +14,7 @@ import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.adapter.in.dto.validation.DtoValidation;
 import com.example.hh3week.application.port.in.UserUseCase;
 import com.example.hh3week.application.service.UserService;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.user.entity.PointStatus;
 import com.example.hh3week.domain.user.entity.User;
 

@@ -99,7 +99,7 @@ public class ReservationController {
 
 		try {
 			// 타임아웃을 설정하여 기다림 (예: 10초)
-			TokenDto tokenDto = future.get(30, TimeUnit.SECONDS);
+			TokenDto tokenDto = future.get(60, TimeUnit.SECONDS);
 			return ResponseEntity.ok(tokenDto);
 		} catch (TimeoutException e) {
 			throw new IllegalArgumentException("예약 요청이 타임아웃되었습니다.", e);

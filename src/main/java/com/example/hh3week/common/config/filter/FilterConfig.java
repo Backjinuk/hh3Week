@@ -1,4 +1,4 @@
-package com.example.hh3week.common.config;
+package com.example.hh3week.common.config.filter;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
