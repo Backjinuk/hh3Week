@@ -46,11 +46,11 @@ public class UserController {
 			content = @Content)
 	})
 	@PostMapping("/handleUserPoint")
-	public ResponseEntity<UserPointHistoryDto> handleUserPoint(
+	public ResponseEntity<UserPointHistoryDto> handleUserPoint2(
 		@Parameter(description = "사용자 포인트 충전 또는 사용을 위한 DTO", required = true)
 		@RequestBody UserPointHistoryDto userPointHistoryDto) {
 
-		UserPointHistoryDto processedHistory = userUseCase.handleUserPoint(userPointHistoryDto);
+		UserPointHistoryDto processedHistory = userUseCase.handleUserPoint2(userPointHistoryDto);
 		return ResponseEntity.ok(processedHistory);
 	}
 

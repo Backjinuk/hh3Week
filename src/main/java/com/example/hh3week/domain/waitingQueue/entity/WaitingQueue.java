@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,9 +38,12 @@ public class WaitingQueue {
 
 	private long priority;
 
+	// @Version
+	// private long version;
+
 	@Builder
 	public WaitingQueue(long waitingId, long userId, long seatDetailId, LocalDateTime reservationDt,
-		WaitingStatus waitingStatus, long priority) {
+		WaitingStatus waitingStatus, long priority, long version) {
 		this.waitingId = waitingId;
 		this.userId = userId;
 		this.seatDetailId = seatDetailId;
@@ -47,7 +51,6 @@ public class WaitingQueue {
 		this.waitingStatus = waitingStatus;
 		this.priority = priority;
 	}
-
 
 	public static WaitingQueue ToEntity(WaitingQueueDto waitingQueueDto){
 		return WaitingQueue.builder()

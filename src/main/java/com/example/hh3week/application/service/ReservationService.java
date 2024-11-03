@@ -1,27 +1,30 @@
 package com.example.hh3week.application.service;
 
 import java.util.List;
-
-import javax.swing.text.DefaultEditorKit;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
+import com.example.hh3week.adapter.in.dto.token.TokenDto;
+import com.example.hh3week.application.port.out.ReservationMessagingPort;
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
-import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 
 @Service
 public class ReservationService {
 
 	private final ReservationSeatRepositoryPort reservationSeatRepositoryPort;
 
-	public ReservationService(ReservationSeatRepositoryPort reservationSeatRepositoryPort) {
+	private final ReservationMessagingPort reservationMessagingPort;
+
+	public ReservationService(ReservationSeatRepositoryPort reservationSeatRepositoryPort,
+		ReservationMessagingPort reservationMessagingPort) {
 		this.reservationSeatRepositoryPort = reservationSeatRepositoryPort;
+		this.reservationMessagingPort = reservationMessagingPort;
 	}
 
 	/*
@@ -59,6 +62,10 @@ public class ReservationService {
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailById(seatDetailId));
 	}
 
+	public ReservationSeatDetail getSeatDetailById2(long seatDetailId) {
+		return reservationSeatRepositoryPort.getSeatDetailById(seatDetailId);
+	}
+
 	public ReservationSeatDto getSeatById(long seatId){
 		return ReservationSeatDto.ToDto(reservationSeatRepositoryPort.getSeatById(seatId));
 	}
@@ -67,7 +74,14 @@ public class ReservationService {
 		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
 	}
 
+	public void updateSeatDetailStatus2(ReservationSeatDetail seatDetail) {
+		reservationSeatRepositoryPort.updateSeatDetailStatus(seatDetail);
+	}
 	public ReservationSeatDetailDto getSeatDetailByIdForUpdate(long seatDetailId) {
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailByIdForUpdate(seatDetailId));
+	}
+
+	public CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatDetailId) {
+		return reservationMessagingPort.sendReservationRequest(userId, seatDetailId);
 	}
 }

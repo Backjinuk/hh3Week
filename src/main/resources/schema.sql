@@ -1,97 +1,107 @@
+drop table if exists concert;
+drop table if exists concert_schedule;
+drop table if exists payment_history;
+drop table if exists reservation_seat;
+drop table if exists reservation_seat_detail;
+drop table if exists token;
+drop table if exists user;
+drop table if exists user_point_history;
+drop table if exists waiting_queue;
 
--- 2. 모든 테이블 삭제
-DROP TABLE IF EXISTS waiting_queue;
-DROP TABLE IF EXISTS token;
-DROP TABLE IF EXISTS concert_schedule;
-DROP TABLE IF EXISTS concert;
-DROP TABLE IF EXISTS reservation_seat_detail;
-DROP TABLE IF EXISTS reservation_seat;
-DROP TABLE IF EXISTS payment_history;
-DROP TABLE IF EXISTS user_point_history;
-DROP TABLE IF EXISTS user;
+create table concert
+(
+    concert_id      bigint not null auto_increment,
+    concert_content varchar(255),
+    concert_name    varchar(255),
+    primary key (concert_id)
+) engine = InnoDB;
+create table concert_schedule
+(
+    concert_id              bigint not null,
+    concert_price           bigint not null,
+    concert_schedule_id     bigint not null auto_increment,
+    end_dt                  datetime(6),
+    start_dt                datetime(6),
+    version                 bigint not null default 0,
+    concert_schedule_status varchar(255),
+    primary key (concert_schedule_id)
+) engine = InnoDB;
+create table payment_history
+(
+    payment_amount bigint not null,
+    payment_dt     datetime(6),
+    payment_id     bigint not null auto_increment,
+    reservation_id bigint not null,
+    user_id        bigint not null,
+    payment_status varchar(255),
+    primary key (payment_id)
+) engine = InnoDB;
+create table reservation_seat
+(
+    concert_id       bigint not null,
+    current_reserved bigint not null,
+    max_capacity     bigint not null,
+    seat_id          bigint not null auto_increment,
+    primary key (seat_id)
+) engine = InnoDB;
+create table reservation_seat_detail
+(
+    seat_detail_id     bigint not null auto_increment,
+    seat_id            bigint not null,
+    seat_price         bigint not null,
+    user_id            bigint not null,
+    version            bigint not null default 0,
+    seat_code          varchar(255),
+    reservation_status varchar(255),
+    primary key (seat_detail_id)
+) engine = InnoDB;
+create table token
+(
+    expires_at datetime(6),
+    issued_at  datetime(6),
+    token_id   bigint not null auto_increment,
+    user_id    bigint not null,
+    version    bigint not null default 0,
+    token      varchar(255),
+    primary key (token_id)
+) engine = InnoDB;
+create table user
+(
+    point_balance bigint not null,
+    user_id       bigint not null auto_increment,
+    version        bigint not null default 0,
+    user_name     varchar(255),
+    primary key (user_id)
+) engine = InnoDB;
+create table user_point_history
+(
+    history_id   bigint not null auto_increment,
+    point_amount bigint not null,
+    point_dt     datetime(6),
+    user_id      bigint not null,
+    version      bigint not null default 0,
+    point_status varchar(255),
+    primary key (history_id)
+) engine = InnoDB;
+create table waiting_queue
+(
+    priority       bigint not null,
+    reservation_dt datetime(6),
+    seat_detail_id bigint not null,
+    user_id        bigint not null,
+    version        bigint not null default 0,
+    waiting_id     bigint not null auto_increment,
+    waiting_status varchar(255),
+    primary key (waiting_id)
+) engine = InnoDB;
 
--- 3. 외래 키 검사 활성화 (필요 시)
-SET FOREIGN_KEY_CHECKS = 1;
 
--- 4. 테이블 생성
 
--- User 테이블
-CREATE TABLE user (
-                      user_id INT PRIMARY KEY AUTO_INCREMENT,
-                      user_name VARCHAR(100) NOT NULL,
-                      point_balance BIGINT NOT NULL
-);
 
--- PointHistory 테이블
-CREATE TABLE user_point_history (
-                               history_id INT PRIMARY KEY AUTO_INCREMENT,
-                               user_id INT,
-                               point_amount BIGINT NOT NULL,
-                               point_status VARCHAR(50) NOT NULL,
-                               point_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
--- PaymentHistory 테이블
-CREATE TABLE payment_history (
-                                 payment_id INT PRIMARY KEY AUTO_INCREMENT,
-                                 user_id INT,
-                                 reservation_id INT,
-                                 payment_amount BIGINT NOT NULL,
-                                 payment_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                 payment_status VARCHAR(50) NOT NULL
 
-);
+-- ALTER TABLE waiting_queue ADD CONSTRAINT unique_priority_per_seat UNIQUE (seat_detail_id, priority);
 
--- ReservationSeat 테이블
-CREATE TABLE reservation_seat (
-                                  seat_id INT PRIMARY KEY AUTO_INCREMENT,
-                                  concert_id INT,
-                                  max_capacity INT NOT NULL,
-                                  current_reserved INT NOT NULL
-);
 
--- ReservationSeatDetail 테이블
-CREATE TABLE reservation_seat_detail (
-                                         seat_detail_id INT PRIMARY KEY AUTO_INCREMENT,
-                                         user_id INT,
-                                         seat_id INT,
-                                         seat_code VARCHAR(10) NOT NULL,
-                                         reservation_status VARCHAR(50) NOT NULL,
-                                         seat_price FLOAT NOT NULL
-);
 
--- Concert 테이블
-CREATE TABLE concert (
-                         concert_id INT PRIMARY KEY AUTO_INCREMENT,
-                         concert_name VARCHAR(255) NOT NULL,
-                         concert_content TEXT NOT NULL
-);
 
--- ConcertSchedule 테이블
-CREATE TABLE concert_schedule (
-                                  concert_schedule_id INT PRIMARY KEY AUTO_INCREMENT,
-                                  concert_id INT,
-                                  concert_schedule_status VARCHAR(50) NOT NULL,
-                                  concert_price BIGINT NOT NULL,
-                                  start_dt TIMESTAMP NOT NULL,
-                                  end_dt TIMESTAMP NOT NULL
-);
-
--- Token 테이블
-CREATE TABLE token (
-                       token_id INT PRIMARY KEY AUTO_INCREMENT,
-                       user_id INT,
-                       token VARCHAR(255) NOT NULL,
-                       issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       expires_at TIMESTAMP NOT NULL
-);
-
--- WaitingQueue 테이블
-CREATE TABLE waiting_queue (
-                               waiting_id INT PRIMARY KEY AUTO_INCREMENT,
-                               user_id INT,
-                               seat_detail_id INT,
-                               reservation_dt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                               waiting_status VARCHAR(50) NOT NULL,
-                               priority INT NOT NULL
-                           );

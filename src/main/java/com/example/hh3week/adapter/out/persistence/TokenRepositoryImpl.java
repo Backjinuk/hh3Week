@@ -6,16 +6,17 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.TokenRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.token.entity.QToken;
 import com.example.hh3week.domain.token.entity.Token;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolationException;
 
 @Repository
 public class TokenRepositoryImpl implements TokenRepositoryPort {
@@ -33,10 +34,16 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	}
 
 	@Override
-	@Transactional
 	public Token createToken(Token token) {
-		entityManager.persist(token);
-		return token;
+		try {
+			entityManager.persist(token);
+			return token;
+		} catch (PersistenceException e) {
+			if (e.getCause() instanceof ConstraintViolationException) {
+				throw new IllegalArgumentException("이미 존재하는 토큰입니다.", e);
+			}
+			throw e;
+		}
 	}
 
 	@Override

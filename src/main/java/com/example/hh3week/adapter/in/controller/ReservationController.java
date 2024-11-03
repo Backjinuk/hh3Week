@@ -2,16 +2,23 @@
 
 package com.example.hh3week.adapter.in.controller;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.hh3week.adapter.in.dto.concert.ConcertScheduleDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.application.port.in.ReservationUseCase;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +26,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -27,7 +33,7 @@ public class ReservationController {
 
 	private final ReservationUseCase reservationUseCase;
 
-	public ReservationController(ReservationUseCase reservationUseCase) {
+	public ReservationController(ReservationUseCase reservationUseCase ) {
 		this.reservationUseCase = reservationUseCase;
 	}
 
@@ -77,11 +83,11 @@ public class ReservationController {
 		@ApiResponse(responseCode = "500", description = "서버 오류",
 			content = @Content)
 	})
+
 	@PostMapping("/reservations/reserveSeat")
-	@Transactional
 	public ResponseEntity<TokenDto> reserveSeat(
 		@Parameter(description = "좌석 예약을 위한 사용자 ID와 좌석 상세 ID", required = true)
-		@RequestBody Map<String, Long> requestBody) {
+		@RequestBody Map<String, Long> requestBody) throws ExecutionException, InterruptedException, TimeoutException {
 
 		Long userId = requestBody.get("userId");
 		Long seatDetailId = requestBody.get("seatDetailId");
@@ -89,8 +95,20 @@ public class ReservationController {
 		if (userId == null || seatDetailId == null) {
 			throw new IllegalArgumentException("userId와 seatDetailId는 필수 입력 항목입니다.");
 		}
+		CompletableFuture<TokenDto> future = reservationUseCase.sendReservationRequest(userId, seatDetailId);
 
-		TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);
-		return ResponseEntity.ok(tokenDto);
+		try {
+			// 타임아웃을 설정하여 기다림 (예: 10초)
+			TokenDto tokenDto = future.get(60, TimeUnit.SECONDS);
+			return ResponseEntity.ok(tokenDto);
+		} catch (TimeoutException e) {
+			throw new IllegalArgumentException("예약 요청이 타임아웃되었습니다.", e);
+		} catch (ExecutionException e) {
+			throw new IllegalArgumentException("예약 처리 중 오류가 발생했습니다.", e.getCause());
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new IllegalArgumentException("예약 요청이 인터럽트되었습니다.", e);
+		}
 	}
+
 }

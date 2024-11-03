@@ -1,5 +1,28 @@
 # 실제 운영될 DB 프로필
 spring:
+
+  data:
+    redis:
+      host: BJW_RedisDB
+      port: 6379
+      url: redis://backjin.iptime.org:6379
+      password:
+
+  kafka:
+    bootstrap-servers: backjin.iptime.org:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: reservation-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
   application:
     name: hh3week
 
@@ -8,6 +31,12 @@ spring:
     username: app_user
     password: 'wlsdnr7^^' # 특수 문자가 포함되어 있으므로 따옴표로 감쌌습니다.
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20  # 기존 10에서 20으로 증가
+      minimum-idle: 10
+      idle-timeout: 600000  # 10분
+      connection-timeout: 30000  # 30초
+      max-lifetime: 1800000  # 30분
 
   jpa:
     hibernate:
@@ -41,8 +70,3 @@ jwt:
   expiration: 86400000 # 24시간 (밀리초 단위)
 
 testToken: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg"
-
-
-
-
-

@@ -37,6 +37,9 @@ public class ConcertSchedule {
 
 	private LocalDateTime endDt;
 
+	// @Version
+	// private long version;
+
 	@Builder
 	public ConcertSchedule(long concertScheduleId, long concertId, ConcertScheduleStatus concertScheduleStatus,
 		long concertPrice, LocalDateTime startDt, LocalDateTime endDt) {

@@ -1,13 +1,13 @@
 package com.example.hh3week.adapter.out.persistence;
 
+import static jakarta.persistence.LockModeType.*;
+
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.reservation.entity.QReservationSeat;
 import com.example.hh3week.domain.reservation.entity.QReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
@@ -16,7 +16,6 @@ import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 
 @Repository
 public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryPort {
@@ -105,7 +104,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
     public ReservationSeatDetail getSeatDetailByIdForUpdate(long seatDetailId) {
         ReservationSeatDetail seatDetail = queryFactory.selectFrom(qReservationSeatDetail)
             .where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
-            .setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+            .setLockMode(OPTIMISTIC) // 비관적 잠금 설정
             .fetchOne();
 
         if (seatDetail == null) {

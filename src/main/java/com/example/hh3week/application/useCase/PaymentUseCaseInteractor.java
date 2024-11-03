@@ -18,7 +18,7 @@ import com.example.hh3week.application.service.ReservationService;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.UserService;
 import com.example.hh3week.application.service.WaitingQueueService;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.payment.entity.PaymentStatus;
 import com.example.hh3week.domain.user.entity.PointStatus;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;

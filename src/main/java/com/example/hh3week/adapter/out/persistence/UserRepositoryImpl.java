@@ -4,10 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.UserRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.user.entity.QUser;
 import com.example.hh3week.domain.user.entity.QUserPointHistory;
 import com.example.hh3week.domain.user.entity.User;
@@ -32,7 +31,10 @@ public class UserRepositoryImpl implements UserRepositoryPort {
 
 	@Override
 	public User getUserInfo(long userId) {
-		User user = queryFactory.selectFrom(qUser).where(qUser.userId.eq(userId)).fetchOne();
+		User user = queryFactory.selectFrom(qUser)
+			.where(qUser.userId.eq(userId))
+			// .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+			.fetchOne();
 
 		if(user == null){
 			CustomException.nullPointer("사용자를 찾을 수 없습니다.", this.getClass());

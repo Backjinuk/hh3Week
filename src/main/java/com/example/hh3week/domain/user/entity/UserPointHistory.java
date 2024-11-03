@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,9 @@ public class UserPointHistory {
 	private PointStatus pointStatus;
 
 	private LocalDateTime pointDt;
+
+	// @Version
+	// private long version;
 
 	@Builder
 	public UserPointHistory(long historyId, long userId, long pointAmount, PointStatus pointStatus,

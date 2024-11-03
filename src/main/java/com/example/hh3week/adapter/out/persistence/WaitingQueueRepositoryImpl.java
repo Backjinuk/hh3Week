@@ -4,20 +4,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.data.jpa.repository.Lock;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.waitingQueue.entity.QWaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,14 +35,13 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	}
 
 	@Override
-	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
 		long seatDetailId = waitingQueue.getSeatDetailId();
 
 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.setLockMode(LockModeType.PESSIMISTIC_READ) // 비관적 잠금 설정
+			// .setLockMode(LockModeType.OPTIMISTIC_FORCE_INCREMENT) // 비관적 락으로 변경
 			.fetchOne();
 
 		if (maxPriority == null) {
@@ -53,7 +51,12 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		long newPriority = maxPriority + 1;
 		waitingQueue.setPriority(newPriority);
 
-		entityManager.persist(waitingQueue);
+		try {
+			entityManager.persist(waitingQueue);
+			entityManager.flush(); // 즉시 쿼리 실행
+		} catch (PersistenceException e) {
+			throw new OptimisticLockingFailureException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+		}
 
 		return waitingQueue;
 	}
@@ -64,19 +67,17 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		// 예외를 던지지 않고, 대기열 항목이 없을 경우 null을 반환
 		return queryFactory.selectFrom(qWaitingQueue)
 			.where(
-				qWaitingQueue.seatDetailId.eq(seatDetailId)
-					.and(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING))
-			)
+				qWaitingQueue.seatDetailId.eq(seatDetailId).and(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING)))
 			.orderBy(qWaitingQueue.priority.desc(), qWaitingQueue.reservationDt.asc())
 			.fetchFirst();
 	}
-
 
 	@Override
 	public void updateStatus(long waitingId, WaitingStatus status) {
 		long updatedCount = queryFactory.update(qWaitingQueue)
 			.set(qWaitingQueue.waitingStatus, status)
 			.where(qWaitingQueue.waitingId.eq(waitingId))
+			// .setLockMode(LockModeType.OPTIMISTIC)
 			.execute();
 
 		if (updatedCount == 0) {
@@ -88,7 +89,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
 		return queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
-			.setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+			// .setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
 			.fetchOne();
 	}
 
@@ -96,6 +97,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	public int getQueuePosition(long waitingId) {
 		WaitingQueue waitingQueue = queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.waitingId.eq(waitingId))
+			// .setLockMode(LockModeType.OPTIMISTIC)
 			.fetchOne();
 
 		if (waitingQueue == null) {
@@ -150,14 +152,12 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 			.fetch();
 	}
 
-
 	@Override
-	@Transactional
 	public Long findMaxPriorityBySeatDetailIdForUpdate(long seatDetailId) {
 		return queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.setLockMode(LockModeType.PESSIMISTIC_WRITE) // 비관적 잠금 설정
+			// .setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
 			.fetchOne();
 	}
 }

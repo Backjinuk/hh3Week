@@ -11,7 +11,7 @@ import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.adapter.in.dto.user.UserDto;
 import com.example.hh3week.adapter.in.dto.user.UserPointHistoryDto;
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 
 @Component
 public class DtoValidation {

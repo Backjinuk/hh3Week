@@ -35,9 +35,12 @@ public class ReservationSeatDetail {
 
 	private long seatPrice;
 
+	// @Version
+	// private long version;
+
 	@Builder
 	public ReservationSeatDetail(long seatDetailId, long userId, long seatId, String seatCode,
-		ReservationStatus reservationStatus, long seatPrice) {
+		ReservationStatus reservationStatus, long seatPrice, long version) {
 		this.seatDetailId = seatDetailId;
 		this.userId = userId;
 		this.seatId = seatId;

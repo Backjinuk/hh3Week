@@ -12,6 +12,9 @@
 > ## MileStone <br>
 > MileStone 은 <a href="https://github.com/users/Backjinuk/projects/5/views/1">Github Projects</a>에서 확인하실 수 있습니다.
 
+> ## DB락 과 Redis락의 성능 분석록 <br>
+>DB락 과 Redis락의 성능 분석록은 <a href="https://velog.io/@backj123/DB%EB%9D%BD%EA%B3%BC-Redis%EB%9D%BD-%EB%B6%84%EC%84%9D%EB%A1%9D">블로그 바로가기</a>에서 확인하실 수 있습니다.
+
 
 ## 목차
 - - -
@@ -22,6 +25,8 @@
 [3. API 명세서](#3-api-명세서--swagger-ui)
 
 [4. 기술스택](#4-기술스택)
+
+
 * * *
 ## 1. 요구사항 별 시퀸스 다이어그램/ 클래스 다이어그램
 > 요구사항 별 시퀸스 다이어그램은 [여기에서](./docs/SequenceDiagram.md) 확인하실 수 있습니다.<br>
@@ -116,10 +121,10 @@ erDiagram
 * * *
 
 ## 3. API 명세서 / Swagger Ui
-> API 명세서는 [여기에서](./docs/SwaggerUi.md) 확인하실 수 있습니다.<br>
+> Swagger Ui 명세서는 [여기에서](./docs/SwaggerUi.md) 확인하실 수 있습니다.<br>
 > 
 > API 명세서는 [여기에서](./docs/ApiSpac.md) 확인하실 수 있습니다.<br>
-
+>
 > http 파일은 [여기에서](./src/main/resources/http/Mock-API.http) 확인하실 수 있습니다.
 * * *
 

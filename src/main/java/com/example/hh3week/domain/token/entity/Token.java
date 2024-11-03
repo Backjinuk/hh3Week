@@ -1,18 +1,17 @@
 package com.example.hh3week.domain.token.entity;
 
+import java.time.LocalDateTime;
+
+import com.example.hh3week.adapter.in.dto.token.TokenDto;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-
-import com.example.hh3week.adapter.in.dto.token.TokenDto;
 
 @Entity
 @Getter
@@ -32,8 +31,12 @@ public class Token {
 
 	private LocalDateTime expiresAt;
 
+	// @Version
+	// private long version;
+
 	@Builder
-	public Token(long tokenId, long userId, String token, LocalDateTime issuedAt, LocalDateTime expiresAt) {
+	public Token(long tokenId, long userId, String token, LocalDateTime issuedAt, LocalDateTime expiresAt,
+		long version) {
 		this.tokenId = tokenId;
 		this.userId = userId;
 		this.token = token;
@@ -41,8 +44,7 @@ public class Token {
 		this.expiresAt = expiresAt;
 	}
 
-
-	public static Token ToEntity(TokenDto tokenDto){
+	public static Token ToEntity(TokenDto tokenDto) {
 		return Token.builder()
 			.tokenId(tokenDto.getTokenId())
 			.userId(tokenDto.getUserId())

@@ -3,7 +3,7 @@ package com.example.hh3week.domain.validation;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.example.hh3week.common.config.CustomException;
+import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.concert.entity.Concert;
 import com.example.hh3week.domain.concert.entity.ConcertSchedule;
 import com.example.hh3week.domain.payment.entity.PaymentHistory;
