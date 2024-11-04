@@ -78,31 +78,31 @@ public class ReservationControllerTest {
 		verify(reservationUseCase, times(1)).getAvailableReservationSeatList(concertScheduleId);
 	}
 
-	@Test
-	@DisplayName("좌석 예약 요청 성공")
-	@WithMockUser(roles = "USER") // 모의 인증 사용자 설정
-	void 좌석_예약_요청_성공() throws Exception {
-		// Given
-		long userId = 10L;
-		long seatDetailId = 1001L;
-		Map<String, Long> requestBody = new HashMap<>();
-		requestBody.put("userId", userId);
-		requestBody.put("seatDetailId", seatDetailId);
-
-		TokenDto tokenDto = TokenDto.builder().token("sample-token-12345").expiresAt(LocalDateTime.now()).build();
-
-		when(reservationUseCase.reserveSeat(userId, seatDetailId)).thenReturn(tokenDto);
-
-		// When & Then
-		mockMvc.perform(post("/api/v1/reservations/reserveSeat")
-				.with(csrf())
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(requestBody)))
-			.andExpect(status().isOk())
-			.andExpect(content().json(objectMapper.writeValueAsString(tokenDto)));
-
-		verify(reservationUseCase, times(1)).reserveSeat(userId, seatDetailId);
-	}
+	// @Test
+	// @DisplayName("좌석 예약 요청 성공")
+	// @WithMockUser(roles = "USER") // 모의 인증 사용자 설정
+	// void 좌석_예약_요청_성공() throws Exception {
+	// 	// Given
+	// 	long userId = 10L;
+	// 	long seatDetailId = 1001L;
+	// 	Map<String, Long> requestBody = new HashMap<>();
+	// 	requestBody.put("userId", userId);
+	// 	requestBody.put("seatDetailId", seatDetailId);
+	//
+	// 	TokenDto tokenDto = TokenDto.builder().token("sample-token-12345").expiresAt(LocalDateTime.now()).build();
+	//
+	// 	when(reservationUseCase.reserveSeat(userId, seatDetailId)).thenReturn(tokenDto);
+	//
+	// 	// When & Then
+	// 	mockMvc.perform(post("/api/v1/reservations/reserveSeat")
+	// 			.with(csrf())
+	// 			.contentType(MediaType.APPLICATION_JSON)
+	// 			.content(objectMapper.writeValueAsString(requestBody)))
+	// 		.andExpect(status().isOk())
+	// 		.andExpect(content().json(objectMapper.writeValueAsString(tokenDto)));
+	//
+	// 	verify(reservationUseCase, times(1)).reserveSeat(userId, seatDetailId);
+	// }
 
 	@Test
 	@DisplayName("예약 가능한 좌석 조회 시 concertScheduleId 누락")

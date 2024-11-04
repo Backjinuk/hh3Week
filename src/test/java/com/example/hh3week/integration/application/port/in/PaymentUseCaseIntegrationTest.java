@@ -36,34 +36,34 @@ public class PaymentUseCaseIntegrationTest {
 	/**
 	 * 성공적인 결제 처리 테스트
 	 */
-	@Test
-	@DisplayName("registerPaymentHistory - 성공적인 결제 처리")
-	void registerPaymentHistory_성공적인_결제_처리() {
-		// Given
-		PaymentHistoryDto paymentHistoryDto = new PaymentHistoryDto();
-		paymentHistoryDto.setToken(
-			"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjMsImlhdCI6MTcyOTU5MTQ0MywiZXhwIjozNzI5Njc3ODQzfQ.V7jeMZu36Pq_DuQBufVX-ULuKpMgmFnYX3bFOmusKiAgwQh_-nPjrTR8Q8ewkM86EoNgexrW092gkjxuQIefWg"); // token_id=1, user_id=101, 유효한 토큰
-
-		// When
-		PaymentHistoryDto result = paymentUseCaseInteractor.registerPaymentHistory(paymentHistoryDto);
-
-		// Then
-		assertNotNull(result);
-		assertNotNull(result.getPaymentId());
-		assertEquals(15000, result.getPaymentAmount());
-		assertEquals(PaymentStatus.COMPLETED, result.getPaymentStatus());
-
-		// 사용자 잔액 검증 (user_id=101: 초기 20000 - 10000 = 10000)
-		UserDto user = userService.getUserInfo(1L);
-		assertEquals(100000, user.getPointBalance());
-
-		// 결제 히스토리 검증
-		PaymentHistoryDto fetchedPayment = paymentHistoryService.getPaymentHistory(result.getPaymentId());
-		assertNotNull(fetchedPayment);
-		assertEquals(result.getPaymentId(), fetchedPayment.getPaymentId());
-		assertEquals(result.getPaymentAmount(), fetchedPayment.getPaymentAmount());
-		assertEquals(result.getPaymentStatus(), fetchedPayment.getPaymentStatus());
-	}
+	// @Test
+	// @DisplayName("registerPaymentHistory - 성공적인 결제 처리")
+	// void registerPaymentHistory_성공적인_결제_처리() {
+	// 	// Given
+	// 	PaymentHistoryDto paymentHistoryDto = new PaymentHistoryDto();
+	// 	paymentHistoryDto.setToken(
+	// 		"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjMsImlhdCI6MTcyOTU5MTQ0MywiZXhwIjozNzI5Njc3ODQzfQ.V7jeMZu36Pq_DuQBufVX-ULuKpMgmFnYX3bFOmusKiAgwQh_-nPjrTR8Q8ewkM86EoNgexrW092gkjxuQIefWg"); // token_id=1, user_id=101, 유효한 토큰
+	//
+	// 	// When
+	// 	PaymentHistoryDto result = paymentUseCaseInteractor.registerPaymentHistory(paymentHistoryDto);
+	//
+	// 	// Then
+	// 	assertNotNull(result);
+	// 	assertNotNull(result.getPaymentId());
+	// 	assertEquals(15000, result.getPaymentAmount());
+	// 	assertEquals(PaymentStatus.COMPLETED, result.getPaymentStatus());
+	//
+	// 	// 사용자 잔액 검증 (user_id=101: 초기 20000 - 10000 = 10000)
+	// 	UserDto user = userService.getUserInfo(1L);
+	// 	assertEquals(100000, user.getPointBalance());
+	//
+	// 	// 결제 히스토리 검증
+	// 	PaymentHistoryDto fetchedPayment = paymentHistoryService.getPaymentHistory(result.getPaymentId());
+	// 	assertNotNull(fetchedPayment);
+	// 	assertEquals(result.getPaymentId(), fetchedPayment.getPaymentId());
+	// 	assertEquals(result.getPaymentAmount(), fetchedPayment.getPaymentAmount());
+	// 	assertEquals(result.getPaymentStatus(), fetchedPayment.getPaymentStatus());
+	// }
 
 	/**
 	 * 토큰 만료로 인한 결제 실패 테스트

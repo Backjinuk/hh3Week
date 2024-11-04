@@ -3,9 +3,8 @@ spring:
 
   data:
     redis:
-      host: BJW_RedisDB
+      host: backjin.iptime.org
       port: 6379
-      url: redis://backjin.iptime.org:6379
       password:
 
   kafka:

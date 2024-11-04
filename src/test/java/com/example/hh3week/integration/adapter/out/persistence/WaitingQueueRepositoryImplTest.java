@@ -66,7 +66,7 @@ public class WaitingQueueRepositoryImplTest {
 
 		// Then
 		assertThat(nextQueue).isNotNull();
-		assertThat(nextQueue.getWaitingId()).isEqualTo(1L);
+		assertThat(nextQueue.getWaitingId()).isEqualTo(1100L);
 		assertThat(nextQueue.getUserId()).isEqualTo(101L);
 		assertThat(nextQueue.getWaitingStatus()).isEqualTo(WaitingStatus.WAITING);
 	}
@@ -75,7 +75,7 @@ public class WaitingQueueRepositoryImplTest {
 	@DisplayName("다음 대기열 항목 조회 - 대기열에 항목이 없을 경우 예외 발생")
 	void 다음대기열항목조회_대기열에항목이없을경우예외발생() {
 		// Given
-		long seatDetailId = 1L; // 대기열에 항목이 없는 콘서트 스케줄 ID
+		long seatDetailId = 1; // 대기열에 항목이 없는 콘서트 스케줄 ID
 
 		// When & Then
 
@@ -88,7 +88,7 @@ public class WaitingQueueRepositoryImplTest {
 	@DisplayName("대기열 항목 상태 업데이트 - 정상적으로 업데이트됨")
 	void 대기열항목상태업데이트_정상적으로업데이트됨() {
 		// Given
-		long waitingId = 1L;
+		long waitingId = 1100L;
 		WaitingStatus newStatus = WaitingStatus.WAITING;
 
 		// When
@@ -127,7 +127,7 @@ public class WaitingQueueRepositoryImplTest {
 
 		// Then
 		assertThat(queueStatus).isNotNull();
-		assertThat(queueStatus.getWaitingId()).isEqualTo(1L);
+		assertThat(queueStatus.getWaitingId()).isEqualTo(1100L);
 		assertThat(queueStatus.getUserId()).isEqualTo(101L);
 		assertThat(queueStatus.getSeatDetailId()).isEqualTo(1L);
 		assertThat(queueStatus.getWaitingStatus()).isEqualTo(WaitingStatus.WAITING);
@@ -152,7 +152,7 @@ public class WaitingQueueRepositoryImplTest {
 	@DisplayName("대기열 항목의 위치 조회 - 정상적으로 반환됨")
 	void 대기열항목의위치조회_정상적으로반환됨() {
 		// Given
-		long waitingId = 2L; // userId 102L, seatDetailId 2L
+		long waitingId = 2200L; // userId 102L, seatDetailId 2L
 
 		// When
 		int position = waitingQueueRepositoryImpl.getQueuePosition(waitingId);

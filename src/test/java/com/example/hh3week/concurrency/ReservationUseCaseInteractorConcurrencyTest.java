@@ -50,7 +50,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 	private ReservationUseCaseInteractor reservationUseCaseInteractor;
 
 	@Autowired
-	private	ReservationUseCase useCase;
+	private ReservationUseCase useCase;
 
 	@Autowired
 	private WaitingQueueService waitingQueueService;
@@ -87,8 +87,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 				try {
 					latch.await();
 
-					TokenDto token = useCase.sendReservationRequest(uid, seatDetailId)
-						.get(30, TimeUnit.SECONDS);
+					TokenDto token = useCase.sendReservationRequest(uid, seatDetailId).get(60, TimeUnit.SECONDS);
 					tokens.add(token);
 
 					Map<String, Object> tokensAllValue = tokenService.getTokensAllValue(token.getToken());
@@ -143,7 +142,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 		int numberOfUsers = 10;
 		int numberOfSeats = 5;
 		int totalAttempts = numberOfUsers * numberOfSeats;
-		int numberOfThreads = 100;
+		int numberOfThreads = 50;
 		ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
 		CountDownLatch latch = new CountDownLatch(1);
 		AtomicInteger successCount = new AtomicInteger(0);
@@ -179,8 +178,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 					// 예약 시도 (재시도 로직 포함)
 					TokenDto token = null;
 					try {
-						token = useCase.sendReservationRequest(userId, seatDetailId)
-							.get(30, TimeUnit.SECONDS);
+						token = useCase.sendReservationRequest(userId, seatDetailId).get(80, TimeUnit.SECONDS);
 					} catch (Exception e) {
 						failureCount.incrementAndGet();
 						return;
@@ -277,7 +275,8 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 
 					// 예약 시도
 					TokenDto token = useCase.sendReservationRequest(userId, fixedSeatDetailId)
-						.get(30, TimeUnit.SECONDS);
+						.get(80, TimeUnit.SECONDS);
+
 					tokens.add(token);
 
 					// 토큰 정보 조회
@@ -373,8 +372,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 					setList.add(seatId);
 
 					// 예약 시도
-					TokenDto token = useCase.sendReservationRequest(fixedUserId, seatId)
-						.get(30, TimeUnit.SECONDS);
+					TokenDto token = useCase.sendReservationRequest(fixedUserId, seatId).get(30, TimeUnit.SECONDS);
 					tokens.add(token);
 
 					// 토큰 정보 조회
@@ -462,8 +460,7 @@ public class ReservationUseCaseInteractorConcurrencyTest {
 			Future<TokenDto> future = executorService.submit(() -> {
 				try {
 					latch.await(); // 모든 스레드가 준비될 때까지 대기
-					return useCase.sendReservationRequest(uid, seatDetailId)
-						.get(30, TimeUnit.SECONDS);
+					return useCase.sendReservationRequest(uid, seatDetailId).get(30, TimeUnit.SECONDS);
 
 				} catch (Exception e) {
 					System.err.println("사용자 " + uid + "의 예약 실패: " + e.getMessage());

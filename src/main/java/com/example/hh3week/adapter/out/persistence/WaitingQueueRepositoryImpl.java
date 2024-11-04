@@ -17,6 +17,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -34,14 +35,15 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		this.queryFactory = queryFactory;
 	}
 
+
 	@Override
+	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
 		long seatDetailId = waitingQueue.getSeatDetailId();
 
 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
 			.from(qWaitingQueue)
 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			// .setLockMode(LockModeType.OPTIMISTIC_FORCE_INCREMENT) // 비관적 락으로 변경
 			.fetchOne();
 
 		if (maxPriority == null) {
@@ -55,7 +57,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 			entityManager.persist(waitingQueue);
 			entityManager.flush(); // 즉시 쿼리 실행
 		} catch (PersistenceException e) {
-			throw new OptimisticLockingFailureException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+			throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
 		}
 
 		return waitingQueue;

@@ -83,7 +83,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 	public void updateSeatDetailStatus(ReservationSeatDetail seatDetail) {
 		queryFactory.update(qReservationSeatDetail)
 			.set(qReservationSeatDetail.reservationStatus, seatDetail.getReservationStatus())
-			.where(qReservationSeatDetail.seatId.eq(seatDetail.getSeatDetailId()))
+			.where(qReservationSeatDetail.seatDetailId.eq(seatDetail.getSeatDetailId()))
 			.execute();
 	}
 
