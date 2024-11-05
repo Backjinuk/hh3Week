@@ -33,7 +33,7 @@ public class ReservationConsumerAdapter {
 		long userId = request.getUserId();
 		long seatDetailId = request.getSeatDetailId();
 
-		log.info("Kafka 메시지 수신: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
+		// log.info("Kafka 메시지 수신: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
 
 		try {
 			// 예약 처리
@@ -42,10 +42,10 @@ public class ReservationConsumerAdapter {
 			// 성공 응답 생성
 			SeatReservationResponse response = new SeatReservationResponse(correlationId, tokenDto, null);
 			responseKafkaTemplate.send(responseTopic, correlationId, response);
-			log.info("예약 처리 완료: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
+			// log.info("예약 처리 완료: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
 		} catch (Exception e) {
-			log.error("예약 처리 실패: correlationId={}, userId={}, seatDetailId={}, error={}",
-				correlationId, userId, seatDetailId, e.getMessage());
+			// log.error("예약 처리 실패: correlationId={}, userId={}, seatDetailId={}, error={}",
+			// 	correlationId, userId, seatDetailId, e.getMessage());
 
 			// 실패 응답 생성
 			SeatReservationResponse response = new SeatReservationResponse(correlationId, null, e.getMessage());

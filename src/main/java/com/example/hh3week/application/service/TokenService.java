@@ -1,9 +1,11 @@
 package com.example.hh3week.application.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +19,14 @@ public class TokenService {
 
 	private final JwtProvider jwtProvider;
 	private final TokenRepositoryPort tokenRepository;
+	private final RedisTemplate<String, Object> redisTemplate;
 
 	@Autowired
-	public TokenService(JwtProvider jwtProvider, TokenRepositoryPort tokenRepository) {
+	public TokenService(JwtProvider jwtProvider, TokenRepositoryPort tokenRepository,
+		RedisTemplate<String, Object> redisTemplate) {
 		this.jwtProvider = jwtProvider;
 		this.tokenRepository = tokenRepository;
+		this.redisTemplate = redisTemplate;
 	}
 
 	/**
@@ -35,23 +40,39 @@ public class TokenService {
 	 */
 	@Transactional
 	public TokenDto createToken(long userId, long queueOrder, long remainingTime, long seatDetailId) {
+		String tokenKey = "tokens:" + userId;
+
 		// JWT 토큰 생성
 		String token = jwtProvider.generateToken(userId, queueOrder, remainingTime, seatDetailId);
 
-		// 토큰 엔티티 생성
-		TokenDto tokenEntity = TokenDto.builder()
+		// TokenDto 생성
+		TokenDto tokenDto = TokenDto.builder()
 			.userId(userId)
 			.token(token)
 			.issuedAt(LocalDateTime.now())
 			.expiresAt(LocalDateTime.now().plusSeconds(remainingTime))
 			.build();
 
-		// 토큰 엔티티를 DB에 저장
-		Token savedToken = tokenRepository.createToken(Token.ToEntity(tokenEntity));
+		// 데이터베이스에 토큰 저장
+		// Token savedToken = tokenRepository.createToken(Token.ToEntity(tokenDto));
+		// System.out.println("Saved Token in DB: " + savedToken);
+
+		// Redis에 토큰 저장
+		try {
+			redisTemplate.opsForHash().put(tokenKey, token, tokenDto);
+			// redisTemplate.expire(tokenKey, Duration.ofSeconds(remainingTime));
+		} catch (Exception e) {
+			// Redis 저장 실패 시, 데이터베이스 트랜잭션 롤백
+			throw new RuntimeException("Redis 저장 중 오류가 발생했습니다.", e);
+		}
 
 		// DTO로 변환하여 반환
-		return TokenDto.ToDto(savedToken);
+		// TokenDto returnedDto = TokenDto.ToDto(savedToken);
+		// System.out.println("Returning TokenDto: " + returnedDto);
+		return tokenDto;
 	}
+
+
 
 	/**
 	 * 토큰의 유효성을 검증하고 사용자 ID를 반환합니다.

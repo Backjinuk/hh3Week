@@ -34,7 +34,7 @@ public class ReservationProducerAdapter implements ReservationMessagingPort {
 
 		// Correlation ID를 키로 사용하여 메시지 전송
 		kafkaTemplate.send(requestTopic, correlationId, request);
-		log.info("예약 요청 전송: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
+		// log.info("예약 요청 전송: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
 
 		// ResponseHolder에 Correlation ID와 Future 매핑
 		responseHolder.addResponse(correlationId, future);

@@ -8,12 +8,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,15 +51,23 @@ public class RedissonConfig {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connectionFactory);
 
-		// JSON 직렬화기 설정
-		Jackson2JsonRedisSerializer<Object> jacksonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+		// ObjectMapper 설정
 		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-		objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-			ObjectMapper.DefaultTyping.NON_FINAL);
-		jacksonSerializer.setObjectMapper(objectMapper);
+		objectMapper.activateDefaultTyping(
+			com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator.builder()
+				.allowIfSubType(Object.class)
+				.build(),
+			ObjectMapper.DefaultTyping.NON_FINAL,
+			com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY
+		);
 
-		// 키와 값에 대한 직렬화기 설정
+		// GenericJackson2JsonRedisSerializer 사용
+		GenericJackson2JsonRedisSerializer jacksonSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
+		// 직렬화기 설정
 		StringRedisSerializer stringSerializer = new StringRedisSerializer();
 		template.setKeySerializer(stringSerializer);
 		template.setValueSerializer(jacksonSerializer);
@@ -64,16 +75,11 @@ public class RedissonConfig {
 		template.setHashValueSerializer(jacksonSerializer);
 
 		template.afterPropertiesSet();
-
-		// Redis 연결 시도 로그
-		try {
-			template.getConnectionFactory().getConnection().ping();
-			log.info("Redis 연결 성공!");
-		} catch (Exception e) {
-			log.error("Redis 연결 실패: {}", e.getMessage());
-		}
-
 		return template;
 	}
+
+
+
+
 
 }
