@@ -3,16 +3,12 @@ package com.example.hh3week.application.useCase;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,7 +100,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
 			WaitingQueueDto waitingId = waitingQueueService.addWaitingQueue(buildWaitingQueueDto(userId, seatDetailId));
 
-			redisTemplate.opsForZSet().add(queueKey, String.valueOf(userId), waitingId.getPriority());
+			redisTemplate.opsForZSet().add(queueKey, waitingId, waitingId.getPriority());
 
 			// 대기열 위치 계산
 			int queuePosition = getQueuePosition2(queueKey, seatDetailId, userId);

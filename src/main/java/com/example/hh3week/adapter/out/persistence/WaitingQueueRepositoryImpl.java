@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
 import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
@@ -16,7 +17,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +28,14 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
 	private final QWaitingQueue qWaitingQueue = QWaitingQueue.waitingQueue;
 
+	private final RedisTemplate<String, Object> redisTemplate;
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	public WaitingQueueRepositoryImpl(JPAQueryFactory queryFactory) {
+	public WaitingQueueRepositoryImpl(JPAQueryFactory queryFactory, RedisTemplate<String, Object> redisTemplate) {
 		this.queryFactory = queryFactory;
+		this.redisTemplate = redisTemplate;
 	}
 
 
@@ -40,28 +43,28 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
 		long seatDetailId = waitingQueue.getSeatDetailId();
+		String queueKey = "waitingQueue:" + seatDetailId;
 
-		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
-			.from(qWaitingQueue)
-			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.fetchOne();
+		Double maxPriority = redisTemplate.opsForZSet().reverseRangeWithScores(queueKey, 0, 0).stream()
+			.map(ZSetOperations.TypedTuple::getScore)
+			.findFirst()
+			.orElse(0.0);
 
-		if (maxPriority == null) {
-			maxPriority = 0L;
-		}
+		long newPriority = maxPriority.longValue() + 1;
 
-		long newPriority = maxPriority + 1;
 		waitingQueue.setPriority(newPriority);
 
 		try {
-			entityManager.persist(waitingQueue);
-			entityManager.flush(); // 즉시 쿼리 실행
-		} catch (PersistenceException e) {
-			throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+			redisTemplate.opsForZSet().add(queueKey, waitingQueue, newPriority);
+		}catch (Exception e){
+			throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
 		}
+
 
 		return waitingQueue;
 	}
+
+
 
 	@Override
 	public WaitingQueue getNextInQueue(long seatDetailId) {

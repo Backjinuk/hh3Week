@@ -58,6 +58,16 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 		return seats;
 	}
 
+	/**
+	 *
+	 * @param concertScheduleId
+	 * @return
+	 */
+	@Override
+	public List<ReservationSeat> getAvailableALLReservationSeatList(long concertScheduleId) {
+		return List.of();
+	}
+
 	@Override
 	public void updateReservationCurrentReserved(ReservationSeat reservationSeat) {
 		queryFactory.update(qReservationSeat)

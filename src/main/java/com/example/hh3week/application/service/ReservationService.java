@@ -3,6 +3,9 @@ package com.example.hh3week.application.service;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
@@ -13,6 +16,8 @@ import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
 import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ReservationService {
@@ -25,6 +30,20 @@ public class ReservationService {
 		ReservationMessagingPort reservationMessagingPort) {
 		this.reservationSeatRepositoryPort = reservationSeatRepositoryPort;
 		this.reservationMessagingPort = reservationMessagingPort;
+	}
+
+
+	@Cacheable("RESERVATION_ITEM")
+	@Transactional(readOnly = true)
+	public List<ReservationSeatDto> getPopularItems() {
+		List<ReservationSeat> availableALLReservationSeatList = reservationSeatRepositoryPort.getAvailableALLReservationSeatList();
+		return availableALLReservationSeatList;
+	}
+
+	@Scheduled(cron = "0 0 0 * * *") // 매일 자정에 캐시 무효화
+	@CacheEvict(value = "RESERVATION_ITEM", allEntries = true) // 모든 캐시 항목 무효화
+	public void evictPopularItemsCache() {
+		System.out.println("Evicted POPULAR_ITEM cache");
 	}
 
 	/*
@@ -54,16 +73,11 @@ public class ReservationService {
 			CustomException.illegalArgument("이미 최대 예약 수에 도달했습니다.", new IllegalArgumentException(), this.getClass());
 		}
 
-
 		reservationSeatRepositoryPort.updateReservationCurrentReserved(ReservationSeat.ToEntity(seat));
 	}
 
 	public ReservationSeatDetailDto getSeatDetailById(long seatDetailId) {
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailById(seatDetailId));
-	}
-
-	public ReservationSeatDetail getSeatDetailById2(long seatDetailId) {
-		return reservationSeatRepositoryPort.getSeatDetailById(seatDetailId);
 	}
 
 	public ReservationSeatDto getSeatById(long seatId){
@@ -74,9 +88,7 @@ public class ReservationService {
 		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
 	}
 
-	public void updateSeatDetailStatus2(ReservationSeatDetail seatDetail) {
-		reservationSeatRepositoryPort.updateSeatDetailStatus(seatDetail);
-	}
+
 	public ReservationSeatDetailDto getSeatDetailByIdForUpdate(long seatDetailId) {
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailByIdForUpdate(seatDetailId));
 	}
