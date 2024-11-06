@@ -10,7 +10,6 @@ public interface ReservationSeatRepositoryPort {
 
 	List<ReservationSeat> getAvailableReservationSeatList(long concertScheduleId);
 
-
 	List<ReservationSeat> getAvailableALLReservationSeatList();
 
 	void updateReservationCurrentReserved(ReservationSeat reservationSeat);

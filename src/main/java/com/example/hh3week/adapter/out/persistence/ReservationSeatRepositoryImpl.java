@@ -4,6 +4,8 @@ import static jakarta.persistence.LockModeType.*;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
@@ -25,10 +27,13 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 	private final QReservationSeat qReservationSeat = QReservationSeat.reservationSeat;
 	private final QReservationSeatDetail qReservationSeatDetail = QReservationSeatDetail.reservationSeatDetail;
+	private final RedisTemplate<String, Object> redisTemplate;
 
-	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager) {
+	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager,
+		@Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
 		this.queryFactory = queryFactory;
 		this.entityManager = entityManager;
+		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -58,15 +63,13 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 		return seats;
 	}
 
-	/**
-	 *
-	 * @param concertScheduleId
-	 * @return
-	 */
 	@Override
-	public List<ReservationSeat> getAvailableALLReservationSeatList(long concertScheduleId) {
-		return List.of();
+	public List<ReservationSeat> getAvailableALLReservationSeatList() {
+		return queryFactory.selectFrom(qReservationSeat)
+			.stream()
+			.toList();
 	}
+
 
 	@Override
 	public void updateReservationCurrentReserved(ReservationSeat reservationSeat) {
@@ -78,6 +81,9 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 	@Override
 	public ReservationSeatDetail getSeatDetailById(long seatDetailId) {
+		// redisTemplate
+
+
 		ReservationSeatDetail seatDetail = queryFactory.selectFrom(qReservationSeatDetail)
 			.where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
 			.fetchOne();

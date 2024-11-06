@@ -40,7 +40,6 @@ public class TokenService {
 	 */
 	@Transactional
 	public TokenDto createToken(long userId, long queueOrder, long remainingTime, long seatDetailId) {
-		String tokenKey = "tokens:" + userId;
 
 		// JWT 토큰 생성
 		String token = jwtProvider.generateToken(userId, queueOrder, remainingTime, seatDetailId);
@@ -54,22 +53,11 @@ public class TokenService {
 			.build();
 
 		// 데이터베이스에 토큰 저장
-		// Token savedToken = tokenRepository.createToken(Token.ToEntity(tokenDto));
-		// System.out.println("Saved Token in DB: " + savedToken);
+		Token savedToken = tokenRepository.createToken(Token.ToEntity(tokenDto));
 
-		// Redis에 토큰 저장
-		try {
-			redisTemplate.opsForHash().put(tokenKey, token, tokenDto);
-			// redisTemplate.expire(tokenKey, Duration.ofSeconds(remainingTime));
-		} catch (Exception e) {
-			// Redis 저장 실패 시, 데이터베이스 트랜잭션 롤백
-			throw new RuntimeException("Redis 저장 중 오류가 발생했습니다.", e);
-		}
 
 		// DTO로 변환하여 반환
-		// TokenDto returnedDto = TokenDto.ToDto(savedToken);
-		// System.out.println("Returning TokenDto: " + returnedDto);
-		return tokenDto;
+		return TokenDto.ToDto(savedToken);
 	}
 
 
