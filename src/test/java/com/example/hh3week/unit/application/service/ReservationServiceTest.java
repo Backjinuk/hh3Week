@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
@@ -20,6 +21,7 @@ import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 
+@SpringBootTest
 class ReservationServiceTest {
 
 	@Mock
@@ -31,6 +33,11 @@ class ReservationServiceTest {
 	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.openMocks(this);
+	}
+
+	@Test
+	void test(){
+		reservationService.reloadReservationItem();
 	}
 
 	@Test

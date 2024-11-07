@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
+import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
 import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.waitingQueue.entity.QWaitingQueue;
@@ -45,17 +46,12 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		long seatDetailId = waitingQueue.getSeatDetailId();
 		String queueKey = "waitingQueue:" + seatDetailId;
 
-		Double maxPriority = redisTemplate.opsForZSet().reverseRangeWithScores(queueKey, 0, 0).stream()
-			.map(ZSetOperations.TypedTuple::getScore)
-			.findFirst()
-			.orElse(0.0);
-
-		long newPriority = maxPriority.longValue() + 1;
+		long newPriority = redisTemplate.opsForZSet().zCard(queueKey) + 1;
 
 		waitingQueue.setPriority(newPriority);
 
 		try {
-			redisTemplate.opsForZSet().add(queueKey, waitingQueue, newPriority);
+			redisTemplate.opsForZSet().add(queueKey, WaitingQueueDto.ToDto(waitingQueue), newPriority);
 		}catch (Exception e){
 			throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
 		}

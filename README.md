@@ -13,7 +13,9 @@
 > MileStone 은 <a href="https://github.com/users/Backjinuk/projects/5/views/1">Github Projects</a>에서 확인하실 수 있습니다.
 
 > ## DB락 과 Redis락의 성능 분석록 <br>
->DB락 과 Redis락의 성능 분석록은 <a href="https://velog.io/@backj123/DB%EB%9D%BD%EA%B3%BC-Redis%EB%9D%BD-%EB%B6%84%EC%84%9D%EB%A1%9D">블로그 바로가기</a>에서 확인하실 수 있습니다.
+> DB락 과 Redis락의 성능 분석록은 <a href="https://velog.io/@backj123/DB%EB%9D%BD%EA%B3%BC-Redis%EB%9D%BD-%EB%B6%84%EC%84%9D%EB%A1%9D">블로그 바로가기</a>에서 확인하실 수 있습니다. <br>
+> 
+> Redis에 관한 분석록은 <a href="https://velog.io/@backj123/Redis%EB%A1%9C-%EB%8C%80%EA%B8%B0%EC%97%B4-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0">블로그 바로가기</a>에서 확인하실 수 있습니다.
 
 
 ## 목차

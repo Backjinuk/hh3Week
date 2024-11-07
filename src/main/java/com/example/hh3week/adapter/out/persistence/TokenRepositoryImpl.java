@@ -40,7 +40,7 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 
 		// Redis에 토큰 저장
 		try {
-			redisTemplate.opsForHash().put(tokenKey, token, token);
+			redisTemplate.opsForZSet().add(tokenKey, token, LocalDateTime.now().getNano() );
 			// redisTemplate.expire(tokenKey, Duration.ofSeconds(remainingTime));
 		} catch (Exception e) {
 			// Redis 저장 실패 시, 데이터베이스 트랜잭션 롤백

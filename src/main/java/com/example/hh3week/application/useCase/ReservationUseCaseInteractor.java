@@ -90,6 +90,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		// Step 2: 좌석 상세 정보 조회
 		ReservationSeatDetailDto seatDetail = reservationService.getSeatDetailById(seatDetailId);
 
+		log.info("seatDetail 의 정보 {}",seatDetail.getReservationStatus());
+
 		// Step 3: 좌석 상태 확인 및 예약 처리
 		if (seatDetail.getReservationStatus() == ReservationStatus.AVAILABLE) {
 			seatDetail.setReservationStatus(ReservationStatus.PENDING);

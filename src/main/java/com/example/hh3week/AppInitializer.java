@@ -13,11 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 public class AppInitializer implements CommandLineRunner {
 
 	private final ReservationService reservationService;
-	private final RedisTemplate<String, Object> redisTemplate;
 
-	public AppInitializer(ReservationService reservationService, RedisTemplate<String, Object> redisTemplate) {
+	public AppInitializer(ReservationService reservationService) {
 		this.reservationService = reservationService;
-		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
