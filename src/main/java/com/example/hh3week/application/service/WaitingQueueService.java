@@ -71,6 +71,10 @@ public class WaitingQueueService {
 		return waitingQueueRepository.getQueuePosition(waitingId);
 	}
 
+	public int getQueuePosition(long seatDetailId, long waitingId) {
+		return waitingQueueRepository.getQueuePosition(waitingId, seatDetailId);
+	}
+
 	/**
 	 * 특정 대기열 항목의 상태를 업데이트하는 메서드입니다.
 	 *
@@ -92,6 +96,9 @@ public class WaitingQueueService {
 		WaitingQueue queueStatus = waitingQueueRepository.getQueueStatus(userId, concertScheduleId);
 		return (queueStatus != null) ? WaitingQueueDto.ToDto(queueStatus) : null;
 	}
+
+
+
 
 	/**
 	 * 특정 대기열 항목을 만료 상태로 변경하는 메서드입니다.

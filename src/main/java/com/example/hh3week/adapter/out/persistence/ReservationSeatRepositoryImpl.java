@@ -18,6 +18,7 @@ import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @Repository
 public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryPort {
@@ -29,8 +30,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 	private final QReservationSeatDetail qReservationSeatDetail = QReservationSeatDetail.reservationSeatDetail;
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager,
-		@Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
+	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager, RedisTemplate<String, Object> redisTemplate) {
 		this.queryFactory = queryFactory;
 		this.entityManager = entityManager;
 		this.redisTemplate = redisTemplate;
@@ -64,6 +64,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 	}
 
 	@Override
+	@Transactional
 	public List<ReservationSeat> getAvailableALLReservationSeatList() {
 		return queryFactory.selectFrom(qReservationSeat)
 			.stream()

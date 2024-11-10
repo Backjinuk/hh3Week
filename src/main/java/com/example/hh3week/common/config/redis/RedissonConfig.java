@@ -56,15 +56,15 @@ public class RedissonConfig {
 
 	@Bean
 	public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-			.entryTtl(Duration.ofHours(1)) // 캐시 만료 시간 설정 (예: 1시간)
+		RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
 			.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
 		return RedisCacheManager.builder(connectionFactory)
-			.cacheDefaults(cacheConfiguration)
+			.cacheDefaults(cacheConfig)
+			.transactionAware()
 			.build();
 	}
-
 
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {

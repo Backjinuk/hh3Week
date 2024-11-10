@@ -46,6 +46,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	}
 
 	@Override
+	@Transactional
 	public List<ReservationSeatDto> getAvailableReservationSeatList(long concertScheduleId) {
 		return reservationService.getAvailableReservationSeatList(concertScheduleId)
 			.stream()
@@ -78,12 +79,11 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	}
 
 	public TokenDto reserveSeatTransactional(long userId, long seatDetailId) {
-		String queueKey = "waitingQueue:" + seatDetailId;
 
 		// Step 1: 대기열에 이미 등록된 사용자 확인
-		Double score = redisTemplate.opsForZSet().score(queueKey, String.valueOf(userId));
+		boolean userInQueue = waitingQueueService.isUserInQueue(userId, seatDetailId);
 
-		if (score != null) {
+		if (userInQueue) {
 			throw new IllegalArgumentException("사용자가 이미 대기열에 등록되어 있습니다.");
 		}
 
@@ -99,13 +99,12 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 			return tokenService.createToken(userId, 0, calculateRemainingTime(0), seatDetailId);
 		} else {
-			// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
-			WaitingQueueDto waitingId = waitingQueueService.addWaitingQueue(buildWaitingQueueDto(userId, seatDetailId));
 
-			redisTemplate.opsForZSet().add(queueKey, waitingId, waitingId.getPriority());
+			// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
+			WaitingQueueDto waitingQueueDto = waitingQueueService.addWaitingQueue( buildWaitingQueueDto(userId, seatDetailId));
 
 			// 대기열 위치 계산
-			int queuePosition = getQueuePosition2(queueKey, seatDetailId, userId);
+			int queuePosition = waitingQueueService.getQueuePosition(seatDetailId, waitingQueueDto.getWaitingId());
 
 			// 토큰 발급
 			long remainingTime = calculateRemainingTime(queuePosition);

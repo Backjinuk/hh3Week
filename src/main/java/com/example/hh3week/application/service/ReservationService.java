@@ -31,68 +31,34 @@ public class ReservationService {
 	private final ReservationMessagingPort reservationMessagingPort;
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	public ReservationService(ReservationSeatRepositoryPort reservationSeatRepositoryPort,
-		ReservationMessagingPort reservationMessagingPort,
-		@Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate) {
+	public ReservationService(ReservationSeatRepositoryPort reservationSeatRepositoryPort, ReservationMessagingPort reservationMessagingPort, RedisTemplate<String, Object> redisTemplate) {
 		this.reservationSeatRepositoryPort = reservationSeatRepositoryPort;
 		this.reservationMessagingPort = reservationMessagingPort;
 		this.redisTemplate = redisTemplate;
 	}
 
-	@CacheEvict(value = "RESERVATION_ITEM", allEntries = true) // 모든 캐시 항목 무효화
-	public void invalidateReservationCache() {
-		// 캐시를 무효화하는 것 외에 추가 작업이 필요 없다면 비어있는 메서드로 남김
-	}
-
-	public void reloadReservationItem() {
-		invalidateReservationCache(); // 캐시 무효화
-
-		// 모든 예약 좌석 정보를 Redis에 저장
-		getReservationItem(); // 데이터를 다시 로드
-	}
-
-	@Cacheable("RESERVATION_ITEM")
-	@Transactional
-	public void getReservationItem() {
-		String reservationKey = "reservationKey";
-
-		// 모든 예약 좌석 정보를 Redis에 저장
-		List<ReservationSeatDto> reservationSeatList = reservationSeatRepositoryPort.getAvailableALLReservationSeatList()
+	/*
+	* @Cacheable은 메서드 실행결과를 저장하거나 이미 캐싱된 데이터를 반환하는 역활
+	* 이때 DB조회를 하게 되는데 Hibernate는 트랜잭션이 열려 있는 상태에서만 DB와의 연결을 유지 하기 때문에
+	* @Transactionl이 필요함
+	* */
+	@Cacheable(value = "RESERVATION_ITEM", key = "'reservationKey'")
+	public List<ReservationSeatDto> getReservationItem() {
+		return reservationSeatRepositoryPort.getAvailableALLReservationSeatList()
 			.stream()
-			.map(reservationSeat -> {
-				ReservationSeatDto reservationSeatDto = ReservationSeatDto.ToDto(reservationSeat);
-				redisTemplate.opsForHash()
-					.put(reservationKey, String.valueOf(reservationSeatDto.getSeatId()), reservationSeatDto);
-				redisTemplate.expire("reservationKey", Duration.ofDays(1));
-				return reservationSeatDto;
-			})
+			.map(ReservationSeatDto::ToDto)
 			.toList();
-
-		// 예약 세부 정보 리스트 초기화
-		for (ReservationSeatDto reservationSeatDto : reservationSeatList) {
-			long seatId = reservationSeatDto.getSeatId();
-
-			// 예약 좌석 세부 정보를 가져오기
-			reservationSeatRepositoryPort.getAvailableReservationSeatDetailList(seatId)
-				.forEach(reservationSeatDetail -> {
-					ReservationSeatDetailDto reservationSeatDetailDto = ReservationSeatDetailDto.ToDto(
-						reservationSeatDetail);
-					String seatDetailKey =
-						"reservationDetailKey:" + reservationSeatDetailDto.getSeatDetailId(); // Redis 키
-
-					// 객체를 Value로 저장 (직렬화하여 저장)
-					redisTemplate.opsForValue().set(seatDetailKey, reservationSeatDetailDto);
-					redisTemplate.expire(seatDetailKey, Duration.ofDays(1)); // 세부 정보 만료 시간 설정
-				});
-		}
-
 	}
 
-	@Scheduled(cron = "0 0 0 * * *") // 매일 자정에 캐시 무효화
-	@CacheEvict(value = "RESERVATION_ITEM", allEntries = true) // 모든 캐시 항목 무효화
-	public void evictPopularItemsCache() {
-		getReservationItem();
-		System.out.println("Evicted POPULAR_ITEM cache");
+	@CacheEvict(value = "RESERVATION_ITEM", allEntries = true)
+	public void clearReservationCache() {
+		System.out.println("Existing reservation cache cleared.");
+	}
+
+
+	public void initializeAndRefreshCache() {
+		clearReservationCache();      // 기존 캐시 삭제
+		getReservationItem(); // 새 데이터로 캐시 갱신
 	}
 
 	/*
@@ -131,20 +97,25 @@ public class ReservationService {
 		reservationSeatRepositoryPort.updateReservationCurrentReserved(ReservationSeat.ToEntity(seat));
 	}
 
+	/*
+	* Redis를 사용할려고 했으나 Update가 자주 일어나서 성능의 저하를 가지고옴 기존 DB를 사용
+	* */
 	public ReservationSeatDetailDto getSeatDetailById(long seatDetailId) {
-		// Redis에서 예약 세부 정보 리스트 가져오기
-		String seatDetailKey = "reservationDetailKey:" + seatDetailId; // Redis 키
-
-		// Redis에서 해당 좌석 세부 정보를 가져오기
-		ReservationSeatDetailDto foundDetail = (ReservationSeatDetailDto) redisTemplate.opsForValue().get(seatDetailKey);
-
-		if (foundDetail == null) {
-			throw new IllegalArgumentException("해당 좌석 세부 정보가 Redis에 존재하지 않습니다.");
-		}
-
 		//기존 DB사용 로직
-		// reservationSeatRepositoryPort.getSeatDetailById(seatDetailId);
-		return foundDetail;
+		// Redis에서 예약 세부 정보 리스트 가져오기
+		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailById(seatDetailId));
+
+
+	/*
+			String seatDetailKey = "reservationDetailKey:" + seatDetailId; // Redis 키
+
+			// Redis에서 해당 좌석 세부 정보를 가져오기
+			ReservationSeatDetailDto foundDetail = (ReservationSeatDetailDto) redisTemplate.opsForValue().get(seatDetailKey);
+
+			if (foundDetail == null) {
+				throw new IllegalArgumentException("해당 좌석 세부 정보가 Redis에 존재하지 않습니다.");
+			}
+	*/
 
 	}
 

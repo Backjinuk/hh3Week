@@ -22,7 +22,7 @@ public class AppInitializer implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		log.info("메모리 캐싱 전");
-		reservationService.getReservationItem();
+		reservationService.initializeAndRefreshCache();
 		log.info("메모리 캐싱 후");
 	}
 }

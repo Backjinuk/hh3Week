@@ -1,6 +1,11 @@
 # 실제 운영될 DB 프로필
 spring:
-
+  cache:
+    type: redis
+  redis:
+    cache:
+      redis:
+        use-key-prefix: true
   data:
     redis:
       host: backjin.iptime.org
