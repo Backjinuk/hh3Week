@@ -30,12 +30,12 @@ VALUES
 -- Token 더미 데이터
 INSERT INTO token (token_id, user_id, token, issued_at, expires_at)
 VALUES
-    (1, 101, 'token123', '2024-01-01 10:00:00', '2025-01-12 10:00:00'),
-    (2, 102, 'token456', '2024-01-01 10:00:00', '2024-01-01 10:00:00'), -- 이미 만료된 토큰
-    (3, 1, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg', '2024-01-01 10:00:00', '2024-12-01 10:00:00'),
-    (4, 104, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMDQiLCJxdWV1ZU9yZGVyIjoyLCJyZW1haW5pbmdUaW1lIjoxMjAwLCJzZWF0RGV0YWlsSWQiOjQsImlhdCI6MTcyOTU5MTY4MiwiZXhwIjozNzI5Njc4MDgyfQ.A2u8Ux-oNuursObK8nVEX8ccdRQ8NHsUi2VlIp3RYfUgPm4WcUtW1V9Qf6xgcg38jD9Ij872gdhd50yROKOYJw', '2024-01-01 10:00:00', '2024-12-01 10:00:00'),
-    (6, 2, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MiwicmVtYWluaW5nVGltZSI6MTIwMCwic2VhdERldGFpbElkIjo1LCJpYXQiOjE3Mjk1OTQxMzAsImV4cCI6MTcyOTU5NDEzMH0.uH9jId_nN-_3k_pKqGd6I-n_3TROmwf7aoc-5WCdDjVToXgHSw1Lm34GnwE8DXSD2o8Cy5vufgikghjgVkXfHw', '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
-    (5, 999, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OTkiLCJxdWV1ZU9yZGVyIjoxLCJyZW1haW5pbmdUaW1lIjo2MDAsInNlYXREZXRhaWxJZCI6NCwiaWF0IjoxNzI5NTkxNzc5LCJleHAiOjM3Mjk2NzgxNzl9.6s1px0ZC4ONr5sbRZQgqZ-CVecod4YxW4Z6Lylt_RqRNE9tx6UIpqL7ZEZChd_lRGin-WC3vbuR0nx7kr5os1A', '2024-01-01 10:00:00', '2024-12-01 10:00:00'); -- 이미 만료된 토큰
+    (1, 10001, 'token123', '2024-01-01 10:00:00', '2025-01-12 10:00:00');
+--     (2, 102, 'token456', '2024-01-01 10:00:00', '2024-01-01 10:00:00'), -- 이미 만료된 토큰
+--     (3, 1, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg', '2024-01-01 10:00:00', '2024-12-01 10:00:00'),
+--     (4, 104, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMDQiLCJxdWV1ZU9yZGVyIjoyLCJyZW1haW5pbmdUaW1lIjoxMjAwLCJzZWF0RGV0YWlsSWQiOjQsImlhdCI6MTcyOTU5MTY4MiwiZXhwIjozNzI5Njc4MDgyfQ.A2u8Ux-oNuursObK8nVEX8ccdRQ8NHsUi2VlIp3RYfUgPm4WcUtW1V9Qf6xgcg38jD9Ij872gdhd50yROKOYJw', '2024-01-01 10:00:00', '2024-12-01 10:00:00'),
+--     (6, 2, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MiwicmVtYWluaW5nVGltZSI6MTIwMCwic2VhdERldGFpbElkIjo1LCJpYXQiOjE3Mjk1OTQxMzAsImV4cCI6MTcyOTU5NDEzMH0.uH9jId_nN-_3k_pKqGd6I-n_3TROmwf7aoc-5WCdDjVToXgHSw1Lm34GnwE8DXSD2o8Cy5vufgikghjgVkXfHw', '2024-01-01 10:00:00', '2024-01-01 10:00:00'),
+--     (5, 999, 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OTkiLCJxdWV1ZU9yZGVyIjoxLCJyZW1haW5pbmdUaW1lIjo2MDAsInNlYXREZXRhaWxJZCI6NCwiaWF0IjoxNzI5NTkxNzc5LCJleHAiOjM3Mjk2NzgxNzl9.6s1px0ZC4ONr5sbRZQgqZ-CVecod4YxW4Z6Lylt_RqRNE9tx6UIpqL7ZEZChd_lRGin-WC3vbuR0nx7kr5os1A', '2024-01-01 10:00:00', '2024-12-01 10:00:00'); -- 이미 만료된 토큰
 
 -- ConcertSchedule 더미 데이터
 INSERT INTO concert_schedule (concert_schedule_id, concert_id, concert_schedule_status, concert_price, start_dt, end_dt)
@@ -75,11 +75,12 @@ VALUES
 -- src/test/resources/test-data-waiting-queue.sql
 
 -- WaitingQueue 더미 데이터
-INSERT INTO waiting_queue (waiting_id, user_id, seat_detail_id, reservation_dt, waiting_status, priority)
-VALUES
-    (1, 101, 1, '2024-01-01 10:00:00', 'WAITING', 5),
-    (2, 102, 1, '2024-01-01 10:05:00', 'WAITING', 3),
-    (3, 103, 2, '2024-01-02 11:00:00', 'SERVED', 4);
+ INSERT INTO waiting_queue (waiting_id, user_id, seat_detail_id, reservation_dt, waiting_status, priority)
+ VALUES
+     (1100, 101, 1, '2024-01-01 10:00:00', 'WAITING', 5),
+     (2200, 102, 1, '2024-01-01 10:05:00', 'WAITING', 3),
+     (3300, 103, 2, '2024-01-02 11:00:00', 'SERVED', 4);
+
 
 
 -- ReservationSeat 더미 데이터

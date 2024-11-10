@@ -108,7 +108,7 @@ public class TokenRepositoryImplTest {
 	@DisplayName("사용자 ID로 토큰 조회 - 해당 사용자에게 할당된 토큰이 존재할 경우 반환")
 	void 사용자ID로토큰조회_해당사용자에게할당된토큰이존재할경우반환() {
 		// Given
-		long userId = 101L;
+		long userId = 10001L;
 
 		// When
 		Optional<Token> tokenOpt = tokenRepositoryImpl.getTokenByUserId(userId);

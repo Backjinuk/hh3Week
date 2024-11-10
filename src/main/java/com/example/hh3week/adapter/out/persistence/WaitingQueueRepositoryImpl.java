@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.example.hh3week.application.port.out.WaitingQueueRepositoryPort;
@@ -16,7 +16,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,38 +27,81 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
 	private final QWaitingQueue qWaitingQueue = QWaitingQueue.waitingQueue;
 
+	private final RedisTemplate<String, Object> redisTemplate;
+
+
+	private  String queueKey = "waitingQueue:";
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	public WaitingQueueRepositoryImpl(JPAQueryFactory queryFactory) {
+	public WaitingQueueRepositoryImpl(JPAQueryFactory queryFactory, RedisTemplate<String, Object> redisTemplate) {
 		this.queryFactory = queryFactory;
+		this.redisTemplate = redisTemplate;
 	}
 
+
+	/* Redis를 DB처럼 사용 */
 	@Override
+	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
-		long seatDetailId = waitingQueue.getSeatDetailId();
+		 queueKey += waitingQueue.getSeatDetailId();
 
-		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
-			.from(qWaitingQueue)
-			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			// .setLockMode(LockModeType.OPTIMISTIC_FORCE_INCREMENT) // 비관적 락으로 변경
-			.fetchOne();
-
-		if (maxPriority == null) {
-			maxPriority = 0L;
-		}
-
-		long newPriority = maxPriority + 1;
-		waitingQueue.setPriority(newPriority);
+		waitingQueue.setPriority(LocalDateTime.now().getNano());
 
 		try {
-			entityManager.persist(waitingQueue);
-			entityManager.flush(); // 즉시 쿼리 실행
-		} catch (PersistenceException e) {
-			throw new OptimisticLockingFailureException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+			redisTemplate.opsForZSet().add(queueKey, waitingQueue, waitingQueue.getPriority());
+
+		} catch (Exception e) {
+			throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
 		}
 
+		//  기존 DB 사용 로직
+		// 		long seatDetailId = waitingQueue.getSeatDetailId();
+		//
+		// 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
+		// 			.from(qWaitingQueue)
+		// 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
+		// 			.fetchOne();
+		//
+		// 		if (maxPriority == null) {
+		// 			maxPriority = 0L;
+		// 		}
+		//
+		// 		long newPriority = maxPriority + 1;
+		// 		waitingQueue.setPriority(newPriority);
+		//
+		// 		try {
+		// 			entityManager.persist(waitingQueue);
+		// 			entityManager.flush(); // 즉시 쿼리 실행
+		// 		} catch (PersistenceException e) {
+		// 			throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+		// 		}
+		//
+		// 		return waitingQueue;
+
 		return waitingQueue;
+	}
+
+
+	/* Redis를 DB처럼 사용 */
+	@Override
+	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
+		 queueKey +=  seatDetailId;
+
+		return Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
+			.stream()
+			.map(Object -> (WaitingQueue)Object)
+			.filter(waitingQueue -> waitingQueue.getUserId() == userId)
+			.findFirst() // 첫 번째 요소 가져오기
+			.orElseThrow(() -> new IllegalArgumentException("대기열에 해당 사용자가 없습니다."));
+
+
+		//  기존 DB 사용 로직
+		// return queryFactory.selectFrom(qWaitingQueue)
+		// 	.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
+		// 	.fetchOne();
+
 	}
 
 	@Override
@@ -77,7 +120,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		long updatedCount = queryFactory.update(qWaitingQueue)
 			.set(qWaitingQueue.waitingStatus, status)
 			.where(qWaitingQueue.waitingId.eq(waitingId))
-			// .setLockMode(LockModeType.OPTIMISTIC)
 			.execute();
 
 		if (updatedCount == 0) {
@@ -86,18 +128,10 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	}
 
 	@Override
-	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
-		return queryFactory.selectFrom(qWaitingQueue)
-			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
-			// .setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
-			.fetchOne();
-	}
-
-	@Override
 	public int getQueuePosition(long waitingId) {
+
 		WaitingQueue waitingQueue = queryFactory.selectFrom(qWaitingQueue)
 			.where(qWaitingQueue.waitingId.eq(waitingId))
-			// .setLockMode(LockModeType.OPTIMISTIC)
 			.fetchOne();
 
 		if (waitingQueue == null) {
@@ -116,6 +150,23 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 
 		return (int)position;
 	}
+
+	/* Redis를 DB처럼 사용 */
+	@Override
+	public int getQueuePosition(long waitingId, long seatDetailId) {
+		queueKey += seatDetailId;
+
+		Double rank = Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
+			.stream()
+			.map(Object -> (WaitingQueue) Object)
+			.filter(waitingQueue -> waitingQueue.getWaitingId() == waitingId)
+			.findFirst()
+			.map(waitingQueue -> redisTemplate.opsForZSet().score(queueKey, waitingQueue))
+			.orElseThrow(() -> new IllegalArgumentException("사용자의 대기열 순위를 찾을 수 없습니다."));
+
+		return rank.intValue() + 1; // 1-based 순위 반환
+	}
+
 
 	@Override
 	public void expireQueue(long waitingId) {

@@ -3,6 +3,7 @@ package com.example.hh3week.adapter.in.dto.token;
 import java.time.LocalDateTime;
 
 import com.example.hh3week.domain.token.entity.Token;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,9 +19,12 @@ public class TokenDto {
 
 	private String token;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime issuedAt;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime expiresAt;
+
 
 	@Builder
 	public TokenDto(long tokenId, long userId, String token, LocalDateTime issuedAt, LocalDateTime expiresAt) {

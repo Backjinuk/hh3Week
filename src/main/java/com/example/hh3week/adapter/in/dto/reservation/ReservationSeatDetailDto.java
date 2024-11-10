@@ -9,9 +9,11 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
+@ToString
 public class ReservationSeatDetailDto {
 
 	@Id

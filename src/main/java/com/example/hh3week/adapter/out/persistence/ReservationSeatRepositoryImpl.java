@@ -4,6 +4,8 @@ import static jakarta.persistence.LockModeType.*;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
@@ -16,6 +18,7 @@ import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @Repository
 public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryPort {
@@ -25,10 +28,12 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 	private final QReservationSeat qReservationSeat = QReservationSeat.reservationSeat;
 	private final QReservationSeatDetail qReservationSeatDetail = QReservationSeatDetail.reservationSeatDetail;
+	private final RedisTemplate<String, Object> redisTemplate;
 
-	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager) {
+	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager, RedisTemplate<String, Object> redisTemplate) {
 		this.queryFactory = queryFactory;
 		this.entityManager = entityManager;
+		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -59,6 +64,15 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 	}
 
 	@Override
+	@Transactional
+	public List<ReservationSeat> getAvailableALLReservationSeatList() {
+		return queryFactory.selectFrom(qReservationSeat)
+			.stream()
+			.toList();
+	}
+
+
+	@Override
 	public void updateReservationCurrentReserved(ReservationSeat reservationSeat) {
 		queryFactory.update(qReservationSeat)
 			.set(qReservationSeat.currentReserved, reservationSeat.getCurrentReserved())
@@ -68,6 +82,9 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 	@Override
 	public ReservationSeatDetail getSeatDetailById(long seatDetailId) {
+		// redisTemplate
+
+
 		ReservationSeatDetail seatDetail = queryFactory.selectFrom(qReservationSeatDetail)
 			.where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
 			.fetchOne();
@@ -83,7 +100,7 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 	public void updateSeatDetailStatus(ReservationSeatDetail seatDetail) {
 		queryFactory.update(qReservationSeatDetail)
 			.set(qReservationSeatDetail.reservationStatus, seatDetail.getReservationStatus())
-			.where(qReservationSeatDetail.seatId.eq(seatDetail.getSeatDetailId()))
+			.where(qReservationSeatDetail.seatDetailId.eq(seatDetail.getSeatDetailId()))
 			.execute();
 	}
 

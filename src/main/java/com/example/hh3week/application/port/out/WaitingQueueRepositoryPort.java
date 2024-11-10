@@ -19,6 +19,8 @@ public interface WaitingQueueRepositoryPort {
 
 	int getQueuePosition(long waitingId);
 
+	int getQueuePosition(long waitingId, long seatDetailId);
+
 	void expireQueue(long waitingId);
 
 	List<WaitingQueue> getQueueBySeatDetailId(long seatDetailId);
@@ -28,4 +30,5 @@ public interface WaitingQueueRepositoryPort {
 	List<WaitingQueue> findExpiredQueues(LocalDateTime currentTime);
 
 	Long findMaxPriorityBySeatDetailIdForUpdate(long seatDetailId);
+
 }
