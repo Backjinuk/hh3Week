@@ -16,6 +16,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,62 +46,62 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	@Override
 	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
-		 queueKey += waitingQueue.getSeatDetailId();
+		//  queueKey += waitingQueue.getSeatDetailId();
+		//
+		// waitingQueue.setPriority(LocalDateTime.now().getNano());
+		//
+		// try {
+		// 	redisTemplate.opsForZSet().add(queueKey, waitingQueue, waitingQueue.getPriority());
+		//
+		// } catch (Exception e) {
+		// 	throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
+		// }
 
-		waitingQueue.setPriority(LocalDateTime.now().getNano());
+		 // 기존 DB 사용 로직
+		long seatDetailId = waitingQueue.getSeatDetailId();
 
-		try {
-			redisTemplate.opsForZSet().add(queueKey, waitingQueue, waitingQueue.getPriority());
+		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
+			.from(qWaitingQueue)
+			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
+			.fetchOne();
 
-		} catch (Exception e) {
-			throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
+		if (maxPriority == null) {
+			maxPriority = 0L;
 		}
 
-		//  기존 DB 사용 로직
-		// 		long seatDetailId = waitingQueue.getSeatDetailId();
-		//
-		// 		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
-		// 			.from(qWaitingQueue)
-		// 			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-		// 			.fetchOne();
-		//
-		// 		if (maxPriority == null) {
-		// 			maxPriority = 0L;
-		// 		}
-		//
-		// 		long newPriority = maxPriority + 1;
-		// 		waitingQueue.setPriority(newPriority);
-		//
-		// 		try {
-		// 			entityManager.persist(waitingQueue);
-		// 			entityManager.flush(); // 즉시 쿼리 실행
-		// 		} catch (PersistenceException e) {
-		// 			throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
-		// 		}
-		//
-		// 		return waitingQueue;
+		long newPriority = maxPriority + 1;
+		waitingQueue.setPriority(newPriority);
+
+		try {
+			entityManager.persist(waitingQueue);
+			entityManager.flush(); // 즉시 쿼리 실행
+		} catch (PersistenceException e) {
+			throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+		}
 
 		return waitingQueue;
+
+		// return waitingQueue;
 	}
 
 
 	/* Redis를 DB처럼 사용 */
 	@Override
 	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
-		 queueKey +=  seatDetailId;
-
-		return Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
-			.stream()
-			.map(Object -> (WaitingQueue)Object)
-			.filter(waitingQueue -> waitingQueue.getUserId() == userId)
-			.findFirst() // 첫 번째 요소 가져오기
-			.orElseThrow(() -> new IllegalArgumentException("대기열에 해당 사용자가 없습니다."));
+		//  queueKey +=  seatDetailId;
+		//
+		// return Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
+		// 	.stream()
+		// 	.map(Object -> (WaitingQueue)Object)
+		// 	.filter(waitingQueue -> waitingQueue.getUserId() == userId)
+		// 	.findFirst() // 첫 번째 요소 가져오기
+		// 	.orElseThrow(() -> new IllegalArgumentException("대기열에 해당 사용자가 없습니다."));
 
 
 		//  기존 DB 사용 로직
-		// return queryFactory.selectFrom(qWaitingQueue)
-		// 	.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
-		// 	.fetchOne();
+		return queryFactory.selectFrom(qWaitingQueue)
+			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
+			.fetchOne();
 
 	}
 

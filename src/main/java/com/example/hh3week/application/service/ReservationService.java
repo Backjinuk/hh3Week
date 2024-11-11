@@ -127,18 +127,18 @@ public class ReservationService {
 		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
 
 		// Redis에서도 상태 업데이트
-		ReservationSeatDetailDto foundDetail = (ReservationSeatDetailDto)redisTemplate.opsForValue().get("reservationDetailKey:" + seatDetail.getSeatDetailId());
-
-		if (foundDetail != null) {
-			// 상태 업데이트
-			foundDetail.setReservationStatus(seatDetail.getReservationStatus());
-
-			// Redis에 업데이트된 객체 저장
-			redisTemplate.opsForValue().set("reservationDetailKey:" + seatDetail.getSeatDetailId(), foundDetail);
-		} else {
-			throw new IllegalArgumentException("해당 좌석 세부 정보가 Redis에 존재하지 않습니다.");
-		}
-
+		// ReservationSeatDetailDto foundDetail = (ReservationSeatDetailDto)redisTemplate.opsForValue().get("reservationDetailKey:" + seatDetail.getSeatDetailId());
+		//
+		// if (foundDetail != null) {
+		// 	// 상태 업데이트
+		// 	foundDetail.setReservationStatus(seatDetail.getReservationStatus());
+		//
+		// 	// Redis에 업데이트된 객체 저장
+		// 	redisTemplate.opsForValue().set("reservationDetailKey:" + seatDetail.getSeatDetailId(), foundDetail);
+		// } else {
+		// 	throw new IllegalArgumentException("해당 좌석 세부 정보가 Redis에 존재하지 않습니다.");
+		// }
+		//
 
 	}
 
