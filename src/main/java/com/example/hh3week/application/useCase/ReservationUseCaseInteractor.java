@@ -104,7 +104,9 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			WaitingQueueDto waitingQueueDto = waitingQueueService.addWaitingQueue( buildWaitingQueueDto(userId, seatDetailId));
 
 			// 대기열 위치 계산
-			int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto.getWaitingId());
+			int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto);
+
+			// int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto.getWaitingId());
 
 			// 토큰 발급
 			long remainingTime = calculateRemainingTime(queuePosition);

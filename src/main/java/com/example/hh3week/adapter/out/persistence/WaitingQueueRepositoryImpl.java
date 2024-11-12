@@ -152,6 +152,26 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 		return (int)position;
 	}
 
+	/**
+	 *
+	 * @param waitingQueue
+	 * @return
+	 */
+	@Override
+	public int getQueuePosition(WaitingQueue waitingQueue) {
+		Long positionCount = queryFactory.select(qWaitingQueue.priority)
+			.from(qWaitingQueue)
+			.where(qWaitingQueue.seatDetailId.eq(waitingQueue.getSeatDetailId())
+				.and(qWaitingQueue.waitingStatus.eq(WaitingStatus.WAITING))
+				.and(qWaitingQueue.priority.goe(waitingQueue.getPriority()))
+				.and(qWaitingQueue.reservationDt.lt(waitingQueue.getReservationDt())))
+			.fetchOne();
+
+		long position = (positionCount != null ? positionCount : 0L) + 1;
+
+		return (int)position;
+	}
+
 	/* Redis를 DB처럼 사용 */
 	@Override
 	public int getQueuePosition(long waitingId, long seatDetailId) {

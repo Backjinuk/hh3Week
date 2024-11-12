@@ -1,7 +1,6 @@
 package com.example.hh3week.application.port.out;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
@@ -18,6 +17,8 @@ public interface WaitingQueueRepositoryPort {
 	WaitingQueue getQueueStatus(long userId, long seatDetailId);
 
 	int getQueuePosition(long waitingId);
+
+	int getQueuePosition(WaitingQueue waitingQueue);
 
 	int getQueuePosition(long waitingId, long seatDetailId);
 
