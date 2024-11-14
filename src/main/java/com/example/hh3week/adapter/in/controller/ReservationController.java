@@ -95,6 +95,7 @@ public class ReservationController {
 		if (userId == null || seatDetailId == null) {
 			throw new IllegalArgumentException("userId와 seatDetailId는 필수 입력 항목입니다.");
 		}
+		// 이부분에서 Kafka를 통해 비동기 처리됨
 		CompletableFuture<TokenDto> future = reservationUseCase.sendReservationRequest(userId, seatDetailId);
 
 		try {
