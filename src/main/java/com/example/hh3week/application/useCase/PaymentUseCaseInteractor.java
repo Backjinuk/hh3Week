@@ -24,6 +24,7 @@ import com.example.hh3week.application.service.WaitingQueueService;
 import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.payment.entity.PaymentStatus;
 import com.example.hh3week.domain.user.entity.PointStatus;
+import com.example.hh3week.domain.user.entity.UserPointHistory;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -119,22 +120,12 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 		reservationService.updateSeatReservation(seatDto);
 
 		// 유저 포인트 히스토리 등록
-		UserPointHistoryDto userPointHistoryDto = UserPointHistoryDto.builder()
-			.userId(userId)
-			.pointDt(LocalDateTime.now())
-			.pointAmount(seatDetailDto.getSeatPrice())
-			.pointStatus(PointStatus.USE)
-			.build();
+		UserPointHistoryDto userPointHistoryDto = usePointHistoryDto(userId, seatDetailDto.getSeatPrice());
+
 		userService.addUserPointHistoryInUser(userPointHistoryDto);
 
 		// 결제 히스토리 등록
-		PaymentHistoryDto reqHistoryDto = PaymentHistoryDto.builder()
-			.reservationId(seatDetailId)
-			.paymentAmount(seatDetailDto.getSeatPrice())
-			.paymentStatus(PaymentStatus.COMPLETED)
-			.userId(userId)
-			.build();
-
+		PaymentHistoryDto reqHistoryDto = addHistoryDto(seatDetailId, seatDetailDto.getSeatPrice(), userId);
 		return paymentHistoryService.registerPaymentHistory(reqHistoryDto);
 	}
 
@@ -147,4 +138,25 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 	public List<PaymentHistoryDto> getPaymentHistoryByUserId(long userId) {
 		return paymentHistoryService.getPaymentHistoryByUserId(userId);
 	}
+
+	private UserPointHistoryDto usePointHistoryDto(long userId, long seatPrice){
+
+		return UserPointHistoryDto.builder()
+			.userId(userId)
+			.pointDt(LocalDateTime.now())
+			.pointAmount(seatPrice)
+			.pointStatus(PointStatus.USE)
+			.build();
+	}
+
+	private PaymentHistoryDto addHistoryDto(long seatDetailId, long seatPrice, long userId){
+
+		return PaymentHistoryDto.builder()
+			.reservationId(seatDetailId)
+			.paymentAmount(seatPrice)
+			.paymentStatus(PaymentStatus.COMPLETED)
+			.userId(userId)
+			.build();
+	}
+
 }

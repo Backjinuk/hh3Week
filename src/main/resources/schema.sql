@@ -96,6 +96,8 @@ create table waiting_queue
 ) engine = InnoDB;
 
 
+CREATE INDEX idx_seatDetailId_userId ON waiting_queue (user_id, seat_detail_id);
+-- CREATE INDEX idx_seatDetailId_priority ON waiting_queue (seat_detail_id, priority);
 
 
 
