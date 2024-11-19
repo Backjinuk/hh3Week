@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
+import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 
 public interface ReservationUseCase {
 
@@ -14,6 +15,9 @@ public interface ReservationUseCase {
 
 	CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatId);
 
+	void validateReservationEligibility(long userId, long seatDetailId);
+
+	WaitingQueueDto addWaitingQueue(long userId, long seatDetailId);
 }
 
 

@@ -2,7 +2,6 @@ package com.example.hh3week.application.useCase;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -67,7 +66,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			}
 
 			// 실제 비즈니스 로직 수행
-			return reserveSeatTransactional(userId, seatDetailId);
+			return handleSeatReservation(userId, seatDetailId);
+
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new IllegalArgumentException("락 획득이 인터럽트되었습니다.");
@@ -78,7 +78,19 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		}
 	}
 
-	public TokenDto reserveSeatTransactional(long userId, long seatDetailId) {
+	public TokenDto handleSeatReservation(long userId, long seatDetailId) {
+		// 예약 가능한지 확인
+		validateReservationEligibility(userId, seatDetailId);
+
+		// 대기열에 사용자 추가
+		WaitingQueueDto waitingQueueDto = addWaitingQueue( userId, seatDetailId);
+
+		// 토큰 발급
+		return issuedToken(waitingQueueDto, userId, seatDetailId);
+
+	}
+
+	public void validateReservationEligibility(long userId, long seatDetailId){
 
 		// Step 1: 대기열에 이미 등록된 사용자 확인
 		boolean userInQueue = waitingQueueService.isUserInQueue(userId, seatDetailId);
@@ -90,36 +102,34 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		// Step 2: 좌석 상세 정보 조회
 		ReservationSeatDetailDto seatDetail = reservationService.getSeatDetailById(seatDetailId);
 
-		log.info("seatDetail 의 정보 {}",seatDetail.getReservationStatus());
-
 		// Step 3: 좌석 상태 확인 및 예약 처리
 		if (seatDetail.getReservationStatus() == ReservationStatus.AVAILABLE) {
 			seatDetail.setReservationStatus(ReservationStatus.PENDING);
 			reservationService.updateSeatDetailStatus(seatDetail);
-
-			return tokenService.createToken(userId, 0, calculateRemainingTime(0), seatDetailId);
-		} else {
-
-			// 좌석이 AVAILABLE이 아닌 경우, 대기열에 사용자 추가
-			WaitingQueueDto waitingQueueDto = waitingQueueService.addWaitingQueue( buildWaitingQueueDto(userId, seatDetailId));
-
-			// 대기열 위치 계산
-			int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto);
-
-			// int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto.getWaitingId());
-
-			// 토큰 발급
-			long remainingTime = calculateRemainingTime(queuePosition);
-
-			return tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
 		}
 	}
+
+	public WaitingQueueDto addWaitingQueue(long userId, long seatDetailId){
+		return waitingQueueService.addWaitingQueue( buildWaitingQueueDto(userId, seatDetailId));
+	}
+	public TokenDto issuedToken(WaitingQueueDto waitingQueueDto, long userId, long seatDetailId){
+		// 대기열 위치 계산
+		int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto);
+
+		// 토큰 발급
+		long remainingTime = calculateRemainingTime(queuePosition);
+
+		return tokenService.createToken(userId, queuePosition, remainingTime, seatDetailId);
+	}
+
 
 
 	@Override
 	public CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatId) {
 		return reservationService.sendReservationRequest(userId, seatId);
 	}
+
+
 
 	/**
 	 * 대기열에서 남은 시간을 계산하는 메서드 (예시)
@@ -128,16 +138,11 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	 * @return 남은 대기 시간 (초 단위)
 	 */
 	private long calculateRemainingTime(int queuePosition) {
-		// 예시: 각 사용자당 5분의 대기 시간 부여
 		return queuePosition * 300L;
 	}
 
-	private int getQueuePosition2(String queueKey, long seatDetailId, long userId) {
-		Long rank = redisTemplate.opsForZSet().rank(queueKey, String.valueOf(userId));
 
-			return Objects.requireNonNull(rank).intValue() + 1; // 1-based index
 
-	}
 
 	private WaitingQueueDto buildWaitingQueueDto(long userId, long seatDetailId) {
 		return WaitingQueueDto.builder()
@@ -148,6 +153,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			.priority(System.currentTimeMillis()) // priority를 enqueueTime으로 설정 (예시)
 			.build();
 	}
+
+
 
 	private WaitingQueue buildWaitingQueue(long userId, long seatDetailId) {
 		return WaitingQueue.builder()

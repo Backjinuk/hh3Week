@@ -1,4 +1,4 @@
-package com.example.hh3week.adapter.out.messaging.kafka.adapter;
+package com.example.hh3week.adapter.out.streaming.kafka.adapter;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -8,8 +8,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
+import com.example.hh3week.adapter.out.streaming.kafka.dto.UserQueueValidationRequest;
 import com.example.hh3week.application.port.out.ReservationMessagingPort;
-import com.example.hh3week.adapter.out.messaging.kafka.dto.SeatReservationRequest;
+import com.example.hh3week.adapter.out.streaming.kafka.dto.SeatReservationRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,13 +18,16 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ReservationProducerAdapter implements ReservationMessagingPort {
 	private final KafkaTemplate<String, SeatReservationRequest> kafkaTemplate;
+	private final KafkaTemplate<String, UserQueueValidationRequest> kafkaTemplate2;
 	private final String requestTopic = "seat-reservations";
 	private final ResponseHolder responseHolder;
 
 	@Autowired
 	public ReservationProducerAdapter(KafkaTemplate<String, SeatReservationRequest> kafkaTemplate,
+		KafkaTemplate<String, UserQueueValidationRequest> kafkaTemplate2,
 		ResponseHolder responseHolder) {
 		this.kafkaTemplate = kafkaTemplate;
+		this.kafkaTemplate2 = kafkaTemplate2;
 		this.responseHolder = responseHolder;
 	}
 
@@ -34,11 +38,18 @@ public class ReservationProducerAdapter implements ReservationMessagingPort {
 
 		// Correlation ID를 키로 사용하여 메시지 전송
 		kafkaTemplate.send(requestTopic, correlationId, request);
-		// log.info("예약 요청 전송: correlationId={}, userId={}, seatDetailId={}", correlationId, userId, seatDetailId);
 
 		// ResponseHolder에 Correlation ID와 Future 매핑
 		responseHolder.addResponse(correlationId, future);
 
 		return future;
 	}
+
+
+
+	public void validateUserInQueue(long userId, long seatDetailId){
+		kafkaTemplate2.send("user-queue-validation-topic", new UserQueueValidationRequest(userId, seatDetailId));
+	}
+
+
 }
