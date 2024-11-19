@@ -67,6 +67,10 @@ public class ReservationController {
 		return ResponseEntity.ok(availableSeats);
 	}
 
+
+
+
+
 	/**
 	 * 사용자가 좌석 예약을 요청할 때, 대기열을 생성하고 토큰을 발급하는 API 엔드포인트입니다.
 	 *
@@ -95,6 +99,8 @@ public class ReservationController {
 		if (userId == null || seatDetailId == null) {
 			throw new IllegalArgumentException("userId와 seatDetailId는 필수 입력 항목입니다.");
 		}
+
+		// 이부분에서 Kafka를 통해 비동기 처리됨
 		CompletableFuture<TokenDto> future = reservationUseCase.sendReservationRequest(userId, seatDetailId);
 
 		try {

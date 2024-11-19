@@ -146,4 +146,7 @@ public class WaitingQueueService {
 			.toList();
 	}
 
+	public void deleteWaitingQueueFromUser(WaitingQueueDto waitingQueueDto) {
+		waitingQueueRepository.deleteWaitingQueueFromUser(WaitingQueue.ToEntity(waitingQueueDto));
+	}
 }

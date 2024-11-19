@@ -232,4 +232,13 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 			// .setLockMode(LockModeType.OPTIMISTIC) // 비관적 잠금 설정
 			.fetchOne();
 	}
+
+	@Override
+	public void deleteWaitingQueueFromUser(WaitingQueue waitingQueue) {
+		queryFactory.delete(qWaitingQueue)
+			.where(qWaitingQueue.userId.eq(waitingQueue.getWaitingId())
+				.and(qWaitingQueue.seatDetailId.eq(waitingQueue.getSeatDetailId() ))
+			).execute();
+
+	}
 }

@@ -32,4 +32,5 @@ public interface WaitingQueueRepositoryPort {
 
 	Long findMaxPriorityBySeatDetailIdForUpdate(long seatDetailId);
 
+	void deleteWaitingQueueFromUser(WaitingQueue waitingQueue);
 }

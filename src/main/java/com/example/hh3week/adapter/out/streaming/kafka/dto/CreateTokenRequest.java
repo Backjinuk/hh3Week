@@ -1,33 +1,36 @@
-package com.example.hh3week.adapter.out.streaming.kafka.dto;
+package com.example.hh3week.adapter.out.messaging.kafka.dto;
 
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 
 import lombok.Data;
 
 @Data
-public class SeatReservationRequest {
-	private String correlationId;
+public class CreateTokenRequest {
+
+	private String correlationId; // 추가
 	private long userId;
+	private int queuePosition;
+	private long remainingTime;
 	private long seatDetailId;
 
-	// Constructors
-	public SeatReservationRequest() {}
+	public CreateTokenRequest() {}
 
-	public SeatReservationRequest(String correlationId, long userId, long seatDetailId) {
+	public CreateTokenRequest(String correlationId, long userId, int queuePosition, long remainingTime, long seatDetailId) {
 		this.correlationId = correlationId;
 		this.userId = userId;
+		this.queuePosition = queuePosition;
+		this.remainingTime = remainingTime;
 		this.seatDetailId = seatDetailId;
 	}
 
-
 	@Data
 	public static class Success {
-		private String correlationId; // 추가
+		private String correlationId;
 		private long userId;
 		private long seatDetailId;
-		private TokenDto token; // 성공 시 TokenDto 포함
+		private TokenDto token;
 
-		public Success() { }
+		public Success() {}
 
 		public Success(String correlationId, long userId, long seatDetailId, TokenDto token) {
 			this.correlationId = correlationId;
@@ -35,13 +38,11 @@ public class SeatReservationRequest {
 			this.seatDetailId = seatDetailId;
 			this.token = token;
 		}
-
-
 	}
 
 	@Data
-	public static class Failure {
-		private String correlationId; // 추가
+	public static class Failure{
+		private String correlationId;
 		private long userId;
 		private long seatDetailId;
 		private String reason;
@@ -55,5 +56,4 @@ public class SeatReservationRequest {
 			this.reason = reason;
 		}
 	}
-
 }
