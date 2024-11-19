@@ -31,11 +31,12 @@ kafka:
     reserve-seat-request: reserve-seat-request
     reserve-seat-success: reserve-seat-success
     reserve-seat-failure: reserve-seat-failure
-    create-token-request: create-token-request
-    create-token-success: create-token-success
     create-token-failure: create-token-failure
     seat-reservations-response : seat-reservations-response
     seat-reservations : seat-reservations
+    user-queue-validation-topic:  user-queue-validation-topic
+    add-waiting-queue-response: add-waiting-queue-response
+    issued-token-request: issued-token-request
     release-seat: release-seat
 
 
