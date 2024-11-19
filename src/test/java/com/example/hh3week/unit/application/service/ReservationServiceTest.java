@@ -36,11 +36,6 @@ class ReservationServiceTest {
 	}
 
 	@Test
-	void test(){
-		reservationService.reloadReservationItem();
-	}
-
-	@Test
 	@DisplayName("특정 콘서트의 예약 가능한 좌석 목록을 조회 성공")
 	void 특정_콘서트의_예약_가능한_좌석_목록을_조회_성공() {
 		// given

@@ -3,7 +3,10 @@ package com.example.hh3week.application.useCase;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import com.example.hh3week.application.service.WaitingQueueService;
 import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.payment.entity.PaymentStatus;
 import com.example.hh3week.domain.user.entity.PointStatus;
+import com.example.hh3week.domain.user.entity.UserPointHistory;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +38,16 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 	private final WaitingQueueService waitingQueueService;
 	private final TokenService tokenService;
 	private final ReservationService reservationService;
+	private final RedissonClient redissonClient;
 
 	public PaymentUseCaseInteractor(PaymentHistoryService paymentHistoryService, UserService userService,
-		WaitingQueueService waitingQueueService, TokenService tokenService, ReservationService reservationService) {
+		WaitingQueueService waitingQueueService, TokenService tokenService, ReservationService reservationService, RedissonClient redissonClient) {
 		this.paymentHistoryService = paymentHistoryService;
 		this.userService = userService;
 		this.waitingQueueService = waitingQueueService;
 		this.tokenService = tokenService;
 		this.reservationService = reservationService;
+		this.redissonClient = redissonClient;
 	}
 
 	/*
@@ -53,10 +59,31 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 	 * - [ ]  유저 포인트 히스토리 등록
 	 * - [ ]  결제 히스토리 등록
 	 * */
+
 	@Override
 	@Transactional
 	public PaymentHistoryDto registerPaymentHistory(PaymentHistoryDto paymentHistoryDto) {
+		String lockKey = "lock:payment:" + paymentHistoryDto.getPaymentId();
+		RLock lock = redissonClient.getLock(lockKey);
+		boolean isLocked = false;
+		try {
 
+			isLocked = lock.tryLock(5, 30, TimeUnit.SECONDS);
+			if (!isLocked) {
+				throw new IllegalArgumentException("좌석 락을 획득할 수 없습니다. 다시 시도해주세요.");
+			}
+
+			return registerPayment(paymentHistoryDto);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (isLocked && lock.isHeldByCurrentThread()) {
+				lock.unlock();
+			}
+		}
+	}
+
+	private PaymentHistoryDto registerPayment(PaymentHistoryDto paymentHistoryDto) {
 		// 토큰값 검증
 		boolean tokenExpired = tokenService.isTokenExpired(paymentHistoryDto.getToken());
 
@@ -93,25 +120,14 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 		reservationService.updateSeatReservation(seatDto);
 
 		// 유저 포인트 히스토리 등록
-		UserPointHistoryDto userPointHistoryDto = UserPointHistoryDto.builder()
-			.userId(userId)
-			.pointDt(LocalDateTime.now())
-			.pointAmount(seatDetailDto.getSeatPrice())
-			.pointStatus(PointStatus.USE)
-			.build();
+		UserPointHistoryDto userPointHistoryDto = usePointHistoryDto(userId, seatDetailDto.getSeatPrice());
+
 		userService.addUserPointHistoryInUser(userPointHistoryDto);
 
 		// 결제 히스토리 등록
-		PaymentHistoryDto reqHistoryDto = PaymentHistoryDto.builder()
-			.reservationId(seatDetailId)
-			.paymentAmount(seatDetailDto.getSeatPrice())
-			.paymentStatus(PaymentStatus.COMPLETED)
-			.userId(userId)
-			.build();
-
+		PaymentHistoryDto reqHistoryDto = addHistoryDto(seatDetailId, seatDetailDto.getSeatPrice(), userId);
 		return paymentHistoryService.registerPaymentHistory(reqHistoryDto);
 	}
-
 
 	@Override
 	public PaymentHistoryDto getPaymentHistory(long paymentId) {
@@ -122,4 +138,25 @@ public class PaymentUseCaseInteractor implements PaymentUseCase {
 	public List<PaymentHistoryDto> getPaymentHistoryByUserId(long userId) {
 		return paymentHistoryService.getPaymentHistoryByUserId(userId);
 	}
+
+	private UserPointHistoryDto usePointHistoryDto(long userId, long seatPrice){
+
+		return UserPointHistoryDto.builder()
+			.userId(userId)
+			.pointDt(LocalDateTime.now())
+			.pointAmount(seatPrice)
+			.pointStatus(PointStatus.USE)
+			.build();
+	}
+
+	private PaymentHistoryDto addHistoryDto(long seatDetailId, long seatPrice, long userId){
+
+		return PaymentHistoryDto.builder()
+			.reservationId(seatDetailId)
+			.paymentAmount(seatPrice)
+			.paymentStatus(PaymentStatus.COMPLETED)
+			.userId(userId)
+			.build();
+	}
+
 }

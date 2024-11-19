@@ -16,6 +16,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.validation.ConstraintViolationException;
 
 @Repository
 public class TokenRepositoryImpl implements TokenRepositoryPort {
@@ -36,29 +38,28 @@ public class TokenRepositoryImpl implements TokenRepositoryPort {
 	@Override
 	public Token createToken(Token token) {
 
-		String tokenKey = "tokens:" + token.getUserId();
+		// String tokenKey = "tokens:" + token.getUserId();
+		//
+		// // Redis에 토큰 저장
+		// try {
+		// 	redisTemplate.opsForZSet().add(tokenKey, token, LocalDateTime.now().getNano() );
+		// 	// redisTemplate.expire(tokenKey, Duration.ofSeconds(remainingTime));
+		// } catch (Exception e) {
+		// 	// Redis 저장 실패 시, 데이터베이스 트랜잭션 롤백
+		// 	throw new RuntimeException("Redis 저장 중 오류가 발생했습니다.", e);
+		// }
 
-		// Redis에 토큰 저장
+		// 기존 DB를 사용한 로직
 		try {
-			redisTemplate.opsForZSet().add(tokenKey, token, LocalDateTime.now().getNano() );
-			// redisTemplate.expire(tokenKey, Duration.ofSeconds(remainingTime));
-		} catch (Exception e) {
-			// Redis 저장 실패 시, 데이터베이스 트랜잭션 롤백
-			throw new RuntimeException("Redis 저장 중 오류가 발생했습니다.", e);
+			entityManager.persist(token);
+			return token;
+		} catch (PersistenceException e) {
+			if (e.getCause() instanceof ConstraintViolationException) {
+				throw new IllegalArgumentException("이미 존재하는 토큰입니다.", e);
+			}
+			throw e;
 		}
-
-			/* 기존 DB를 사용한 로직
-					try {
-						entityManager.persist(token);
-						return token;
-					} catch (PersistenceException e) {
-						if (e.getCause() instanceof ConstraintViolationException) {
-							throw new IllegalArgumentException("이미 존재하는 토큰입니다.", e);
-						}
-						throw e;
-					}
-			*/
-		return token;
+		// return token;
 	}
 
 	@Override

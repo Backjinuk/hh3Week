@@ -75,6 +75,10 @@ public class WaitingQueueService {
 		return waitingQueueRepository.getQueuePosition(waitingId, seatDetailId);
 	}
 
+	public int getQueuePosition(WaitingQueueDto waitingQueueDto) {
+		return waitingQueueRepository.getQueuePosition(WaitingQueue.ToEntity(waitingQueueDto));
+	}
+
 	/**
 	 * 특정 대기열 항목의 상태를 업데이트하는 메서드입니다.
 	 *
@@ -142,4 +146,7 @@ public class WaitingQueueService {
 			.toList();
 	}
 
+	public void deleteWaitingQueueFromUser(WaitingQueueDto waitingQueueDto) {
+		waitingQueueRepository.deleteWaitingQueueFromUser(WaitingQueue.ToEntity(waitingQueueDto));
+	}
 }

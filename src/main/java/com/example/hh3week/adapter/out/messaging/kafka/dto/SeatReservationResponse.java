@@ -11,7 +11,8 @@ public class SeatReservationResponse {
 	private String error;
 
 	// Constructors
-	public SeatReservationResponse() {}
+	public SeatReservationResponse() {
+	}
 
 	public SeatReservationResponse(String correlationId, TokenDto token, String error) {
 		this.correlationId = correlationId;

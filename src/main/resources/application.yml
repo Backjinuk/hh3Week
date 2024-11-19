@@ -26,6 +26,20 @@ spring:
           json:
             trusted:
               packages: "*"
+kafka:
+  topics:
+    reserve-seat-request: reserve-seat-request
+    reserve-seat-success: reserve-seat-success
+    reserve-seat-failure: reserve-seat-failure
+    create-token-request: create-token-request
+    create-token-success: create-token-success
+    create-token-failure: create-token-failure
+    seat-reservations-response : seat-reservations-response
+    seat-reservations : seat-reservations
+    release-seat: release-seat
+
+
+
 
   application:
     name: hh3week
