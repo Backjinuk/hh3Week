@@ -2,17 +2,12 @@ package com.example.hh3week.application.useCase;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +15,10 @@ import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
-import com.example.hh3week.adapter.out.messaging.kafka.dto.ReleaseSeat;
 import com.example.hh3week.application.port.in.ReservationUseCase;
 import com.example.hh3week.application.service.ReservationService;
 import com.example.hh3week.application.service.TokenService;
 import com.example.hh3week.application.service.WaitingQueueService;
-import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
 import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingQueue;
 import com.example.hh3week.domain.waitingQueue.entity.WaitingStatus;
@@ -73,7 +66,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			}
 
 			// 실제 비즈니스 로직 수행
-			return reserveSeatTransactional(userId, seatDetailId);
+			return handleSeatReservation(userId, seatDetailId);
 
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -85,46 +78,41 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		}
 	}
 
-	public TokenDto reserveSeatTransactional(long userId, long seatDetailId) {
+	public TokenDto handleSeatReservation(long userId, long seatDetailId) {
+		// 예약 가능한지 확인
+		validateReservationEligibility(userId, seatDetailId);
 
-		if (waitingQueueService.isUserInQueue(userId, seatDetailId)) {
+		// 대기열에 사용자 추가
+		WaitingQueueDto waitingQueueDto = addWaitingQueue( userId, seatDetailId);
+
+		// 토큰 발급
+		return issuedToken(waitingQueueDto, userId, seatDetailId);
+
+	}
+
+	public void validateReservationEligibility(long userId, long seatDetailId){
+
+		// Step 1: 대기열에 이미 등록된 사용자 확인
+		boolean userInQueue = waitingQueueService.isUserInQueue(userId, seatDetailId);
+
+		if (userInQueue) {
 			throw new IllegalArgumentException("사용자가 이미 대기열에 등록되어 있습니다.");
 		}
 
+		// Step 2: 좌석 상세 정보 조회
 		ReservationSeatDetailDto seatDetail = reservationService.getSeatDetailById(seatDetailId);
 
+		// Step 3: 좌석 상태 확인 및 예약 처리
 		if (seatDetail.getReservationStatus() == ReservationStatus.AVAILABLE) {
 			seatDetail.setReservationStatus(ReservationStatus.PENDING);
 			reservationService.updateSeatDetailStatus(seatDetail);
 		}
-
-		return issuedTokens(userId, seatDetailId);
 	}
 
-
-	@Override
-	public CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatId) {
-		return reservationService.sendReservationRequest(userId, seatId);
+	public WaitingQueueDto addWaitingQueue(long userId, long seatDetailId){
+		return waitingQueueService.addWaitingQueue( buildWaitingQueueDto(userId, seatDetailId));
 	}
-
-
-	/**
-	 * 대기열에서 남은 시간을 계산하는 메서드 (예시)
-	 *
-	 * @param queuePosition 대기열에서의 위치
-	 * @return 남은 대기 시간 (초 단위)
-	 */
-	private long calculateRemainingTime(int queuePosition) {
-		// 예시: 각 사용자당 5분의 대기 시간 부여
-		return queuePosition * 300L;
-	}
-
-
-	private TokenDto issuedTokens(long userId, long seatDetailId){
-
-		// 대기열에 추가
-		WaitingQueueDto waitingQueueDto = waitingQueueService.addWaitingQueue(buildWaitingQueueDto(userId, seatDetailId));
-
+	public TokenDto issuedToken(WaitingQueueDto waitingQueueDto, long userId, long seatDetailId){
 		// 대기열 위치 계산
 		int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto);
 
@@ -136,41 +124,22 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 
 
-	@KafkaListener(topics = "${kafka.topics.release-seat}", groupId = "saga-group")
-	@Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 5000))
-	public void handleReleaseSeat(ReleaseSeat event) throws Exception {
-
-		ReservationSeatDetailDto reservationSeatDetail = ReservationSeatDetailDto.builder()
-			.seatDetailId(event.getSeatDetailId())
-			.reservationStatus(ReservationStatus.AVAILABLE)
-			.build();
-
-		// 좌석 상태를 AVAILABLE로 되돌림
-		reservationService.updateSeatDetailStatus(reservationSeatDetail);
-
-		WaitingQueueDto waitingQueueDto = WaitingQueueDto.builder()
-			.userId(event.getUserId())
-			.seatDetailId(event.getSeatDetailId())
-			.build();
-
-		// 대기열에서 사용자 제거
-		waitingQueueService.deleteWaitingQueueFromUser(waitingQueueDto);
-
-		// 로그 기록
-		log.info("좌석 상태 원복 완료: UserId={}, SeatDetailId={}", event.getUserId(), event.getSeatDetailId());
+	@Override
+	public CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatId) {
+		return reservationService.sendReservationRequest(userId, seatId);
 	}
 
 
 
-	@Recover
-	public void recover(ReleaseSeat event, Exception e) {
-		// 보상 트랜잭션 최종 실패 시 알림 또는 추가 조치
-		log.error("좌석 상태 원복 최종 실패: UserId={}, SeatDetailId={}, Reason={}", event.getUserId(), event.getSeatDetailId(),
-			e.getMessage());
-		// 필요 시, 관리자에게 알림을 보내거나 로그를 기록할 수 있습니다.
+	/**
+	 * 대기열에서 남은 시간을 계산하는 메서드 (예시)
+	 *
+	 * @param queuePosition 대기열에서의 위치
+	 * @return 남은 대기 시간 (초 단위)
+	 */
+	private long calculateRemainingTime(int queuePosition) {
+		return queuePosition * 300L;
 	}
-
-
 
 
 
@@ -184,6 +153,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 			.priority(System.currentTimeMillis()) // priority를 enqueueTime으로 설정 (예시)
 			.build();
 	}
+
+
 
 	private WaitingQueue buildWaitingQueue(long userId, long seatDetailId) {
 		return WaitingQueue.builder()

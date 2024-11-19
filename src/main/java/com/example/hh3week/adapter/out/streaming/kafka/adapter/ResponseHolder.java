@@ -1,4 +1,4 @@
-package com.example.hh3week.adapter.out.messaging.kafka.adapter;
+package com.example.hh3week.adapter.out.streaming.kafka.adapter;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,4 +20,5 @@ public class ResponseHolder {
 	public CompletableFuture<TokenDto> getResponse(String correlationId) {
 		return responses.remove(correlationId);
 	}
+
 }
