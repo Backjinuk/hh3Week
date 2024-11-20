@@ -13,7 +13,9 @@ import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 import com.example.hh3week.adapter.out.streaming.kafka.dto.AddToWaitingQueueResponse;
 import com.example.hh3week.adapter.out.streaming.kafka.dto.SeatReservationRequest;
 import com.example.hh3week.adapter.out.streaming.kafka.dto.TokenIssuedRequest;
+import com.example.hh3week.adapter.out.streaming.kafka.dto.TokenIssuedResponse;
 import com.example.hh3week.adapter.out.streaming.kafka.dto.UserQueueValidationRequest;
+import com.example.hh3week.adapter.out.streaming.kafka.dto.UserQueueValidationResponse;
 import com.example.hh3week.application.port.in.ReservationUseCase;
 import com.example.hh3week.application.port.out.ReservationMessagingPort;
 
@@ -35,6 +37,10 @@ public class ReservationConsumerAdapter {
 	@Value("${kafka.topics.add-waiting-queue-response}")
 	private String addWaitingQueueResponse;
 
+
+	@Value("${kafka.topics.issued-token-response}")
+	private String issuedTokenResponse;
+
 	@Value("${kafka.topics.issued-token-request}")
 	private String issuedTokenRequest;
 
@@ -47,85 +53,83 @@ public class ReservationConsumerAdapter {
 		this.reservationMessagingPort = reservationMessagingPort;
 	}
 
-	@KafkaListener(topics = "${kafka.topics.seat-reservations}", groupId = "reservation-group")
-	public void consumeReservationRequest(SeatReservationRequest request) {
-		String correlationId = request.getCorrelationId();
-		long userId = request.getUserId();
-		long seatDetailId = request.getSeatDetailId();
-
-		try {
-			// 예약 처리
-			TokenDto tokenDto = reservationUseCase.reserveSeat(userId, seatDetailId);
-
-			// `CompletableFuture`를 통해 응답을 처리
-			CompletableFuture<TokenDto> future = responseHolder.getResponse(correlationId);
-			if (future != null) {
-				future.complete(tokenDto); // 성공 시 `tokenDto` 완료
-			} else {
-				log.warn("응답을 찾을 수 없습니다: correlationId={}", correlationId);
-			}
-
-			// // 성공 응답 생성
-			// SeatReservationResponse response = new SeatReservationResponse(correlationId, tokenDto, null);
-			// responseKafkaTemplate.send(responseTopic, correlationId, response);
-		} catch (Exception e) {
-
-			// `CompletableFuture`에 예외를 완료 처리
-			CompletableFuture<TokenDto> future = responseHolder.getResponse(correlationId);
-			if (future != null) {
-				future.completeExceptionally(new IllegalArgumentException(e.getMessage()));
-			}
-
-			// // 실패 응답 생성
-			// SeatReservationResponse response = new SeatReservationResponse(correlationId, null, e.getMessage());
-			// responseKafkaTemplate.send(responseTopic, correlationId, response);
-		}
-	}
-
 
 	@KafkaListener(topics = "${kafka.topics.user-queue-validation-topic}", groupId = "reservation-group")
 	public void consumeUserQueueValidationRequest(UserQueueValidationRequest request){
 		long userId = request.getUserId();
 		long seatDetailId = request.getSeatDetailId();
+		String correlationId = request.getCorrelationId();
 
-		try{
-			//로직 수행
+		try {
+			// 예약 가능성 검증 로직 수행
 			reservationUseCase.validateReservationEligibility(userId, seatDetailId);
 
-			//이벤트 발행
+			// 대기열에 추가 성공 메시지 전송
 			String message = "성공적으로 대기열에 추가되었습니다.";
-			reservationMessagingPort.addToWaitingQueueRequest(userId, seatDetailId, message,  addWaitingQueueResponse);
+			reservationMessagingPort.addToWaitingQueueRequest(correlationId, userId, seatDetailId, message, addWaitingQueueResponse);
 
-		}catch (Exception e){
-
-			String message = "대기열에 추가 실패" + e.getMessage();
-			reservationMessagingPort.addToWaitingQueueRequest(userId, seatDetailId, message, addWaitingQueueResponse);
+		} catch (Exception e) {
+			log.error("대기열에 추가 실패: correlationId={}, userId={}, seatDetailId={}, error={}", correlationId, userId, seatDetailId, e.getMessage());
+			String message = "대기열에 추가 실패: " + e.getMessage();
+			reservationMessagingPort.addToWaitingQueueRequest(correlationId, userId, seatDetailId, message, addWaitingQueueResponse);
 		}
 	}
 
+
 	@KafkaListener(topics = "${kafka.topics.add-waiting-queue-response}", groupId="reservation-group")
 	public void consumeAddWaitingQueueResponse(AddToWaitingQueueResponse response){
+		String correlationId = response.getCorrelationId();
 		long userId = response.getUserId();
 		long seatDetailId = response.getSeatDetailId();
 
-		//로직 수행
+		// 대기열에 추가 후 토큰 발급
 		WaitingQueueDto waitingQueueDto = reservationUseCase.addWaitingQueue(userId, seatDetailId);
-
-		reservationMessagingPort.issuedTokensRequest(userId, seatDetailId,  waitingQueueDto,  issuedTokenRequest);
+		reservationMessagingPort.issuedTokensRequest(correlationId, userId, seatDetailId, waitingQueueDto, issuedTokenRequest);
 	}
 
+
+
 	@KafkaListener(topics = "${kafka.topics.issued-token-request}", groupId ="reservation-group")
-	public void consumeIssuedTokenResponse(TokenIssuedRequest tokenIssuedRequest){
+	public void consumeIssuedTokenRequest(TokenIssuedRequest tokenIssuedRequest){
+		String correlationId = tokenIssuedRequest.getCorrelationId();
 		long userId = tokenIssuedRequest.getUserId();
 		long seatDetailId = tokenIssuedRequest.getSeatDetailId();
 		WaitingQueueDto waitingQueueDto = tokenIssuedRequest.getWaitingQueueDto();
 
-		//로직수행
-		reservationUseCase.issuedToken(userId, seatDetailId, waitingQueueDto);
+		try {
+			// 토큰 발급 로직 수행
+			TokenDto tokenDto = reservationUseCase.issuedToken(userId, seatDetailId, waitingQueueDto);
 
-		//completableFutrue에 저장후 값 반환하기
+			// 토큰 발급 응답 생성 및 전송
+			TokenIssuedResponse response = new TokenIssuedResponse(correlationId, tokenDto, null);
+			reservationMessagingPort.issuedTokensResponse(issuedTokenResponse, correlationId, response);
 
 
+		} catch (Exception e) {
+			// 오류 발생 시 토큰 발급 실패 응답 전송
+			TokenIssuedResponse response = new TokenIssuedResponse(correlationId, null, e.getMessage());
+			reservationMessagingPort.issuedTokensResponse(issuedTokenResponse, correlationId, response);
+		}
 	}
+
+	@KafkaListener(topics = "${kafka.topics.issued-token-response}", groupId ="reservation-group")
+	public void consumeIssuedTokenResponse(TokenIssuedResponse response){
+		String correlationId = response.getCorrelationId();
+		TokenDto tokenDto = response.getTokenDto();
+		String errorMessage = response.getMessage();
+
+		CompletableFuture<TokenDto> future = responseHolder.getResponse(correlationId);
+		if (future != null) {
+			if (tokenDto != null) {
+				future.complete(tokenDto);
+			} else {
+				future.completeExceptionally(new IllegalArgumentException(errorMessage));
+			}
+		} else {
+			log.warn("correlationId={}에 대한 CompletableFuture를 찾을 수 없습니다.", correlationId);
+		}
+	}
+
+
 
 }

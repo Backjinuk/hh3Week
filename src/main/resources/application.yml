@@ -26,21 +26,6 @@ spring:
           json:
             trusted:
               packages: "*"
-kafka:
-  topics:
-    reserve-seat-request: reserve-seat-request
-    reserve-seat-success: reserve-seat-success
-    reserve-seat-failure: reserve-seat-failure
-    create-token-failure: create-token-failure
-    seat-reservations-response : seat-reservations-response
-    seat-reservations : seat-reservations
-    user-queue-validation-topic:  user-queue-validation-topic
-    add-waiting-queue-response: add-waiting-queue-response
-    issued-token-request: issued-token-request
-    release-seat: release-seat
-
-
-
 
   application:
     name: hh3week
@@ -88,4 +73,17 @@ jwt:
   secret: "c3ByaW5nYm9vdC1qd3QtdHV0b3JpYWwtc3ByaW5nYm9vdC1qd3QtdHV0b3JpYWwtc3ByaW5nYm9vdC1qd3QtdHV0b3JpYWwK"
   expiration: 86400000 # 24시간 (밀리초 단위)
 
+kafka:
+  topics:
+    reserve-seat-request: reserve-seat-request
+    reserve-seat-success: reserve-seat-success
+    reserve-seat-failure: reserve-seat-failure
+    create-token-failure: create-token-failure
+    seat-reservations-response : seat-reservations-response
+    seat-reservations : seat-reservations
+    user-queue-validation-topic:  user-queue-validation-topic
+    add-waiting-queue-response: add-waiting-queue-response
+    issued-token-request: issued-token-request
+    issued-token-response: issued-token-response
+    release-seat: release-seat
 testToken: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwicXVldWVPcmRlciI6MSwicmVtYWluaW5nVGltZSI6NjAwLCJzZWF0RGV0YWlsSWQiOjUsImlhdCI6MTcyOTYwNTIzOSwiZXhwIjoxNzYxMTYyODM5fQ.Ski_jMqgz2CzCYRFUpiDbTHluIUO6wJF2zOUpoO0NvjuwHfgiE_RgfEzJYsiQVj0vWf5XCcg5-m599GqW6_Bbg"

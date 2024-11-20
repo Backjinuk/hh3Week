@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenIssuedRequest {
+public class TokenIssuedRequest{
+	private String correlationId;
 	private long userId;
 	private long seatDetailId;
 	private WaitingQueueDto waitingQueueDto;

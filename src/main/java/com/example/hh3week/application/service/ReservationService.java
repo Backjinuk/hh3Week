@@ -150,7 +150,7 @@ public class ReservationService {
 	}
 
 	public CompletableFuture<TokenDto> sendReservationRequest(long userId, long seatDetailId) {
-		return reservationMessagingPort.sendReservationRequest(userId, seatDetailId);
+		return reservationMessagingPort.validateUserInQueue(userId, seatDetailId);
 	}
 
 
