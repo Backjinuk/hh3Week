@@ -79,6 +79,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	}
 
 	public TokenDto handleSeatReservation(long userId, long seatDetailId) {
+
 		// 예약 가능한지 확인
 		validateReservationEligibility(userId, seatDetailId);
 
@@ -89,6 +90,9 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		return issuedToken(userId, seatDetailId, waitingQueueDto);
 
 	}
+
+
+
 
 	public void validateReservationEligibility(long userId, long seatDetailId){
 

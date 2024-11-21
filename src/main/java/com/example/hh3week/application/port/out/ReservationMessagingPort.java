@@ -12,9 +12,9 @@ public interface ReservationMessagingPort {
 
 	CompletableFuture<TokenDto> validateUserInQueue(long userId, long seatDetailId);
 
-	void addToWaitingQueueRequest(String correlationId, long userId, long seatDetailId, String message, String addWaitingQueueResponse);
+	void addToWaitingQueueRequest(String correlationId, long userId, long seatDetailId, String message);
 
-	void issuedTokensRequest(String correlationId,long userId, long seatDetailId, WaitingQueueDto waitingQueueDto, String topics);
+	void issuedTokensRequest(String correlationId,long userId, long seatDetailId, WaitingQueueDto waitingQueueDto);
 
-	void issuedTokensResponse(String issuedTokenResponse, String correlationId, TokenIssuedResponse response);
+	void issuedTokensResponse(String correlationId, TokenIssuedResponse response);
 }

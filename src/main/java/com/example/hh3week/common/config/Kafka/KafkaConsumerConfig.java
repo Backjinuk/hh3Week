@@ -14,8 +14,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import com.example.hh3week.adapter.out.streaming.kafka.dto.SeatReservationResponse;
-
 @EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
