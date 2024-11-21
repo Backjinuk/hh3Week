@@ -48,4 +48,11 @@ public class OutboxEventRepositoryImpl implements OutboxEventRepository {
 	public void addReservationOutBox(ReservationOutBox reservationOutBox) {
 		entityManager.persist(reservationOutBox);
 	}
+
+	@Override
+	public void updateEventOutBox(ReservationOutBox event) {
+		queryFactory.update(qReservationOutBox)
+			.set(qReservationOutBox.processed ,event.isProcessed())
+			.where(qReservationOutBox.aggregateId.eq(event.getAggregateId()));
+	}
 }

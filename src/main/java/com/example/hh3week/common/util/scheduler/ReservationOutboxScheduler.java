@@ -41,7 +41,7 @@ public class ReservationOutboxScheduler {
 
 				// 전송 성공 시 Outbox 상태 업데이트
 				event.setProcessed(true);
-				outboxEventRepository.addReservationOutBox(event);
+				outboxEventRepository.updateEventOutBox(event);
 				log.info("Outbox 이벤트 전송 성공: {}", event.getId());
 			} catch (Exception e) {
 				log.error("Outbox 이벤트 전송 실패: {}", event.getId(), e);

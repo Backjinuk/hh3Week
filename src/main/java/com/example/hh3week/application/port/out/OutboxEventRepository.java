@@ -15,4 +15,6 @@ public interface OutboxEventRepository {
 	List<ReservationOutBox> findByProcessedFalse();
 
 	void addReservationOutBox(ReservationOutBox reservationOutBox);
+
+	void updateEventOutBox(ReservationOutBox event);
 }

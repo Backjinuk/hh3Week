@@ -1,4 +1,4 @@
-package com.example.hh3week.adapter.out.streaming.kafka.adapter;
+package com.example.hh3week.common.util;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;

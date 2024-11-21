@@ -13,15 +13,15 @@ import org.springframework.stereotype.Service;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 import com.example.hh3week.adapter.out.streaming.kafka.dto.AddToWaitingQueueResponse;
-import com.example.hh3week.adapter.out.streaming.kafka.dto.TokenIssuedRequest;
+import com.example.hh3week.adapter.out.messaging.kafka.dto.TokenIssuedRequest;
 import com.example.hh3week.adapter.out.streaming.kafka.dto.TokenIssuedResponse;
-import com.example.hh3week.adapter.out.streaming.kafka.dto.UserQueueValidationRequest;
+import com.example.hh3week.adapter.out.messaging.kafka.dto.UserQueueValidationRequest;
 import com.example.hh3week.application.port.out.OutboxEventRepository;
 import com.example.hh3week.application.port.out.ReservationMessagingPort;
+import com.example.hh3week.common.util.ResponseHolder;
 import com.example.hh3week.domain.outBox.ReservationOutBox;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
