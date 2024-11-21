@@ -75,6 +75,8 @@ public class ReservationProducerAdapter implements ReservationMessagingPort {
 				.processed(false)
 				.build();
 
+			//outboxEventRepository.addReservationOutBox(event);
+
 			kafkaTemplate.send(reservationOutBoxRequest, event);
 
 			// Kafka로 전송
