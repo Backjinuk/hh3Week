@@ -1,4 +1,4 @@
-package com.example.hh3week.adapter.out.streaming.kafka.dto;
+package com.example.hh3week.adapter.out.messaging.kafka.dto;
 
 import com.example.hh3week.adapter.in.dto.waitingQueue.WaitingQueueDto;
 
