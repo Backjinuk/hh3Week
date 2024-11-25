@@ -21,4 +21,8 @@ public class ResponseHolder {
 		return responses.remove(correlationId);
 	}
 
+	public void removeResponse(String correlationId){
+		responses.remove(correlationId);
+	}
+
 }

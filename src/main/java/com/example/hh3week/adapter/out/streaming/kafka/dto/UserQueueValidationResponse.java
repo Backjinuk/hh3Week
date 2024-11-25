@@ -8,8 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserQueueValidationResponse {
+
+	private String correlationId;
 	private long userId;
 	private long seatDetailId;
-
+	private String message;
+	private String topics;
 
 }

@@ -18,6 +18,8 @@ public interface ReservationUseCase {
 	void validateReservationEligibility(long userId, long seatDetailId);
 
 	WaitingQueueDto addWaitingQueue(long userId, long seatDetailId);
+
+	TokenDto issuedToken(long userId, long seatDetailId, WaitingQueueDto waitingQueueDto);
 }
 
 

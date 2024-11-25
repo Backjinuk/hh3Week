@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddToWaitingQueueResponse {
+
+	private String correlationId;
 	private long userId;
 	private long seatDetailId;
 	private String message;

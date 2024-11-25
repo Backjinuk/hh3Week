@@ -79,6 +79,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	}
 
 	public TokenDto handleSeatReservation(long userId, long seatDetailId) {
+
 		// 예약 가능한지 확인
 		validateReservationEligibility(userId, seatDetailId);
 
@@ -86,9 +87,12 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		WaitingQueueDto waitingQueueDto = addWaitingQueue( userId, seatDetailId);
 
 		// 토큰 발급
-		return issuedToken(waitingQueueDto, userId, seatDetailId);
+		return issuedToken(userId, seatDetailId, waitingQueueDto);
 
 	}
+
+
+
 
 	public void validateReservationEligibility(long userId, long seatDetailId){
 
@@ -112,7 +116,8 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 	public WaitingQueueDto addWaitingQueue(long userId, long seatDetailId){
 		return waitingQueueService.addWaitingQueue( buildWaitingQueueDto(userId, seatDetailId));
 	}
-	public TokenDto issuedToken(WaitingQueueDto waitingQueueDto, long userId, long seatDetailId){
+
+	public TokenDto issuedToken(long userId, long seatDetailId, WaitingQueueDto waitingQueueDto){
 		// 대기열 위치 계산
 		int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto);
 

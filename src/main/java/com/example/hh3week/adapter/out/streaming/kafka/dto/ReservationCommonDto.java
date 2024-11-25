@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenIssueRequest {
+public class ReservationCommonDto {
+
+	private String correlationId;
 	private long userId;
-	private long queuePosition;
-	private long remainingTime;
 	private long seatDetailId;
+	private String message;
 
 }
