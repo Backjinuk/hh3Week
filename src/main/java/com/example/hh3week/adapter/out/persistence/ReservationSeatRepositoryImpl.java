@@ -19,7 +19,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryPort {
 
@@ -28,12 +30,10 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 	private final QReservationSeat qReservationSeat = QReservationSeat.reservationSeat;
 	private final QReservationSeatDetail qReservationSeatDetail = QReservationSeatDetail.reservationSeatDetail;
-	private final RedisTemplate<String, Object> redisTemplate;
 
-	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager, RedisTemplate<String, Object> redisTemplate) {
+	public ReservationSeatRepositoryImpl(JPAQueryFactory queryFactory, EntityManager entityManager) {
 		this.queryFactory = queryFactory;
 		this.entityManager = entityManager;
-		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -82,8 +82,8 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 
 	@Override
 	public ReservationSeatDetail getSeatDetailById(long seatDetailId) {
-		// redisTemplate
 
+		log.info("getSeatDetailById 조회전");
 
 		ReservationSeatDetail seatDetail = queryFactory.selectFrom(qReservationSeatDetail)
 			.where(qReservationSeatDetail.seatDetailId.eq(seatDetailId))
@@ -93,16 +93,30 @@ public class ReservationSeatRepositoryImpl implements ReservationSeatRepositoryP
 			CustomException.nullPointer("해당 좌석을 찾을수 없습니다.", this.getClass());
 		}
 
+		log.info("getSeatDetailById 조회후");
 		return seatDetail;
 	}
 
 	@Override
 	public void updateSeatDetailStatus(ReservationSeatDetail seatDetail) {
-		queryFactory.update(qReservationSeatDetail)
-			.set(qReservationSeatDetail.reservationStatus, seatDetail.getReservationStatus())
-			.where(qReservationSeatDetail.seatDetailId.eq(seatDetail.getSeatDetailId()))
-			.execute();
+
+		try {
+			long affectedRows = queryFactory.update(qReservationSeatDetail)
+				.set(qReservationSeatDetail.reservationStatus, seatDetail.getReservationStatus())
+				.where(qReservationSeatDetail.seatDetailId.eq(seatDetail.getSeatDetailId()))
+				.execute();
+
+			if (affectedRows == 0) {
+				log.warn("updateSeatDetailStatus 실패: seatDetailId={}에 해당하는 데이터가 없습니다.", seatDetail.getSeatDetailId());
+			}
+
+		} catch (Exception e) {
+			// 예외가 발생할 경우 로그를 남기고 예외를 다시 던지기
+			log.error("updateSeatDetailStatus 중 예외 발생: {}", e.getMessage(), e);
+			throw e;
+		}
 	}
+
 
 	@Override
 	public ReservationSeat getSeatById(long seatId) {

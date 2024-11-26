@@ -53,6 +53,7 @@ public class ReservationConsumerAdapter {
 		outboxEventRepository.addReservationOutBox(reservationOutBox);
 	}
 
+	@Transactional
 	@KafkaListener(topics = "${kafka.topics.user-queue-validation-topic}", groupId = "reservation-group")
 	public void consumeUserQueueValidationRequest(UserQueueValidationRequest request){
 		long userId = request.getUserId();
@@ -86,8 +87,6 @@ public class ReservationConsumerAdapter {
 		reservationMessagingPort.issuedTokensRequest(correlationId, userId, seatDetailId, waitingQueueDto);
 	}
 
-
-
 	@KafkaListener(topics = "${kafka.topics.issued-token-request}", groupId ="reservation-group")
 	public void consumeIssuedTokenRequest(TokenIssuedRequest tokenIssuedRequest){
 		String correlationId = tokenIssuedRequest.getCorrelationId();
@@ -111,6 +110,7 @@ public class ReservationConsumerAdapter {
 		}
 	}
 
+	@Transactional
 	@KafkaListener(topics = "${kafka.topics.issued-token-response}", groupId ="reservation-group")
 	public void consumeIssuedTokenResponse(TokenIssuedResponse response){
 		String correlationId = response.getCorrelationId();

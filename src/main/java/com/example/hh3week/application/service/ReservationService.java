@@ -6,22 +6,16 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDetailDto;
 import com.example.hh3week.adapter.in.dto.reservation.ReservationSeatDto;
 import com.example.hh3week.adapter.in.dto.token.TokenDto;
-import com.example.hh3week.adapter.out.messaging.kafka.dto.ReleaseSeat;
 import com.example.hh3week.application.port.out.ReservationMessagingPort;
 import com.example.hh3week.application.port.out.ReservationSeatRepositoryPort;
 import com.example.hh3week.common.config.exception.CustomException;
 import com.example.hh3week.domain.reservation.entity.ReservationSeat;
 import com.example.hh3week.domain.reservation.entity.ReservationSeatDetail;
-import com.example.hh3week.domain.reservation.entity.ReservationStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,25 +94,9 @@ public class ReservationService {
 		reservationSeatRepositoryPort.updateReservationCurrentReserved(ReservationSeat.ToEntity(seat));
 	}
 
-	/*
-	 * Redis를 사용할려고 했으나 Update가 자주 일어나서 성능의 저하를 가지고옴 기존 DB를 사용
-	 * */
 	public ReservationSeatDetailDto getSeatDetailById(long seatDetailId) {
 		//기존 DB사용 로직
-		// Redis에서 예약 세부 정보 리스트 가져오기
 		return ReservationSeatDetailDto.ToDto(reservationSeatRepositoryPort.getSeatDetailById(seatDetailId));
-
-
-	/*
-			String seatDetailKey = "reservationDetailKey:" + seatDetailId; // Redis 키
-
-			// Redis에서 해당 좌석 세부 정보를 가져오기
-			ReservationSeatDetailDto foundDetail = (ReservationSeatDetailDto) redisTemplate.opsForValue().get(seatDetailKey);
-
-			if (foundDetail == null) {
-				throw new IllegalArgumentException("해당 좌석 세부 정보가 Redis에 존재하지 않습니다.");
-			}
-	*/
 
 	}
 
@@ -128,21 +106,6 @@ public class ReservationService {
 
 	public void updateSeatDetailStatus(ReservationSeatDetailDto seatDetail) {
 		reservationSeatRepositoryPort.updateSeatDetailStatus(ReservationSeatDetail.ToEntity(seatDetail));
-
-		// Redis에서도 상태 업데이트
-		// ReservationSeatDetailDto foundDetail = (ReservationSeatDetailDto)redisTemplate.opsForValue().get("reservationDetailKey:" + seatDetail.getSeatDetailId());
-		//
-		// if (foundDetail != null) {
-		// 	// 상태 업데이트
-		// 	foundDetail.setReservationStatus(seatDetail.getReservationStatus());
-		//
-		// 	// Redis에 업데이트된 객체 저장
-		// 	redisTemplate.opsForValue().set("reservationDetailKey:" + seatDetail.getSeatDetailId(), foundDetail);
-		// } else {
-		// 	throw new IllegalArgumentException("해당 좌석 세부 정보가 Redis에 존재하지 않습니다.");
-		// }
-		//
-
 	}
 
 	public ReservationSeatDetailDto getSeatDetailByIdForUpdate(long seatDetailId) {

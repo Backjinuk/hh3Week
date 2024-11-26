@@ -28,6 +28,7 @@ public class WaitingQueueScheduler {
 	/**
 	 * 매 1분마다 대기열을 확인하고 만료된 항목을 처리하는 메서드
 	 */
+/*
 	@Scheduled(fixedRate = 60000) // 60,000 밀리초 = 1분
 	public void processExpiredQueues() {
 		LocalDateTime currentTime = LocalDateTime.now();
@@ -43,6 +44,7 @@ public class WaitingQueueScheduler {
 			}
 		}
 	}
+*/
 
 
 }

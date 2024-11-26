@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.example.hh3week.application.port.out.OutboxEventRepository;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Component
 public class ReservationOutboxScheduler {
 
 
@@ -28,7 +30,7 @@ public class ReservationOutboxScheduler {
 		this.kafkaTemplate = kafkaTemplate;
 	}
 
-	@Scheduled(fixedDelay = 50000) // 5초마다 실행
+	@Scheduled(fixedRate = 50000) // 5초마다 실행
 	@Transactional
 	public void dispatchUnprocessedEvents() {
 		// 처리되지 않은 이벤트 조회

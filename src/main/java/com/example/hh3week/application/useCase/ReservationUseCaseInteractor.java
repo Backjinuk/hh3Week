@@ -100,6 +100,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 		boolean userInQueue = waitingQueueService.isUserInQueue(userId, seatDetailId);
 
 		if (userInQueue) {
+			log.info("이미 대기열 진입된 사용자");
 			throw new IllegalArgumentException("사용자가 이미 대기열에 등록되어 있습니다.");
 		}
 
@@ -119,7 +120,7 @@ public class ReservationUseCaseInteractor implements ReservationUseCase {
 
 	public TokenDto issuedToken(long userId, long seatDetailId, WaitingQueueDto waitingQueueDto){
 		// 대기열 위치 계산
-		int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto);
+		int queuePosition = waitingQueueService.getQueuePosition(waitingQueueDto.getWaitingId(), waitingQueueDto.getSeatDetailId());
 
 		// 토큰 발급
 		long remainingTime = calculateRemainingTime(queuePosition);

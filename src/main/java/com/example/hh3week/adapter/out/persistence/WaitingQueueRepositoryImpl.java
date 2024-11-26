@@ -31,7 +31,6 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	private final RedisTemplate<String, Object> redisTemplate;
 
 
-	private  String queueKey = "waitingQueue:";
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -46,62 +45,70 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	@Override
 	@Transactional
 	public WaitingQueue addToQueue(WaitingQueue waitingQueue) {
-		//  queueKey += waitingQueue.getSeatDetailId();
-		//
-		// waitingQueue.setPriority(LocalDateTime.now().getNano());
-		//
-		// try {
-		// 	redisTemplate.opsForZSet().add(queueKey, waitingQueue, waitingQueue.getPriority());
-		//
-		// } catch (Exception e) {
-		// 	throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
-		// }
 
-		 // 기존 DB 사용 로직
-		long seatDetailId = waitingQueue.getSeatDetailId();
+		String queueKey = "waitingQueue:" +  waitingQueue.getSeatDetailId();
 
-		Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
-			.from(qWaitingQueue)
-			.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
-			.fetchOne();
-
-		if (maxPriority == null) {
-			maxPriority = 0L;
-		}
-
-		long newPriority = maxPriority + 1;
-		waitingQueue.setPriority(newPriority);
+		waitingQueue.setPriority(LocalDateTime.now().getNano());
 
 		try {
-			entityManager.persist(waitingQueue);
-			entityManager.flush(); // 즉시 쿼리 실행
-		} catch (PersistenceException e) {
-			throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+			redisTemplate.opsForZSet().add(queueKey, waitingQueue, waitingQueue.getPriority());
+		}catch (Exception e){
+			throw new IllegalArgumentException("대기열에 추가할수 없습니다.", e);
 		}
+
+
+		 // 기존 DB 사용 로직
+		// long seatDetailId = waitingQueue.getSeatDetailId();
+		//
+		// Long maxPriority = queryFactory.select(qWaitingQueue.priority.max())
+		// 	.from(qWaitingQueue)
+		// 	.where(qWaitingQueue.seatDetailId.eq(seatDetailId))
+		// 	.fetchOne();
+		//
+		// if (maxPriority == null) {
+		// 	maxPriority = 0L;
+		// }
+		//
+		// long newPriority = maxPriority + 1;
+		// waitingQueue.setPriority(newPriority);
+		//
+		// try {
+		// 	entityManager.persist(waitingQueue);
+		// 	entityManager.flush(); // 즉시 쿼리 실행
+		// } catch (PersistenceException e) {
+		// 	throw new IllegalArgumentException("동일한 우선순위로 대기열에 추가할 수 없습니다.", e);
+		// }
 
 		return waitingQueue;
 
-		// return waitingQueue;
 	}
 
 
 	/* Redis를 DB처럼 사용 */
 	@Override
 	public WaitingQueue getQueueStatus(long userId, long seatDetailId) {
-		//  queueKey +=  seatDetailId;
-		//
-		// return Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
-		// 	.stream()
-		// 	.map(Object -> (WaitingQueue)Object)
-		// 	.filter(waitingQueue -> waitingQueue.getUserId() == userId)
-		// 	.findFirst() // 첫 번째 요소 가져오기
-		// 	.orElseThrow(() -> new IllegalArgumentException("대기열에 해당 사용자가 없습니다."));
+		String queueKey = "waitingQueue:" +   seatDetailId;
+
+		WaitingQueue waitingQueue1 = Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
+			.stream()
+			.map(Object -> (WaitingQueue)Object)
+			.filter(waitingQueue -> waitingQueue.getUserId() == userId)
+			.findFirst() // 첫 번째 요소 가져오기
+			.orElseGet(() -> {
+				return WaitingQueue.builder()
+					.userId(userId)
+					.seatDetailId(seatDetailId)
+					.build();
+			});
+
+		return waitingQueue1;
+
 
 
 		//  기존 DB 사용 로직
-		return queryFactory.selectFrom(qWaitingQueue)
-			.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
-			.fetchOne();
+		// return queryFactory.selectFrom(qWaitingQueue)
+		// 	.where(qWaitingQueue.userId.eq(userId).and(qWaitingQueue.seatDetailId.eq(seatDetailId)))
+		// 	.fetchOne();
 
 	}
 
@@ -175,15 +182,22 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepositoryPort {
 	/* Redis를 DB처럼 사용 */
 	@Override
 	public int getQueuePosition(long waitingId, long seatDetailId) {
-		queueKey += seatDetailId;
 
-		Double rank = Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
-			.stream()
-			.map(Object -> (WaitingQueue) Object)
-			.filter(waitingQueue -> waitingQueue.getWaitingId() == waitingId)
-			.findFirst()
-			.map(waitingQueue -> redisTemplate.opsForZSet().score(queueKey, waitingQueue))
-			.orElseThrow(() -> new IllegalArgumentException("사용자의 대기열 순위를 찾을 수 없습니다."));
+		String queueKey = "waitingQueue:" +   seatDetailId;
+
+		Double rank;
+		try {
+			 rank = Objects.requireNonNull(redisTemplate.opsForZSet().rangeByScore(queueKey, 0, -1))
+				.stream()
+				.map(Object -> (WaitingQueue)Object)
+				.filter(waitingQueue -> waitingQueue.getWaitingId() == waitingId)
+				.findFirst()
+				.map(waitingQueue -> redisTemplate.opsForZSet().score(queueKey, waitingQueue))
+				.orElseGet(() -> Double.NaN);
+
+		}catch (Exception e){
+			throw new IllegalArgumentException(e);
+		}
 
 		return rank.intValue() + 1; // 1-based 순위 반환
 	}

@@ -127,6 +127,11 @@ public class ReservationProducerAdapter implements ReservationMessagingPort {
 	public void issuedTokensResponse(String correlationId, TokenIssuedResponse response) {
 
 		kafkaTemplate.send(issuedTokenResponse, correlationId, response);
+
+
+
+
+
 	}
 
 
